@@ -35,14 +35,13 @@ describe("EXAM_TYPES", () => {
 });
 
 describe("SECTIONS", () => {
-  it("has 5 sections", () => {
-    expect(SECTIONS).toHaveLength(5);
+  it("has 4 sections", () => {
+    expect(SECTIONS).toHaveLength(4);
   });
 
-  it("includes READING, WRITING, TIU, TWK, TKP", () => {
+  it("includes READING, TIU, TWK, TKP", () => {
     const ids = SECTIONS.map((s) => s.id);
     expect(ids).toContain("READING");
-    expect(ids).toContain("WRITING");
     expect(ids).toContain("TIU");
     expect(ids).toContain("TWK");
     expect(ids).toContain("TKP");

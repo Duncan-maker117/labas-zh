@@ -56,11 +56,11 @@ describe("computeSectionSplit", () => {
   });
 
   it("distributes remainder (first section gets extra)", () => {
-    const result = computeSectionSplit(["READING", "LISTENING", "WRITING"], 22);
+    const result = computeSectionSplit(["READING", "LISTENING", "TIU"], 22);
     expect(result).toHaveLength(3);
-    expect(result[0]!).toEqual({ section: "READING", count: 8 });  // 7 + 1
-    expect(result[1]!).toEqual({ section: "LISTENING", count: 7 }); // 7 + 1
-    expect(result[2]!).toEqual({ section: "WRITING", count: 7 });   // 7
+    expect(result[0]!).toEqual({ section: "READING", count: 8 });   // 7 + 1
+    expect(result[1]!).toEqual({ section: "LISTENING", count: 7 }); // 7
+    expect(result[2]!).toEqual({ section: "TIU", count: 7 });       // 7
   });
 
   it("handles single section with high count", () => {

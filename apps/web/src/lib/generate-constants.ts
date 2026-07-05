@@ -14,7 +14,6 @@ export const EXAM_TYPES = [
 
 export const SECTIONS = [
   { id: "READING", name: "Reading", icon: "menu_book", allowedExams: ALL_EXAMS },
-  { id: "WRITING", name: "Writing", icon: "edit_note", allowedExams: ALL_EXAMS },
   { id: "TIU", name: "TIU", icon: "psychology", allowedExams: ["CPNS"] },
   { id: "TWK", name: "TWK", icon: "gavel", allowedExams: ["CPNS"] },
   { id: "TKP", name: "TKP", icon: "diversity_3", allowedExams: ["CPNS"] },

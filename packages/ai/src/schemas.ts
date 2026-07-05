@@ -3,7 +3,7 @@ import { z } from "zod";
 // ── Shared Schemas ─────────────────────────────────────────
 
 export const examTypeSchema = z.enum(["IELTS", "TOEFL", "JLPT", "HSK", "GOETHE", "TOPIK", "TOAFL", "DELE", "CPNS"]);
-export const sectionTypeSchema = z.enum(["READING", "WRITING", "LISTENING", "SPEAKING", "TIU", "TWK", "TKP"]);
+export const sectionTypeSchema = z.enum(["READING", "LISTENING", "SPEAKING", "TIU", "TWK", "TKP"]);
 
 export const questionFormatSchema = z.enum([
   "multiple_choice",

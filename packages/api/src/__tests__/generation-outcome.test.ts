@@ -50,18 +50,18 @@ describe("resolveGenerationJobOutcome", () => {
     const outcome = resolveGenerationJobOutcome({
       requestedCount: 20,
       generatedCount: 4,
-      failedSections: ["WRITING"],
+      failedSections: ["LISTENING"],
     });
     expect(outcome.status).toBe("completed_partial");
     expect(outcome.errorMessage).toContain("4 dari 20");
-    expect(outcome.errorMessage).toContain("WRITING");
+    expect(outcome.errorMessage).toContain("LISTENING");
   });
 
   it("marks zero questions as failed without blaming provider when cause is unknown", () => {
     const outcome = resolveGenerationJobOutcome({
       requestedCount: 20,
       generatedCount: 0,
-      failedSections: ["READING", "WRITING"],
+      failedSections: ["READING", "LISTENING"],
     });
     expect(outcome.status).toBe("failed");
     expect(outcome.errorMessage).toContain("Tidak ada soal");
@@ -117,10 +117,10 @@ describe("sectionsWithNoQuestions", () => {
       sectionsWithNoQuestions(
         [
           { section: "READING", count: 10 },
-          { section: "WRITING", count: 10 },
+          { section: "LISTENING", count: 10 },
         ],
         [{ section: "READING" }, { section: "READING" }],
       ),
-    ).toEqual(["WRITING"]);
+    ).toEqual(["LISTENING"]);
   });
 });

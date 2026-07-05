@@ -109,8 +109,6 @@ export function RouteComponent() {
   const [weaknessAlign, setWeaknessAlign] = useState(75);
   const [mode, setMode] = useState<"quick" | "agentic">("quick");
 
-  const isReadingAndWriting = selectedSections.includes("READING") && selectedSections.includes("WRITING");
-
   useEffect(() => {
     setSelectedFormats((prev) => {
       const valid = prev.filter((f) =>
@@ -122,13 +120,6 @@ export function RouteComponent() {
       return valid;
     });
   }, [examType]);
-
-  useEffect(() => {
-    if (isReadingAndWriting) {
-      if (questionCount < 20) setQuestionCount(20);
-      if (mode === "quick") setMode("agentic");
-    }
-  }, [isReadingAndWriting]);
 
   const generate = useMutation({
     ...trpc.ai.generate.mutationOptions(),
@@ -467,7 +458,7 @@ export function RouteComponent() {
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {QUESTION_COUNT_PRESETS.map((p) => {
-                const isDisabled = isReadingAndWriting && (p.value === 5 || p.value === 10);
+                const isDisabled = false;
                 return (
                 <button
                   key={p.value}
@@ -491,7 +482,7 @@ export function RouteComponent() {
               <span className="text-xs font-medium text-[var(--warm-charcoal)] whitespace-nowrap">Custom:</span>
               <input
                 type="range"
-                min={isReadingAndWriting ? 20 : 1}
+                min={1}
                 max={40}
                 value={questionCount}
                 onChange={(e) => setQuestionCount(Number(e.target.value))}
@@ -649,7 +640,6 @@ export function RouteComponent() {
             error={error}
             onGenerate={handleGenerate}
             onDismissError={() => setError(null)}
-            disableQuick={isReadingAndWriting}
           />
         </div>
       </div>

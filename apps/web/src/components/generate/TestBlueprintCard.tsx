@@ -17,7 +17,6 @@ interface TestBlueprintCardProps {
   hasKey: boolean;
   error: string | null;
   onGenerate: () => void;
-  disableQuick?: boolean;
 }
 
 export function TestBlueprintCard({
@@ -35,7 +34,6 @@ export function TestBlueprintCard({
   error,
   onGenerate,
   onDismissError,
-  disableQuick,
 }: TestBlueprintCardProps & { onDismissError?: () => void }) {
   const sectionNames = selectedSections
     .map((id) => SECTIONS.find((s) => s.id === id)?.name)
@@ -107,14 +105,11 @@ export function TestBlueprintCard({
           {/* Mode Toggle */}
           <div className="flex gap-1 p-1 rounded-[var(--radius-lg)] bg-[var(--oat-light)]">
             <button
-              onClick={() => !disableQuick && setMode("quick")}
-              disabled={disableQuick}
+              onClick={() => setMode("quick")}
               className={`flex-1 py-2.5 px-3 rounded-[var(--radius-md)] text-sm font-semibold transition-all flex items-center justify-center gap-2 min-h-[44px] ${
-                disableQuick
-                  ? "bg-[var(--oat-light)] text-[var(--warm-silver)] cursor-not-allowed opacity-50"
-                  : mode === "quick"
-                    ? "bg-[var(--pure-white)] text-[var(--clay-black)] clay-shadow"
-                    : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
+                mode === "quick"
+                  ? "bg-[var(--pure-white)] text-[var(--clay-black)] clay-shadow"
+                  : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
               }`}
             >
               <MaterialIcon name="flash_on" className="text-sm" />
@@ -132,12 +127,6 @@ export function TestBlueprintCard({
               Agentic
             </button>
           </div>
-          {disableQuick && (
-            <p className="text-xs text-[var(--warm-charcoal)] flex items-center gap-1">
-              <MaterialIcon name="info" className="text-xs shrink-0" />
-              Reading/Writing membutuhkan Agentic mode (min 20 soal)
-            </p>
-          )}
 
           {mode === "agentic" && (
             <div className="p-3 rounded-[var(--radius-md)] bg-[var(--badge-blue-bg)] border-2 border-[var(--badge-blue-bg)] text-xs text-[var(--badge-blue-text)]">
