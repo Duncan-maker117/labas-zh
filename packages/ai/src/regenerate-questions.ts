@@ -30,7 +30,16 @@ export async function regenerateQuestions(
 ): Promise<{ questions: Array<Record<string, unknown>>; tokensUsed: number; reasoning?: string }> {
   const schema = getGenericQuestionJsonSchemaDescription();
 
-  const prompt = `You are an expert exam question writer. ${context}
+  const avoidContext = input.avoidTopics?.length
+    ? `\nThe following topics are ALREADY covered by other questions. Generate DIFFERENT questions not overlapping with:\n${input.avoidTopics.map(t => `  - "${t}"`).join("\n")}`
+    : "";
+
+  const prompt = `You are an expert exam question writer. ${context}${avoidContext}
+
+DIVERSITY RULES:
+- Generate questions covering DIFFERENT parts of the passage than any failed or already-covered topics above.
+- Each new question must test a DISTINCT aspect.
+- Do NOT generate a variant of the same question — worded differently but testing the same concept.
 
 Passage:
 """

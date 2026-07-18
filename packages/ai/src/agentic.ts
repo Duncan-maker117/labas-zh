@@ -172,6 +172,10 @@ async function step3GenerateQuestions(
 ): Promise<{ questions: Array<Record<string, unknown>>; tokensUsed: number; reasoning?: string }> {
   const schema = getGenericQuestionJsonSchemaDescription();
 
+  const avoidContext = input.avoidTopics?.length
+    ? `\nThe following topics are ALREADY covered by other questions. Generate questions about DIFFERENT parts of the passage:\n${input.avoidTopics.map(t => `  - "${t}"`).join("\n")}\n`
+    : "";
+
   const prompt = `Using the following passage, generate ${count} reading comprehension questions for ${input.examType} exam.
 
 Passage:
@@ -181,6 +185,13 @@ ${passage}
 
 Formats to generate: ${input.formats.join(", ")}
 
+DIVERSITY RULES — CRITICAL:
+- Generate ${count} questions covering DIFFERENT topics and sections of the passage.
+- Each question must test a DISTINCT aspect — different vocabulary, grammar, inference, or factual detail.
+- Do NOT generate multiple questions about the same sentence, concept, or topic.
+- Vary question formats when multiple formats are specified.
+- Every question must be unique in intent, not just wording.
+${avoidContext}
 Rules:
 - Each question must be directly answerable from the passage
 - Use "passageText" field with the relevant excerpt from the passage (or full passage if needed)
@@ -192,7 +203,7 @@ ${buildContentLanguageRules(input.examType)}
 ${buildExplanationLanguageRule(input.examType)}
 - For true_false_not_given: correctAnswer must be exactly TRUE, FALSE, or NOT_GIVEN (uppercase)
 - For author_view: correctAnswer must be exactly YES, NO, or NOT_GIVEN (uppercase)
-- For matching_pairs: options are {key, text} pairs. correctAnswer is serialized mapping like "A:1,B:2".
+- For matching_pairs: options are {key, text} pairs. correctAnswer is serialized mapping like "A:1,B:2,C:3".
 - For matching_headings: options are heading items. correctAnswer is serialized mapping e.g. "1:C,2:A,3:F". matchTargets must list all paragraph letters in the passage (e.g. ["A","B","C","D","E","F"]).
 - For matching_information: options are information items. correctAnswer is serialized mapping e.g. "1:D,2:E,3:G". matchTargets must list all paragraph letters in the passage (e.g. ["A","B","C","D","E","F","G"]).
 - For error_recognition: options are error segments. correctAnswer is key of segment with error.
@@ -272,6 +283,7 @@ For each question, verify:
 2. Are there any ambiguous questions?
 3. Are distractors plausible but clearly wrong?
 4. Are all option texts meaningful (not generic placeholders like "Option A")?
+5. Are any two questions testing the same topic or concept? Flag similar pairs.
 
 Return ONLY valid JSON conforming to this schema:
 ${schema}`;

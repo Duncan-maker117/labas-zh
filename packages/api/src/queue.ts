@@ -16,6 +16,9 @@ import {
   type GenerationInput,
   type GenerationResult,
 } from "@labas/ai";
+import { regenerateQuestions } from "@labas/ai/regenerate-questions";
+import { findSimilarPairs } from "@labas/ai/deduplicate";
+import { OpenAICompatibleClient } from "@labas/ai/client";
 import { db } from "@labas/db";
 import {
   generationJob,
@@ -41,7 +44,6 @@ const QUALITY_QUEUE_NAME = "generation-quality";
 const CANCEL_POLL_MS = 500;
 const HEARTBEAT_MS = 10_000;
 const MAX_QUESTIONS_PER_SHARD = 8;
-const FAST_SHARD_CONCURRENCY = 3;
 const QUALITY_SECTION_CONCURRENCY = 2;
 const QUICK_PARSE_FALLBACK_TO_AGENTIC = false;
 export const MAX_SHARD_RETRIES = 1;
@@ -810,7 +812,7 @@ export const generationWorker = new Worker<FastJobData>(
       const activeSections = input.selectedSections ?? [input.section];
       const sectionSplits = computeSectionSplit(activeSections, input.questionCount);
       const shards = splitIntoShards(sectionSplits);
-      const minPartialThreshold = Math.min(3, input.questionCount);
+
 
       await updateProgress(
         5,
@@ -827,7 +829,6 @@ export const generationWorker = new Worker<FastJobData>(
       let totalTokens = 0;
       let totalDurationMs = 0;
       let completedShards = 0;
-      let partialPublished = false;
       let timeToFirstValidQuestionMs: number | null = null;
       const sectionPassages = new Map<string, string>();
 
@@ -857,7 +858,14 @@ export const generationWorker = new Worker<FastJobData>(
         questions: PersistableQuestion[];
       }> = [];
 
-      const runShard = async (shard: ShardPlan): Promise<void> => {
+      // ── Sequential execution with cross-shard context ──────────
+      const failedShards: ShardPlan[] = [];
+      const shardFailureInfo = new Map<string, { error: string; nonRetryable: boolean }>();
+      let accumulatedTopics: string[] = [];
+
+      const runShard = async (
+        shard: ShardPlan,
+      ): Promise<{ questions: PersistableQuestion[]; topics: string[] }> => {
         cancelPoll.check();
         await pushLog(
           "generate_shard",
@@ -869,6 +877,7 @@ export const generationWorker = new Worker<FastJobData>(
           ...input,
           section: shard.section as any,
           questionCount: shard.count,
+          ...(accumulatedTopics.length > 0 ? { avoidTopics: [...accumulatedTopics] } : {}),
         };
 
         let sectionResult: GenerationResult;
@@ -910,9 +919,7 @@ export const generationWorker = new Worker<FastJobData>(
               /Unterminated string/i.test(quickErrorMessage) ||
               /Missing 'questions' array/i.test(quickErrorMessage));
 
-          if (!shouldFallbackToAgentic) {
-            throw quickErr;
-          }
+          if (!shouldFallbackToAgentic) { throw quickErr; }
 
           sectionResult = await generateQuestionsAgentic(
             { ...subInput, mode: "agentic" },
@@ -927,7 +934,6 @@ export const generationWorker = new Worker<FastJobData>(
           input.apiKeyConfig.model,
           sectionResult,
         );
-        shardResults.push({ shard, questions: normalized });
         totalTokens += sectionResult.meta.tokensUsed ?? 0;
         totalDurationMs += sectionResult.meta.durationMs;
 
@@ -939,7 +945,7 @@ export const generationWorker = new Worker<FastJobData>(
         const generatedCount = shardResults.reduce(
           (acc, item) => acc + item.questions.length,
           0,
-        );
+        ) + normalized.length;
         if (generatedCount > 0 && timeToFirstValidQuestionMs == null) {
           timeToFirstValidQuestionMs = Date.now() - start;
         }
@@ -947,126 +953,80 @@ export const generationWorker = new Worker<FastJobData>(
           progress,
           `Fast generation: ${generatedCount}/${input.questionCount} soal`,
         );
+
+        // Extract topic summaries for cross-shard diversity
+        const newTopics = normalized.map((q) =>
+          q.questionText.split(" ").slice(0, 8).join(" "),
+        );
+        accumulatedTopics.push(...newTopics.slice(0, 3));
+
         await pushLog(
           "generate_shard",
           `[${shard.section}] shard ${shard.shardIndex + 1}/${shard.shardCount} completed`,
           "done",
         );
 
-        if (!partialPublished && generatedCount >= minPartialThreshold) {
-          partialPublished = true;
-          const partialQuestions = shardResults
-            .sort((a, b) => {
-              if (a.shard.sectionIndex !== b.shard.sectionIndex) {
-                return a.shard.sectionIndex - b.shard.sectionIndex;
-              }
-              return a.shard.shardIndex - b.shard.shardIndex;
-            })
-            .flatMap((r) => r.questions)
-            .slice(0, input.questionCount);
-          const partialResult: GenerationResult = {
-            questions: partialQuestions as any,
-            meta: {
-              model: input.apiKeyConfig.model,
-              tokensUsed: totalTokens || approxTokens,
-              durationMs: Date.now() - start,
-              mode: input.mode,
-            },
-          };
-          await updateProgress(
-            70,
-            `Partial ready: ${partialQuestions.length} soal`,
-            "partial_ready",
-            {
-              ...partialResult,
-              sectionSplits,
-              qualityPhase: "fast",
-              isPartial: true,
-              metrics: {
-                timeToFirstValidQuestionMs: timeToFirstValidQuestionMs ?? Date.now() - start,
-                shardCount: shards.length,
-                shardRetryBudget: MAX_SHARD_RETRIES,
-              },
-            },
-          );
-        }
+        return { questions: normalized, topics: newTopics };
       };
 
-      const failedShards: ShardPlan[] = [];
-      const shardFailureInfo = new Map<string, { error: string; nonRetryable: boolean }>();
-      await runWithConcurrency(shards, FAST_SHARD_CONCURRENCY, async (shard) => {
+      // Execute shards sequentially to enable cross-shard context
+      for (const shard of shards) {
         try {
-          await runShard(shard);
+          shardResults.push({ shard, questions: [] });
+          const result = await runShard(shard);
+          const entry = shardResults.find(
+            (r) => r.shard.shardIndex === shard.shardIndex && r.shard.sectionIndex === shard.sectionIndex,
+          );
+          if (entry) entry.questions = result.questions;
         } catch (err: any) {
-          const message = err?.message ?? String(err);
-          shardFailureInfo.set(shardKey(shard), {
-            error: message,
-            nonRetryable: isNonRetryableProviderError(err),
-          });
           log("warn", "[GENERATION] Fast shard failed.", {
             jobId,
             section: shard.section,
             nonRetryable: isNonRetryableProviderError(err),
           });
-          failedShards.push(shard);
-        }
-      });
-
-      if (failedShards.length > 0) {
-        const retryableCount = failedShards.filter(
-          (shard) => !shardFailureInfo.get(shardKey(shard))?.nonRetryable,
-        ).length;
-        if (retryableCount > 0) {
-          await pushLog(
-            "retry_budget",
-            `Retrying ${retryableCount} failed shard(s), budget=${MAX_SHARD_RETRIES}`,
-            "running",
-          );
-        }
-      }
-
-      for (const failedShard of failedShards) {
-        const failure = shardFailureInfo.get(shardKey(failedShard));
-        if (failure?.nonRetryable) {
-          await pushLog(
-            "retry_budget",
-            `[${failedShard.section}] provider error — skipping retries`,
-            "error",
-            failure.error.slice(0, 300),
-          );
-          continue;
-        }
-
-        let success = false;
-        for (let attempt = 1; attempt <= MAX_SHARD_RETRIES; attempt++) {
-          try {
-            await runShard(failedShard);
-            success = true;
-            break;
-          } catch (retryErr: any) {
-            const retryMessage = retryErr?.message ?? String(retryErr);
-            if (isNonRetryableProviderError(retryErr)) {
+          // Retry up to MAX_SHARD_RETRIES for non-retryable errors
+          if (!isNonRetryableProviderError(err)) {
+            failedShards.push(shard);
+            shardFailureInfo.set(shardKey(shard), { error: String(err), nonRetryable: false });
+            for (let attempt = 1; attempt <= MAX_SHARD_RETRIES; attempt++) {
               await pushLog(
                 "retry_budget",
-                `[${failedShard.section}] provider error — stopping retries`,
-                "error",
-                retryMessage.slice(0, 300),
+                `[${shard.section}] shard retry ${attempt}/${MAX_SHARD_RETRIES}`,
+                "running",
               );
-              break;
+              try {
+                const retryResult = await runShard(shard);
+                const entry = shardResults.find(
+                  (r) => r.shard.shardIndex === shard.shardIndex && r.shard.sectionIndex === shard.sectionIndex,
+                );
+                if (entry) entry.questions = retryResult.questions;
+                const recovered = failedShards.indexOf(shard);
+                if (recovered !== -1) failedShards.splice(recovered, 1);
+                shardFailureInfo.delete(shardKey(shard));
+                break;
+              } catch (retryErr: any) {
+                if (isNonRetryableProviderError(retryErr)) {
+                  shardFailureInfo.set(shardKey(shard), { error: String(retryErr), nonRetryable: true });
+                  break;
+                }
+                if (attempt === MAX_SHARD_RETRIES) {
+                  await pushLog(
+                    "retry_budget",
+                    `[${shard.section}] exhausted retry budget`,
+                    "error",
+                  );
+                }
+              }
             }
+          } else {
+            failedShards.push(shard);
+            shardFailureInfo.set(shardKey(shard), { error: String(err), nonRetryable: true });
             await pushLog(
               "retry_budget",
-              `[${failedShard.section}] shard retry ${attempt}/${MAX_SHARD_RETRIES} failed: ${retryMessage}`,
+              `[${shard.section}] provider error — skipping retries`,
               "error",
             );
           }
-        }
-        if (!success && !failure?.nonRetryable) {
-          await pushLog(
-            "retry_budget",
-            `[${failedShard.section}] exhausted retry budget`,
-            "error",
-          );
         }
       }
 
@@ -1079,6 +1039,51 @@ export const generationWorker = new Worker<FastJobData>(
         })
         .flatMap((r) => r.questions)
         .slice(0, input.questionCount);
+
+      // ── Layer C: Post-generation dedup ────────────────────────
+      if (allQuestions.length > 1) {
+        const similarPairs = findSimilarPairs(allQuestions);
+        if (similarPairs.length > 0) {
+          const dedupClient = new OpenAICompatibleClient(
+            input.apiKeyConfig.baseUrl,
+            input.apiKeyConfig.apiKey,
+          );
+          for (const pair of similarPairs) {
+            const existingTopic = pair.keepText.split(" ").slice(0, 6).join(" ");
+            const context = `The question "${pair.removeText}" is too similar (${(pair.similarity * 100).toFixed(0)}%) to "${pair.keepText}". Generate a completely different question.`;
+            try {
+              const passageForDedup = allQuestions[pair.removeIndex]!.passageText;
+              const regen = await regenerateQuestions(
+                dedupClient,
+                { ...input, avoidTopics: [existingTopic] },
+                passageForDedup || "",
+                1,
+                context,
+              );
+              const fixed = normalizeQuestions(
+                allQuestions[pair.removeIndex]!.section,
+                input.apiKeyConfig.model,
+                { questions: regen.questions as any, meta: { model: "", durationMs: 0, mode: "agentic" } },
+              );
+              if (fixed[0]) {
+                allQuestions[pair.removeIndex] = fixed[0];
+                totalTokens += regen.tokensUsed;
+                await pushLog(
+                  "dedup",
+                  `Regenerated duplicate question ${pair.removeIndex + 1}: "${pair.removeText.slice(0, 40)}..." → new question`,
+                  "done",
+                );
+              }
+            } catch {
+              await pushLog(
+                "dedup",
+                `Failed to regenerate question ${pair.removeIndex + 1}, keeping original`,
+                "error",
+              );
+            }
+          }
+        }
+      }
 
       const outcome = resolveGenerationJobOutcome({
         requestedCount: input.questionCount,

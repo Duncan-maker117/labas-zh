@@ -241,6 +241,7 @@ export const generationInputSchema = z.object({
   questionCount: z.number().int().min(1).max(120),
   mode: z.enum(["quick", "agentic"]).default("quick"),
   apiKeyConfig: aiKeyConfigSchema,
+  avoidTopics: z.array(z.string()).optional(),
 });
 
 export type GenerationInput = z.infer<typeof generationInputSchema>;

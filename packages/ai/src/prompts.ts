@@ -16,10 +16,20 @@ export function buildQuickModePrompt(input: GenerationInput): string {
 
   const questionSchemaJson = getQuestionJsonSchemaDescription();
 
+  const avoidContext = input.avoidTopics?.length
+    ? `\nThe following topics are ALREADY covered by other questions. Generate questions about DIFFERENT topics:\n${input.avoidTopics.map(t => `  - "${t}"`).join("\n")}\n`
+    : "";
+
   return `You are an expert exam question writer for ${examType} ${section.toLowerCase()} section.
 
 Generate ${questionCount} authentic, high-quality reading comprehension questions.
 
+DIVERSITY RULES:
+- Generate ${questionCount} questions covering DIFFERENT topics within the provided topic list.
+- Each question must test a DISTINCT concept — different vocabulary, grammar point, or reading skill.
+- Do NOT repeat the same question pattern or structure.
+- For ${questionCount} questions, ensure ${questionCount} unique contexts.
+${avoidContext}
 EXAM: ${examType}
 SECTION: ${section}
 DIFFICULTY: ${difficulty}/5

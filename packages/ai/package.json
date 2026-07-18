@@ -8,6 +8,15 @@
     },
     "./schemas": {
       "default": "./src/schemas.ts"
+    },
+    "./regenerate-questions": {
+      "default": "./src/regenerate-questions.ts"
+    },
+    "./deduplicate": {
+      "default": "./src/deduplicate.ts"
+    },
+    "./client": {
+      "default": "./src/client.ts"
     }
   },
   "dependencies": {
