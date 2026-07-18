@@ -14,12 +14,14 @@ function formatDate(dateStr: string) {
 export function BlogCard({ post }: { post: BlogPostSummary }) {
   return (
     <Link to="/blog/$slug" params={{ slug: post.slug }} className="block group">
-      <Card className="h-full clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)] transition-all hover:border-[var(--matcha-400)] overflow-hidden">
+      <Card className="h-full clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)] transition-all hover:border-[var(--matcha-400)] overflow-hidden p-0">
         {post.thumbnail && (
           <div className="aspect-video overflow-hidden bg-[var(--oat-light)]">
             <img
               src={post.thumbnail}
               alt={post.title}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import SignInForm from "@/components/sign-in-form";
 import SignUpForm from "@/components/sign-up-form";
 import { routeShell } from "@/lib/route-shell";
+import { images } from "@/lib/app-images";
 
 export const Route = createFileRoute("/login")({
   staticData: routeShell.public,
@@ -16,7 +17,7 @@ function RouteComponent() {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-muted/30">
       <div className="w-full max-w-md flex flex-col items-center">
-        <img src="/logo.png" alt="Labas Logo" className="h-20 w-auto mb-8" />
+        <img src={images.logo.src} alt="Labas Logo" className="h-20 w-auto mb-8" />
         {showSignIn ? (
           <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
         ) : (

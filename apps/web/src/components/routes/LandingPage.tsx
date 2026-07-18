@@ -8,6 +8,8 @@ import { CommunityModal } from "@/components/CommunityModal";
 import { trpc } from "@/utils/trpc";
 import { env } from "@labas/env/web";
 import { BlogCard } from "@/components/blog/BlogCard";
+import { images } from "@/lib/app-images";
+import { OptimizedImage } from "@/components/OptimizedImage";
 
 function FaqItem({ question, answer, isDark }: { question: string; answer: string; isDark?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,7 +55,7 @@ export function LandingPage() {
       {/* Navbar */}
       <nav className="w-full px-6 py-4 md:px-12 lg:px-16 flex items-center justify-between max-w-7xl mx-auto z-50 sticky top-0 bg-[var(--warm-cream)] border-b-2 border-[var(--oat-border)]">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Labas Logo" className="h-10 w-auto object-contain" />
+          <img src={images.logo.src} alt="Labas Logo" className="h-10 w-auto object-contain" />
           <span className="font-headline font-semibold text-2xl tracking-[-0.64px] text-[var(--clay-black)] hidden sm:block">Labas</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
@@ -127,20 +129,23 @@ export function LandingPage() {
           {/* MASSIVE HERO IMAGE WITH FLOATING ASSETS - SIDE BY SIDE ON DESKTOP */}
           <div className="flex-1 w-full relative group mt-8 xl:mt-0 flex justify-center xl:justify-end">
             <div className="relative w-full max-w-[650px] lg:max-w-[750px]">
-              <img 
-                src="/hero_img.png" 
+              <OptimizedImage 
+                src={images.hero.src} 
+                srcset={images.hero.srcset}
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw"
                 alt="Labas Dashboard Preview" 
+                priority
                 className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-105 group-hover:-rotate-1 drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-10"
               />
               {/* Variatif Floating Elements */}
               <div className="absolute -top-8 -left-8 md:-top-12 md:-left-12 w-32 md:w-40 h-auto z-20 hidden sm:block">
-                <img src="/generateai.png" alt="floating element" className="w-full h-auto drop-shadow-2xl" />
+                <img src={images.generateAi.src} alt="" loading="lazy" className="w-full h-auto drop-shadow-2xl" />
               </div>
               <div className="absolute -bottom-8 -right-8 md:-bottom-12 md:-right-12 w-40 md:w-48 h-auto z-20 hidden sm:block">
-                <img src="/mocktest.png" alt="floating element" className="w-full h-auto drop-shadow-2xl" />
+                <img src={images.mocktest.src} alt="" loading="lazy" className="w-full h-auto drop-shadow-2xl" />
               </div>
               <div className="absolute top-[40%] -left-16 md:-left-24 w-24 md:w-32 h-auto z-0 hidden lg:block opacity-80 blur-[1px]">
-                <img src="/progress.png" alt="floating element" className="w-full h-auto drop-shadow-xl" />
+                <img src={images.progress.src} alt="" loading="lazy" className="w-full h-auto drop-shadow-xl" />
               </div>
             </div>
           </div>
@@ -341,7 +346,7 @@ export function LandingPage() {
               {/* Feature 1 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src="/generateai.png" alt="AI Generator" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.generateAi.src} alt="AI Generator" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
@@ -356,7 +361,7 @@ export function LandingPage() {
               {/* Feature 2 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src="/latihansoal.png" alt="Latihan Soal" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.latihanSoal.src} alt="Latihan Soal" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
@@ -371,7 +376,7 @@ export function LandingPage() {
               {/* Feature 3 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src="/mocktest.png" alt="Mock Test" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.mocktest.src} alt="Mock Test" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
@@ -386,7 +391,7 @@ export function LandingPage() {
               {/* Feature 4 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src="/progress.png" alt="Progress Tracking" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.progress.src} alt="Progress Tracking" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
@@ -401,7 +406,7 @@ export function LandingPage() {
               {/* Feature 5 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src="/vocabulary.png" alt="Vocabulary" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.vocabulary.src} alt="Vocabulary" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
@@ -416,7 +421,7 @@ export function LandingPage() {
               {/* Feature 6 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src="/diskusi.png" alt="Diskusi" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.diskusi.src} alt="Diskusi" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">

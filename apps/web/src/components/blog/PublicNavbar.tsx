@@ -4,6 +4,7 @@ import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { useState } from "react";
 import { CommunityModal } from "@/components/CommunityModal";
 import { env } from "@labas/env/web";
+import { images } from "@/lib/app-images";
 
 export function PublicNavbar() {
   const [communityModalOpen, setCommunityModalOpen] = useState(false);
@@ -13,7 +14,7 @@ export function PublicNavbar() {
       <CommunityModal isOpen={communityModalOpen} onOpenChange={setCommunityModalOpen} />
       <nav className="w-full px-6 py-4 md:px-12 lg:px-16 flex items-center justify-between max-w-7xl mx-auto z-50 sticky top-0 bg-[var(--warm-cream)] border-b-2 border-[var(--oat-border)]">
         <Link to="/" className="flex items-center gap-3">
-          <img src="/logo.png" alt="Labas Logo" className="h-10 w-auto object-contain" />
+          <img src={images.logo.src} alt="Labas Logo" className="h-10 w-auto object-contain" />
           <span className="font-headline font-semibold text-2xl tracking-[-0.64px] text-[var(--clay-black)] hidden sm:block">Labas</span>
         </Link>
         <div className="flex items-center gap-2 sm:gap-4">

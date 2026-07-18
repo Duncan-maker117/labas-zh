@@ -1,12 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { Button } from "@labas/ui/components/button";
+import { images } from "@/lib/app-images";
 
 export function NotFoundPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--warm-cream)] px-6 py-12">
       <img
-        src="/not_found.png"
+        src={images.notFound.src}
         alt=""
+        loading="lazy"
         className="mb-8 w-full max-w-sm h-auto object-contain"
       />
       <div className="max-w-md text-center">

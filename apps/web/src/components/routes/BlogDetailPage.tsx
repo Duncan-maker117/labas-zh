@@ -94,6 +94,9 @@ export function BlogDetailPage() {
           <img
             src={post.thumbnail}
             alt={post.title}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
             className="w-full aspect-video object-cover rounded-[var(--radius-xl)] mb-8"
           />
         )}

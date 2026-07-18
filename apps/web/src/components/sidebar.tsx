@@ -7,6 +7,7 @@ import { useSidebar } from "@/hooks/use-sidebar";
 import { useAppMode } from "@/lib/app-mode";
 import { triggerGlobalTour } from "@/components/TourGuide";
 import { CommunityModal } from "@/components/CommunityModal";
+import { images } from "@/lib/app-images";
 import {
   Sheet,
   SheetContent,
@@ -193,7 +194,7 @@ export function Sidebar() {
       >
         <div className={`mb-8 ${collapsed ? "px-0 text-center" : "px-3"}`}>
           <img
-            src="/logo.png"
+            src={images.logo.src}
             alt="Labas"
             width={64}
             height={64}
