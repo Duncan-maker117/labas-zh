@@ -1,9 +1,7 @@
 import { trpcServer } from "@hono/trpc-server";
 import { createContext } from "@labas/api/context";
 import { appRouter } from "@labas/api/routers/index";
-import { checkRateLimitAllowed } from "@labas/api/lib/rate-limit";
 import { recordBounce } from "@labas/api/lib/bounce";
-import { isDisposableEmail, hasValidMxRecord, getEmailDomain } from "@labas/api/lib/email-validator";
 import { auth } from "@labas/auth";
 import { env } from "@labas/env/server";
 import { withRequestId } from "@labas/api/logger";
@@ -45,40 +43,6 @@ app.use(
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
-);
-
-// Rate limit sign-up attempts per IP to mitigate mass account creation
-app.use("/api/auth/sign-up/email", async (c, next) => {
-  if (c.req.method !== "POST") return next();
-  const cfIp = c.req.header("cf-connecting-ip");
-  const forwarded = c.req.header("x-forwarded-for");
-  const realIp = c.req.header("x-real-ip");
-  const firstForwardedIp = forwarded ? forwarded.split(",")[0]?.trim() : undefined;
-  const ip = cfIp ?? firstForwardedIp ?? realIp ?? "unknown";
-  const allowed = await checkRateLimitAllowed({ key: `signup:ip:${ip}`, limit: 5, windowMs: 3_600_000 });
-  if (!allowed) {
-    return c.json({ error: "Too many sign-up attempts. Please try again later." }, 429);
-  }
-
-  try {
-    const body = await c.req.parseBody() as { email?: string };
-    const email = typeof body.email === "string" ? body.email : null;
-    if (email) {
-      const domain = getEmailDomain(email);
-      if (!domain || isDisposableEmail(email) || !(await hasValidMxRecord(domain))) {
-        return c.json({ error: "Invalid email address" }, 400);
-      }
-    }
-  } catch {
-    // Body parse error, let Better-Auth handle
-  }
-
-  return next();
-});
-
-// Block Better Auth's auto-exposed update-user endpoint (accepts any user field)
-app.on(["POST", "GET"], "/api/auth/update-user", (c) =>
-  c.json({ error: "Forbidden" }, 403),
 );
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));

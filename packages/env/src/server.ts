@@ -16,6 +16,8 @@ export const env = createEnv({
     SMTP_USER: z.string().min(1),
     SMTP_PASS: z.string().min(1),
     SMTP_FROM: z.string().min(1),
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
     PLATFORM_AI_API_KEY: z.string().optional(),
     PLATFORM_AI_BASE_URL: z.string().optional(),
     PLATFORM_AI_MODEL: z.string().optional(),

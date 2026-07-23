@@ -16,10 +16,17 @@ export function createAuth() {
     trustedOrigins: [env.CORS_ORIGIN],
     emailAndPassword: {
       enabled: true,
+      disableSignUp: true,
     },
     user: {
       changeEmail: {
         enabled: true,
+      },
+    },
+    socialProviders: {
+      google: {
+        clientId: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
       },
     },
     secret: env.BETTER_AUTH_SECRET,
@@ -31,7 +38,6 @@ export function createAuth() {
         httpOnly: true,
       },
     },
-    plugins: [],
   });
 }
 
