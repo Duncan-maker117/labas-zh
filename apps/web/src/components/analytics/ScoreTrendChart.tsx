@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
+import { Link } from "@tanstack/react-router";
 
 interface TrendPoint {
   date: string;
@@ -33,8 +34,15 @@ export function ScoreTrendChart({ data }: ScoreTrendChartProps) {
             Tren Skor
           </CardTitle>
         </CardHeader>
-        <CardContent className="h-64 flex items-center justify-center text-[var(--warm-charcoal)]">
-          Belum ada data tren.
+        <CardContent className="h-64 flex flex-col items-center justify-center text-[var(--warm-charcoal)]">
+          <p className="font-semibold">Belum ada data tren skor.</p>
+          <p className="text-sm mt-1">Selesaikan latihan secara rutin untuk melihat grafik perkembangan.</p>
+          <Link
+            to="/bank"
+            className="mt-4 px-4 py-2 text-sm font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
+          >
+            Mulai Latihan
+          </Link>
         </CardContent>
       </Card>
     );
@@ -45,12 +53,22 @@ export function ScoreTrendChart({ data }: ScoreTrendChartProps) {
     label: formatDateLabel(d.date),
   }));
 
+  const latestScore = chartData[chartData.length - 1]?.avgScorePct ?? null;
+  const scoreLabel = latestScore !== null
+    ? latestScore >= 80 ? "Meningkat" : latestScore >= 60 ? "Stabil" : "Perlu ditingkatkan"
+    : null;
+
   return (
     <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
       <CardHeader>
         <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
           Tren Skor (30 Hari)
         </CardTitle>
+        {scoreLabel && (
+          <span className="text-sm text-[var(--warm-charcoal)] mt-0.5">
+            Terakhir: {latestScore}% — {scoreLabel}
+          </span>
+        )}
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={256}>
@@ -82,7 +100,7 @@ export function ScoreTrendChart({ data }: ScoreTrendChartProps) {
                 borderRadius: "var(--radius-lg)",
                 fontSize: 13,
               }}
-              formatter={(value: unknown, name: unknown, _item: unknown, _index: unknown, _payload: unknown) => {
+              formatter={(value: unknown, name: unknown) => {
                 const num = typeof value === "number" ? value : 0;
                 const n = typeof name === "string" ? name : "";
                 if (n === "avgScorePct") return [`${num}%`, "Rata-rata Skor"];

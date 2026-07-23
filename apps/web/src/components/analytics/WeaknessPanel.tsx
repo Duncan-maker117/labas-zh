@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
+import { Link } from "@tanstack/react-router";
 import { formatLabel } from "@/lib/format";
 
 interface Weakness {
@@ -42,6 +43,12 @@ function getSeverityColor(pct: number) {
   return "text-[var(--matcha-600)]";
 }
 
+function getSeverityLabel(pct: number) {
+  if (pct < 40) return "Perlu fokus";
+  if (pct < 60) return "Butuh latihan";
+  return "Cukup baik";
+}
+
 export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProps) {
   const hasData = weaknesses && weaknesses.length > 0;
 
@@ -56,11 +63,11 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
       <CardContent className="space-y-6">
         {hasData ? (
           <>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {weaknesses.map((w, i) => (
                 <div
                   key={`${w.type}-${w.name}`}
-                  className="flex items-center gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--warm-cream)] border-2 border-[var(--oat-border)]"
+                  className="flex items-center gap-3 p-4 rounded-[var(--radius-lg)] bg-[var(--warm-cream)] border-2 border-[var(--oat-border)]"
                 >
                   <div className="flex items-center justify-center w-10 h-10 rounded-[var(--radius-lg)] bg-[var(--oat-light)] shrink-0">
                     <MaterialIcon name={getTypeIcon(w.type)} className="text-[var(--warm-charcoal)]" />
@@ -70,17 +77,23 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
                       <span className="text-xs font-medium text-[var(--warm-silver)] uppercase tracking-wide">
                         {getTypeLabel(w.type)}
                       </span>
+                      <span className={`text-xs font-medium ${getSeverityColor(w.accuracyPct)}`}>
+                        {getSeverityLabel(w.accuracyPct)}
+                      </span>
                     </div>
                     <div className="text-sm font-semibold text-[var(--clay-black)] truncate">
                       {formatLabel(w.name)}
                     </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className={`text-xl font-headline font-extrabold ${getSeverityColor(w.accuracyPct)}`}>
-                      {w.accuracyPct}%
+                    <div className="text-xs text-[var(--warm-charcoal)] mt-0.5">
+                      {w.totalQuestions} soal · {w.accuracyPct}% benar
                     </div>
-                    <div className="text-xs text-[var(--warm-silver)]">{w.totalQuestions} soal</div>
                   </div>
+                  <Link
+                    to="/bank"
+                    className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
+                  >
+                    Latih
+                  </Link>
                 </div>
               ))}
             </div>
@@ -104,6 +117,12 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
             <MaterialIcon name="insights" className="text-5xl text-[var(--warm-silver)] mx-auto mb-3" />
             <p className="font-semibold">Belum cukup data</p>
             <p className="text-sm mt-1">Selesaikan lebih banyak latihan untuk melihat analisis kelemahan.</p>
+            <Link
+              to="/bank"
+              className="inline-block mt-4 px-4 py-2 text-sm font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
+            >
+              Mulai Latihan
+            </Link>
           </div>
         )}
       </CardContent>

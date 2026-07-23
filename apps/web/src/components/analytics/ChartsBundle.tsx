@@ -1,3 +1,4 @@
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@labas/ui/components/tabs";
 import { ScoreTrendChart } from "./ScoreTrendChart";
 import { BreakdownCharts, type ExamTypeItem, type SectionTypeItem, type FormatItem } from "./BreakdownCharts";
 import { TimeAnalyticsPanel, type SectionTimeItem, type FormatTimeItem, type TimeTrendItem } from "./TimeAnalyticsPanel";
@@ -12,17 +13,6 @@ interface ChartsBundleProps {
   timeTrend: TimeTrendItem[] | undefined;
 }
 
-function SectionHeading({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-6 mt-10 first:mt-0">
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-[var(--warm-charcoal)]">
-        {label}
-      </h2>
-      <div className="flex-1 h-px bg-[var(--oat-border)]" />
-    </div>
-  );
-}
-
 export default function ChartsBundle({
   trend,
   byExamType,
@@ -33,29 +23,47 @@ export default function ChartsBundle({
   timeTrend,
 }: ChartsBundleProps) {
   return (
-    <>
-      <SectionHeading label="Tren Skor" />
-      <div className="mb-8">
-        <ScoreTrendChart data={trend} />
-      </div>
+    <Tabs defaultValue="trend" className="w-full">
+      <TabsList className="h-12 bg-transparent w-full justify-start gap-2">
+        <TabsTrigger
+          value="trend"
+          className="h-11 px-5 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
+        >
+          Tren Skor
+        </TabsTrigger>
+        <TabsTrigger
+          value="performa"
+          className="h-11 px-5 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
+        >
+          Performa
+        </TabsTrigger>
+        <TabsTrigger
+          value="waktu"
+          className="h-11 px-5 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
+        >
+          Waktu
+        </TabsTrigger>
+      </TabsList>
 
-      <SectionHeading label="Performa" />
-      <div className="mb-8">
+      <TabsContent value="trend" className="pt-6">
+        <ScoreTrendChart data={trend} />
+      </TabsContent>
+
+      <TabsContent value="performa" className="pt-6">
         <BreakdownCharts
           byExamType={byExamType}
           bySectionType={bySectionType}
           byFormat={byFormat}
         />
-      </div>
+      </TabsContent>
 
-      <SectionHeading label="Waktu" />
-      <div className="mb-8">
+      <TabsContent value="waktu" className="pt-6">
         <TimeAnalyticsPanel
           sectionTime={sectionTime}
           formatTimeData={formatTimeData}
           timeTrend={timeTrend}
         />
-      </div>
-    </>
+      </TabsContent>
+    </Tabs>
   );
 }

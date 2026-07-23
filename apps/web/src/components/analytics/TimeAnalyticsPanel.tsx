@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
+import { Link } from "@tanstack/react-router";
 import { formatTime } from "@/lib/time";
 import { formatLabel } from "@/lib/format";
 
@@ -32,6 +33,20 @@ interface TimeAnalyticsPanelProps {
   sectionTime: SectionTimeItem[] | undefined;
   formatTimeData: FormatTimeItem[] | undefined;
   timeTrend: TimeTrendItem[] | undefined;
+}
+
+function EmptyTimeBox({ message }: { message: string }) {
+  return (
+    <div className="h-40 flex flex-col items-center justify-center text-[var(--warm-charcoal)]">
+      <p className="font-semibold text-sm">{message}</p>
+      <Link
+        to="/bank"
+        className="mt-3 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
+      >
+        Mulai Latihan
+      </Link>
+    </div>
+  );
 }
 
 export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: TimeAnalyticsPanelProps) {
@@ -61,16 +76,14 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
                       />
                     </div>
                   </div>
-                  <div className="w-20 shrink-0 text-right text-sm text-[var(--warm-charcoal)]">
+                  <div className="w-28 shrink-0 text-right text-sm text-[var(--warm-charcoal)]">
                     {formatTime(item.avgTimeSpentSec)}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-20 flex items-center justify-center text-[var(--warm-charcoal)]">
-              Belum ada data.
-            </div>
+            <EmptyTimeBox message="Belum ada data waktu per section." />
           )}
         </CardContent>
       </Card>
@@ -99,16 +112,14 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
                       />
                     </div>
                   </div>
-                  <div className="w-20 shrink-0 text-right text-sm text-[var(--warm-charcoal)]">
+                  <div className="w-28 shrink-0 text-right text-sm text-[var(--warm-charcoal)]">
                     {formatTime(item.avgTimeSpentSec)}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-20 flex items-center justify-center text-[var(--warm-charcoal)]">
-              Belum ada data.
-            </div>
+            <EmptyTimeBox message="Belum ada data waktu per format soal." />
           )}
         </CardContent>
       </Card>
@@ -147,15 +158,13 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
                     borderRadius: "var(--radius-lg)",
                     fontSize: 13,
                   }}
-                  formatter={(value: unknown, _name: unknown, _item: unknown, _index: unknown, _payload: unknown) => [formatTime(typeof value === "number" ? value : 0), "Rata-rata Waktu"]}
+                  formatter={(value: unknown) => [formatTime(typeof value === "number" ? value : 0), "Rata-rata Waktu"]}
                 />
                 <Bar dataKey="avgTimeSpentSec" fill="var(--slushie-600)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-48 flex items-center justify-center text-[var(--warm-charcoal)]">
-              Belum ada data.
-            </div>
+            <EmptyTimeBox message="Belum ada data tren waktu." />
           )}
         </CardContent>
       </Card>

@@ -9,6 +9,7 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
+import { Link } from "@tanstack/react-router";
 import { formatLabel } from "@/lib/format";
 import { formatTime } from "@/lib/time";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
@@ -71,6 +72,20 @@ function AccuracyBar({ pct }: { pct: number }) {
   );
 }
 
+function EmptyChart({ message }: { message: string }) {
+  return (
+    <div className="h-48 flex flex-col items-center justify-center text-[var(--warm-charcoal)]">
+      <p className="font-semibold text-sm">{message}</p>
+      <Link
+        to="/bank"
+        className="mt-3 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
+      >
+        Mulai Latihan
+      </Link>
+    </div>
+  );
+}
+
 export function BreakdownCharts({ byExamType, bySectionType, byFormat }: BreakdownChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -105,7 +120,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
                     borderRadius: "var(--radius-lg)",
                     fontSize: 13,
                   }}
-                  formatter={(value: unknown, name: unknown, _item: unknown, _index: unknown, _payload: unknown) => {
+                  formatter={(value: unknown, name: unknown) => {
                     const num = typeof value === "number" ? value : 0;
                     const n = typeof name === "string" ? name : "";
                     if (n === "accuracyPct") return [`${num}%`, "Akurasi"];
@@ -121,9 +136,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-56 flex items-center justify-center text-[var(--warm-charcoal)]">
-              Belum ada data.
-            </div>
+            <EmptyChart message="Belum ada data performa per jenis ujian." />
           )}
         </CardContent>
       </Card>
@@ -159,7 +172,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
                     borderRadius: "var(--radius-lg)",
                     fontSize: 13,
                   }}
-                  formatter={(value: unknown, name: unknown, _item: unknown, _index: unknown, _payload: unknown) => {
+                  formatter={(value: unknown, name: unknown) => {
                     const num = typeof value === "number" ? value : 0;
                     const n = typeof name === "string" ? name : "";
                     if (n === "accuracyPct") return [`${num}%`, "Akurasi"];
@@ -175,9 +188,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-56 flex items-center justify-center text-[var(--warm-charcoal)]">
-              Belum ada data.
-            </div>
+            <EmptyChart message="Belum ada data performa per section." />
           )}
         </CardContent>
       </Card>
@@ -217,9 +228,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
               ))}
             </div>
           ) : (
-            <div className="h-20 flex items-center justify-center text-[var(--warm-charcoal)]">
-              Belum ada data.
-            </div>
+            <EmptyChart message="Belum ada data performa per format soal." />
           )}
         </CardContent>
       </Card>
