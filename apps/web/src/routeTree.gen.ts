@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SetupAvatarRouteImport } from './routes/setup-avatar'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PackagesRouteImport } from './routes/packages'
@@ -54,11 +53,6 @@ import { Route as PackageIdIndexRouteImport } from './routes/package.$id.index'
 import { Route as PackageIdTakeRouteImport } from './routes/package.$id.take'
 import { Route as PackageIdAttemptAttemptIdRouteImport } from './routes/package.$id.attempt.$attemptId'
 
-const VerifyEmailRoute = VerifyEmailRouteImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SetupAvatarRoute = SetupAvatarRouteImport.update({
   id: '/setup-avatar',
   path: '/setup-avatar',
@@ -296,7 +290,6 @@ export interface FileRoutesByFullPath {
   '/packages': typeof PackagesRoute
   '/settings': typeof SettingsRoute
   '/setup-avatar': typeof SetupAvatarRoute
-  '/verify-email': typeof VerifyEmailRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/credits': typeof AdminCreditsRoute
   '/admin/featured': typeof AdminFeaturedRoute
@@ -340,7 +333,6 @@ export interface FileRoutesByTo {
   '/packages': typeof PackagesRoute
   '/settings': typeof SettingsRoute
   '/setup-avatar': typeof SetupAvatarRoute
-  '/verify-email': typeof VerifyEmailRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/credits': typeof AdminCreditsRoute
   '/admin/featured': typeof AdminFeaturedRoute
@@ -386,7 +378,6 @@ export interface FileRoutesById {
   '/packages': typeof PackagesRoute
   '/settings': typeof SettingsRoute
   '/setup-avatar': typeof SetupAvatarRoute
-  '/verify-email': typeof VerifyEmailRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/credits': typeof AdminCreditsRoute
   '/admin/featured': typeof AdminFeaturedRoute
@@ -434,7 +425,6 @@ export interface FileRouteTypes {
     | '/packages'
     | '/settings'
     | '/setup-avatar'
-    | '/verify-email'
     | '/admin/activity'
     | '/admin/credits'
     | '/admin/featured'
@@ -478,7 +468,6 @@ export interface FileRouteTypes {
     | '/packages'
     | '/settings'
     | '/setup-avatar'
-    | '/verify-email'
     | '/admin/activity'
     | '/admin/credits'
     | '/admin/featured'
@@ -523,7 +512,6 @@ export interface FileRouteTypes {
     | '/packages'
     | '/settings'
     | '/setup-avatar'
-    | '/verify-email'
     | '/admin/activity'
     | '/admin/credits'
     | '/admin/featured'
@@ -570,7 +558,6 @@ export interface RootRouteChildren {
   PackagesRoute: typeof PackagesRoute
   SettingsRoute: typeof SettingsRoute
   SetupAvatarRoute: typeof SetupAvatarRoute
-  VerifyEmailRoute: typeof VerifyEmailRoute
   AttemptIdRoute: typeof AttemptIdRoute
   PackageIdRoute: typeof PackageIdRouteWithChildren
   ProfileUserIdRoute: typeof ProfileUserIdRoute
@@ -578,13 +565,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verify-email': {
-      id: '/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof VerifyEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/setup-avatar': {
       id: '/setup-avatar'
       path: '/setup-avatar'
@@ -985,7 +965,6 @@ const rootRouteChildren: RootRouteChildren = {
   PackagesRoute: PackagesRoute,
   SettingsRoute: SettingsRoute,
   SetupAvatarRoute: SetupAvatarRoute,
-  VerifyEmailRoute: VerifyEmailRoute,
   AttemptIdRoute: AttemptIdRoute,
   PackageIdRoute: PackageIdRouteWithChildren,
   ProfileUserIdRoute: ProfileUserIdRoute,
