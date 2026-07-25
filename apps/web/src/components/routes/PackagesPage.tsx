@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { authClient } from "@/lib/auth-client";
-import { trpc, queryClient } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 import { Input } from "@labas/ui/components/input";
 import { Button } from "@labas/ui/components/button";
 import { Card } from "@labas/ui/components/card";
@@ -179,17 +179,23 @@ export function PackagesComponent() {
     setCalloutDismissed(true);
   };
 
-  const handlePublishAllPrivate = async () => {
-    if (!userId || totalPrivateCount === 0) return;
-    const allPrivate = await queryClient.fetchQuery(
-      trpc.package.myPackages.queryOptions({
-        isPublic: false,
-        limit: totalPrivateCount,
-        offset: 0,
-      }),
-    );
-    const ids = (allPrivate.packages ?? []).map((p) => p.id);
-    if (ids.length > 0) bulkPublish.mutate({ ids });
+  const bulkPublishAllPrivate = useMutation(
+    trpc.package.bulkPublishAllPrivate.mutationOptions({
+      onSuccess: (data) => {
+        query.refetch();
+        privateCountQuery.refetch();
+        setBulkMode(false);
+        setSelectedIds(new Set());
+        toast.success(`${data.updated} paket berhasil dipublikasikan`);
+      },
+      onError: (err: unknown) => {
+        toast.error("Gagal mempublikasikan semua paket.", { description: getErrorMessage(err) });
+      },
+    }),
+  );
+
+  const handlePublishAllPrivate = () => {
+    bulkPublishAllPrivate.mutate();
   };
 
   const setExamType = (value: string) => {

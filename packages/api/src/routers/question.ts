@@ -323,4 +323,33 @@ export const questionRouter = router({
 
       return { success: true, updated: ownRows.length, skipped };
     }),
+
+  bulkPublishAllPrivate: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const privateRows = await db
+        .select({ id: question.id })
+        .from(question)
+        .where(
+          and(
+            eq(question.creatorUserId, ctx.session.user.id),
+            eq(question.isPublic, false),
+          ),
+        );
+
+      if (privateRows.length === 0) {
+        throwNotFound("Question");
+      }
+
+      await db
+        .update(question)
+        .set({ isPublic: true })
+        .where(
+          and(
+            eq(question.creatorUserId, ctx.session.user.id),
+            eq(question.isPublic, false),
+          ),
+        );
+
+      return { success: true, updated: privateRows.length };
+    }),
 });

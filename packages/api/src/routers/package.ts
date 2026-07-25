@@ -337,6 +337,35 @@ export const packageRouter = router({
       return { success: true, updated: ownRows.length, skipped };
     }),
 
+  bulkPublishAllPrivate: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const privateRows = await db
+        .select({ id: testPackage.id })
+        .from(testPackage)
+        .where(
+          and(
+            eq(testPackage.creatorUserId, ctx.session.user.id),
+            eq(testPackage.isPublic, false),
+          ),
+        );
+
+      if (privateRows.length === 0) {
+        throwNotFound("Package");
+      }
+
+      await db
+        .update(testPackage)
+        .set({ isPublic: true })
+        .where(
+          and(
+            eq(testPackage.creatorUserId, ctx.session.user.id),
+            eq(testPackage.isPublic, false),
+          ),
+        );
+
+      return { success: true, updated: privateRows.length };
+    }),
+
   // ── Section Management ───────────────────────────────────
 
   addSection: protectedProcedure

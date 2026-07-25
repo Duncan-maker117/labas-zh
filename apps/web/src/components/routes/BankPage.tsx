@@ -194,18 +194,26 @@ export function BankComponent() {
     }),
   );
 
-  const handlePublishAllPrivate = async () => {
-    if (!userId || totalPrivateCount === 0) return;
-    const allPrivate = await queryClient.fetchQuery(
-      trpc.question.list.queryOptions({
-        creatorUserId: userId,
-        isPublic: false,
-        limit: totalPrivateCount,
-        offset: 0,
-      }),
-    );
-    const ids = (allPrivate.questions ?? []).map((q) => q.id);
-    if (ids.length > 0) bulkPublish.mutate({ ids });
+  const bulkPublishAllPrivate = useMutation(
+    trpc.question.bulkPublishAllPrivate.mutationOptions({
+      onSuccess: (data) => {
+        setAllQuestions([]);
+        if (offset !== 0) {
+          setOffset(0);
+        } else {
+          questionQuery.refetch();
+        }
+        privateCountQuery.refetch();
+        toast.success(`${data.updated} soal berhasil dipublikasikan`);
+      },
+      onError: (err) => {
+        toast.error("Gagal mempublikasikan semua soal.", { description: getErrorMessage(err) });
+      },
+    }),
+  );
+
+  const handlePublishAllPrivate = () => {
+    bulkPublishAllPrivate.mutate();
   };
 
   // ── Navigation helpers ──
