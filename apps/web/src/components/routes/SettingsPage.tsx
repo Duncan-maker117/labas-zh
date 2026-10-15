@@ -19,6 +19,7 @@ import { TipsCard } from "@/components/settings/TipsCard";
 import { SecurityInfo } from "@/components/settings/SecurityInfo";
 import { AccountSettings } from "@/components/settings/AccountSettings";
 import { z } from "zod";
+import { useLocale, type Locale } from "@/lib/locale";
 
 export const Route = createFileRoute("/settings")({
   validateSearch: z.object({
@@ -193,6 +194,7 @@ function TokenUsageSection() {
 }
 
 export function RouteComponent() {
+  const { locale, setLocale } = useLocale();
   const { configs, isLoading, addConfig, updateConfig, removeConfig } =
     useApiKeys();
 
@@ -280,24 +282,40 @@ export function RouteComponent() {
     <div className="min-h-screen pt-8 pb-32 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto bg-[var(--warm-cream)]">
       <section className="mb-10">
         <div className="flex items-center gap-2 text-sm text-[var(--warm-charcoal)] mb-4">
-          <Link to="/dashboard" className="hover:text-[var(--clay-black)] transition-colors">Beranda</Link>
+          <Link to="/dashboard" className="hover:text-[var(--clay-black)] transition-colors">{locale === "zh-CN" ? "学习概览" : locale === "en-US" ? "Dashboard" : "Beranda"}</Link>
           <MaterialIcon name="chevron_right" className="text-xs" />
-          <span className="text-[var(--clay-black)] font-medium">Pengaturan</span>
+          <span className="text-[var(--clay-black)] font-medium">{locale === "zh-CN" ? "设置" : locale === "en-US" ? "Settings" : "Pengaturan"}</span>
         </div>
         <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-          Pengaturan
+          {locale === "zh-CN" ? "设置" : locale === "en-US" ? "Settings" : "Pengaturan"}
         </h1>
         <p className="text-lg text-[var(--warm-charcoal)] mt-2">
-          Kelola API key, pantau penggunaan token, dan preferensi akun.
+          {locale === "zh-CN" ? "管理 API 密钥、Token 用量和账号偏好。" : locale === "en-US" ? "Manage API keys, token usage, and account preferences." : "Kelola API key, pantau penggunaan token, dan preferensi akun."}
         </p>
       </section>
 
+      <div className="mb-8 rounded-[var(--radius-xl)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] p-5">
+        <label htmlFor="settings-locale" className="mb-2 block text-sm font-semibold text-[var(--clay-black)]">
+          {locale === "zh-CN" ? "界面语言" : locale === "en-US" ? "Interface language" : "Bahasa antarmuka"}
+        </label>
+        <select
+          id="settings-locale"
+          value={locale}
+          onChange={(event) => setLocale(event.target.value as Locale)}
+          className="w-full max-w-xs rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-white px-3 py-2 text-sm text-[var(--clay-black)]"
+        >
+          <option value="zh-CN">简体中文</option>
+          <option value="en-US">English</option>
+          <option value="id-ID">Bahasa Indonesia</option>
+        </select>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setTab} className="w-full">
         <TabsList variant="line" className="mb-6">
-          <TabsTrigger value="api-keys">API Keys</TabsTrigger>
-          <TabsTrigger value="token-usage">Token Usage</TabsTrigger>
-          <TabsTrigger value="account">Akun</TabsTrigger>
-          <TabsTrigger value="security">Keamanan</TabsTrigger>
+          <TabsTrigger value="api-keys">{locale === "zh-CN" ? "API 密钥" : "API Keys"}</TabsTrigger>
+          <TabsTrigger value="token-usage">{locale === "zh-CN" ? "Token 用量" : "Token Usage"}</TabsTrigger>
+          <TabsTrigger value="account">{locale === "zh-CN" ? "账号" : locale === "en-US" ? "Account" : "Akun"}</TabsTrigger>
+          <TabsTrigger value="security">{locale === "zh-CN" ? "安全" : locale === "en-US" ? "Security" : "Keamanan"}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="api-keys" className="space-y-8">

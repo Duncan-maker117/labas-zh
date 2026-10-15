@@ -2,6 +2,7 @@ import { Button } from "@labas/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { EXAM_TYPES, SECTIONS } from "@/lib/generate-constants";
+import { useLocale } from "@/lib/locale";
 
 interface TestBlueprintCardProps {
   examType: string;
@@ -35,8 +36,9 @@ export function TestBlueprintCard({
   onGenerate,
   onDismissError,
 }: TestBlueprintCardProps & { onDismissError?: () => void }) {
+  const { ui, locale } = useLocale();
   const sectionNames = selectedSections
-    .map((id) => SECTIONS.find((s) => s.id === id)?.name)
+    .map((id) => ui(SECTIONS.find((s) => s.id === id)?.name ?? id))
     .filter(Boolean);
 
   return (
@@ -45,41 +47,39 @@ export function TestBlueprintCard({
         <CardHeader>
           <div className="flex items-center gap-3">
             <MaterialIcon name="analytics" className="text-[var(--matcha-600)]" />
-            <CardTitle className="font-headline text-xl text-[var(--clay-black)]">Test Blueprint</CardTitle>
+            <CardTitle className="font-headline text-xl text-[var(--clay-black)]">{ui("Test Blueprint")}</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="flex justify-between items-center pb-4 border-b border-[var(--oat-border)]">
-            <span className="text-[var(--warm-charcoal)]">Ujian</span>
+            <span className="text-[var(--warm-charcoal)]">{ui("Ujian")}</span>
             <span className="font-bold text-[var(--clay-black)]">
               {EXAM_TYPES.find((t) => t.id === examType)?.name}
             </span>
           </div>
           <div className="flex justify-between items-center pb-4 border-b border-[var(--oat-border)]">
-            <span className="text-[var(--warm-charcoal)]">Section</span>
+            <span className="text-[var(--warm-charcoal)]">{ui("Section")}</span>
             <span className="font-bold text-[var(--clay-black)] text-right">
               {sectionNames.join(" + ")}
             </span>
           </div>
           <div className="flex justify-between items-center pb-4 border-b border-[var(--oat-border)]">
-            <span className="text-[var(--warm-charcoal)]">Jumlah Soal</span>
-            <span className="font-bold text-[var(--clay-black)]">{questionCount} Soal</span>
+            <span className="text-[var(--warm-charcoal)]">{ui("Jumlah Soal")}</span>
+            <span className="font-bold text-[var(--clay-black)]">{questionCount} {ui("Soal")}</span>
           </div>
           <div className="flex justify-between items-center pb-4 border-b border-[var(--oat-border)]">
-            <span className="text-[var(--warm-charcoal)]">Format</span>
-            <span className="font-bold text-[var(--clay-black)]">{selectedFormats.length} Jenis</span>
+            <span className="text-[var(--warm-charcoal)]">{ui("Format")}</span>
+            <span className="font-bold text-[var(--clay-black)]">{selectedFormats.length} {ui("Jenis")}</span>
           </div>
           <div className="flex justify-between items-center pb-4 border-b border-[var(--oat-border)]">
-            <span className="text-[var(--warm-charcoal)]">Estimasi Durasi</span>
-            <span className="font-bold text-[var(--clay-black)]">{questionCount * 2} Menit</span>
+            <span className="text-[var(--warm-charcoal)]">{ui("Estimasi Durasi")}</span>
+            <span className="font-bold text-[var(--clay-black)]">{questionCount * 2} {ui("Menit")}</span>
           </div>
 
           {/* AI Confidence Score */}
           <div className="bg-[var(--oat-light)] rounded-[var(--radius-lg)] p-6 flex flex-col items-center gap-4 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--matcha-600)] to-transparent" />
-            <span className="text-xs font-label uppercase tracking-widest text-[var(--warm-charcoal)] font-bold">
-              AI Confidence Score
-            </span>
+            <span className="text-xs font-label uppercase tracking-widest text-[var(--warm-charcoal)] font-bold">{ui("AI Confidence Score")}</span>
             <div className="relative flex items-center justify-center">
               <svg className="w-32 h-32 transform -rotate-90">
                 <circle className="text-[var(--warm-silver)]" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" strokeWidth="8" />
@@ -97,9 +97,7 @@ export function TestBlueprintCard({
               </svg>
               <span className="absolute text-3xl font-headline font-extrabold text-[var(--clay-black)]">{Math.round(weaknessAlign)}%</span>
             </div>
-            <p className="text-[11px] text-center text-[var(--warm-charcoal)] px-2 leading-tight">
-              Probabilitas tinggi untuk mengatasi blindspot linguistik utama.
-            </p>
+            <p className="text-[11px] text-center text-[var(--warm-charcoal)] px-2 leading-tight">{ui("Probabilitas tinggi untuk mengatasi blindspot linguistik utama.")}</p>
           </div>
 
           {/* Mode Toggle */}
@@ -112,9 +110,7 @@ export function TestBlueprintCard({
                   : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
               }`}
             >
-              <MaterialIcon name="flash_on" className="text-sm" />
-              Quick
-            </button>
+              <MaterialIcon name="flash_on" className="text-sm" />{ui("Quick")}</button>
             <button
               onClick={() => setMode("agentic")}
               className={`flex-1 py-2.5 px-3 rounded-[var(--radius-md)] text-sm font-semibold transition-all flex items-center justify-center gap-2 min-h-[44px] ${
@@ -123,18 +119,16 @@ export function TestBlueprintCard({
                   : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
               }`}
             >
-              <MaterialIcon name="psychology" className="text-sm" />
-              Agentic
-            </button>
+              <MaterialIcon name="psychology" className="text-sm" />{ui("Agentic")}</button>
           </div>
 
           {mode === "agentic" && (
             <div className="p-3 rounded-[var(--radius-md)] bg-[var(--badge-blue-bg)] border-2 border-[var(--badge-blue-bg)] text-xs text-[var(--badge-blue-text)]">
               <div className="flex items-center gap-2 mb-1">
                 <MaterialIcon name="info" className="text-sm" />
-                <span className="font-semibold">Mode Agentic</span>
+                <span className="font-semibold">{ui("Mode Agentic")}</span>
               </div>
-              <p>Multi-step validation: passage → validate → questions → self-check → quality score. Lebih lambat tapi kualitas lebih terjamin.</p>
+              <p>{ui("Multi-step validation: passage → validate → questions → self-check → quality score. Lebih lambat tapi kualitas lebih terjamin.")}</p>
             </div>
           )}
 
@@ -146,12 +140,12 @@ export function TestBlueprintCard({
           >
             <MaterialIcon name="auto_awesome" className="group-hover:rotate-12 transition-transform" />
             {activeCount >= maxParallel
-              ? `Maks ${maxParallel} Paralel`
+              ? locale === "zh-CN" ? `最多同时生成 ${maxParallel} 项` : locale === "en-US" ? `Maximum ${maxParallel} parallel` : `Maks ${maxParallel} Paralel`
               : activeCount > 0
                 ? mode === "agentic"
-                  ? "Agentic..."
-                  : "Generating..."
-                : "Generate & Launch"}
+                  ? locale === "zh-CN" ? "正在分步生成…" : locale === "en-US" ? "Generating step by step…" : "Agentic..."
+                  : ui("Generating...")
+                : ui("Generate & Launch")}
           </Button>
 
           {error && (
@@ -163,7 +157,7 @@ export function TestBlueprintCard({
                   <button
                     onClick={onDismissError}
                     className="shrink-0 p-1 rounded hover:bg-[var(--pomegranate-400)]/10 transition-colors"
-                    aria-label="Tutup error"
+                    aria-label={ui("Tutup error")}
                   >
                     <MaterialIcon name="close" className="text-sm" />
                   </button>

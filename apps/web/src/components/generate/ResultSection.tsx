@@ -3,6 +3,8 @@ import { Button } from "@labas/ui/components/button";
 import { Card, CardContent, CardHeader } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import type { GenerationResult } from "@labas/ai";
+import { useLocale } from "@/lib/locale";
+import { FORMATS } from "@/lib/generate-constants";
 
 interface ResultSectionProps {
   result: GenerationResult;
@@ -12,13 +14,14 @@ interface ResultSectionProps {
 }
 
 export function ResultSection({ result, generatedPackageId, onClear, bankLink = "/bank" }: ResultSectionProps) {
+  const { locale, ui } = useLocale();
   return (
     <div className="mt-16 space-y-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-headline font-bold text-[var(--clay-black)]">Hasil Generate</h3>
+          <h3 className="text-2xl font-headline font-bold text-[var(--clay-black)]">{ui("Hasil Generate")}</h3>
           <p className="text-sm text-[var(--warm-charcoal)] mt-1">
-            Paket latihan berhasil dibuat! Soal juga tersimpan di Bank Soal (privat). Jawaban & penjelasan disembunyikan agar latihan tetap fair.
+            {ui("Paket latihan berhasil dibuat! Soal juga tersimpan di Bank Soal (privat). Jawaban & penjelasan disembunyikan agar latihan tetap fair.")}
           </p>
         </div>
         <div className="flex gap-3">
@@ -26,21 +29,21 @@ export function ResultSection({ result, generatedPackageId, onClear, bankLink = 
             <Link to="/package/$id" params={{ id: generatedPackageId }} onClick={() => onClear?.()}>
               <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)]">
                 <MaterialIcon name="play_arrow" className="mr-2" />
-                Lihat Paket
+                {ui("Lihat Paket")}
               </Button>
             </Link>
           )}
           <Link to={bankLink} onClick={() => onClear?.()}>
             <Button className="bg-[var(--matcha-600)] text-[var(--pure-white)] hover:bg-[var(--matcha-800)] clay-hover rounded-[var(--radius-lg)]">
               <MaterialIcon name="database" className="mr-2" />
-              Bank Soal
+              {ui("Bank Soal")}
             </Button>
           </Link>
         </div>
       </div>
 
       <div className="text-sm text-[var(--warm-charcoal)] mb-4 font-mono">
-        Model: {result.meta.model} · Tokens: {result.meta.tokensUsed ?? "?"} · Waktu: {result.meta.durationMs}ms · {result.questions.length} soal
+        {locale === "zh-CN" ? "模型" : "Model"}: {result.meta.model} · Token: {result.meta.tokensUsed ?? "?"} · {locale === "zh-CN" ? "耗时" : locale === "en-US" ? "Time" : "Waktu"}: {result.meta.durationMs}ms · {result.questions.length} {ui("soal")}
       </div>
 
       {result.questions.map((q, idx) => (
@@ -51,7 +54,7 @@ export function ResultSection({ result, generatedPackageId, onClear, bankLink = 
                 {idx + 1}
               </span>
               <span className="text-sm font-bold text-[var(--matcha-600)] uppercase tracking-tighter">
-                {q.format.replace(/_/g, " ")}
+                {ui(FORMATS.find((format) => format.id === q.format)?.name ?? q.format.replace(/_/g, " "))}
               </span>
             </div>
           </CardHeader>

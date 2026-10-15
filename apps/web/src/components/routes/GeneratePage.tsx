@@ -29,11 +29,13 @@ import {
 import { getDifficultyLabel } from "@/lib/difficulty-mapping";
 import "flag-icons/css/flag-icons.min.css";
 import type { Step } from "react-joyride";
+import { useLocale } from "@/lib/locale";
 
 const MAX_PARALLEL = 3;
 
 
 export function RouteComponent() {
+  const { locale, ui } = useLocale();
   const { configs, hasConfigs } = useApiKeys();
 
   const [selectedKeyId, setSelectedKeyId] = useState<string>(
@@ -97,8 +99,11 @@ export function RouteComponent() {
   }, [completedResults.length]);
 
   const routeSearch = useSearch({ strict: false }) as Record<string, unknown>;
-  const defaultExamType = (routeSearch.examType as string) || "IELTS";
-  const defaultSection = defaultExamType === "CPNS" ? "TIU" : "READING";
+  const requestedExamType = routeSearch.examType as string;
+  const defaultExamType = EXAM_TYPES.some((exam) => exam.id === requestedExamType && exam.id !== "CPNS")
+    ? requestedExamType
+    : "IELTS";
+  const defaultSection = "READING";
 
   const [examType, setExamType] = useState(defaultExamType);
   const [selectedSections, setSelectedSections] = useState<string[]>([defaultSection]);
@@ -156,15 +161,15 @@ export function RouteComponent() {
 
   const handleGenerate = () => {
     if (!useFreeCredits && (!hasConfigs || !selectedConfig)) {
-      setError("API key belum dikonfigurasi. Tambahkan di Settings atau gunakan kredit gratis.");
+      setError(ui("API key belum dikonfigurasi. Tambahkan di Settings atau gunakan kredit gratis."));
       return;
     }
     if (selectedSections.length === 0) {
-      setError("Pilih minimal 1 section.");
+      setError(ui("Pilih minimal 1 section."));
       return;
     }
     if (selectedFormats.length === 0) {
-      setError("Pilih minimal 1 format soal.");
+      setError(ui("Pilih minimal 1 format soal."));
       return;
     }
 
@@ -217,55 +222,45 @@ export function RouteComponent() {
       {/* Header */}
       <section className="flex flex-col gap-2 relative mb-10">
         <div className="absolute -left-8 -top-8 w-64 h-64 ai-glow pointer-events-none opacity-50" />
-        <h1 className="text-4xl md:text-5xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-          AI Exam Generator
-        </h1>
-        <p className="text-lg text-[var(--warm-charcoal)] max-w-2xl leading-relaxed">
-          Generate soal latihan dengan AI. Pilih exam, section, format, dan topik — sisanya AI yang kerjakan.
-        </p>
+        <h1 className="text-4xl md:text-5xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">{ui("AI Exam Generator")}</h1>
+        <p className="text-lg text-[var(--warm-charcoal)] max-w-2xl leading-relaxed">{ui("Generate soal latihan dengan AI. Pilih exam, section, format, dan topik — sisanya AI yang kerjakan.")}</p>
         <div className="mt-4 flex flex-wrap gap-3 text-sm text-[var(--warm-charcoal)]">
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--matcha-300)]/30 text-[var(--matcha-800)] font-medium">
             <MaterialIcon name="looks_one" className="text-sm" />
-            Pilih exam &amp; section
+            {ui("Pilih exam & section")}
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] font-medium">
             <MaterialIcon name="looks_two" className="text-sm" />
-            Atur jumlah &amp; format
+            {ui("Atur jumlah & format")}
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--lemon-400)]/30 text-[var(--lemon-800)] font-medium">
             <MaterialIcon name="looks_3" className="text-sm" />
-            Generate &amp; simpan
+            {ui("Generate & simpan")}
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--clay-black)]/10 text-[var(--clay-black)] font-medium">
-            <MaterialIcon name="looks_4" className="text-sm" />
-            Buat paket dari Bank Soal
-          </span>
+            <MaterialIcon name="looks_4" className="text-sm" />{ui("Buat paket dari Bank Soal")}</span>
         </div>
       </section>
 
       {!hasConfigs && !useFreeCredits && !hasFreeCredits && (
         <div className="mb-8 p-4 rounded-[var(--radius-lg)] bg-[var(--badge-blue-bg)] text-[var(--badge-blue-text)] text-sm flex items-center gap-3 border-2 border-[var(--badge-blue-bg)]">
           <MaterialIcon name="warning" />
-          <span>API key belum dikonfigurasi.</span>
-          <Link to="/settings" className="font-semibold underline">
-            Tambahkan di Settings →
-          </Link>
+          <span>{ui("API key belum dikonfigurasi.")}</span>
+          <Link to="/settings" className="font-semibold underline">{ui("Tambahkan di Settings →")}</Link>
         </div>
       )}
 
       {!hasConfigs && !useFreeCredits && hasFreeCredits && (
         <div className="mb-8 p-4 rounded-[var(--radius-lg)] bg-[var(--matcha-300)]/30 text-[var(--matcha-800)] text-sm flex items-center gap-3 border-2 border-[var(--matcha-400)]">
           <MaterialIcon name="tips_and_updates" />
-          <span>Belum ada API key. Kamu bisa pakai Free Credits!</span>
-          <button onClick={() => setUseFreeCredits(true)} className="font-semibold underline">
-            Gunakan Free Credits →
-          </button>
+          <span>{ui("Belum ada API key. Kamu bisa pakai Free Credits!")}</span>
+          <button onClick={() => setUseFreeCredits(true)} className="font-semibold underline">{ui("Gunakan Free Credits →")}</button>
         </div>
       )}
 
       <div className="mb-8 p-5 rounded-[var(--radius-xl)] bg-[var(--pure-white)] border-2 border-[var(--oat-border)]">
         <div className="flex items-center justify-between mb-3">
-          <label className="text-sm font-medium text-[var(--clay-black)]">Generation Mode</label>
+          <label className="text-sm font-medium text-[var(--clay-black)]">{ui("Generation Mode")}</label>
         </div>
         <div className="flex items-center gap-4">
           <button
@@ -276,9 +271,7 @@ export function RouteComponent() {
                 : "bg-[var(--oat-light)] text-[var(--warm-charcoal)] hover:bg-[var(--oat-border)]"
             }`}
           >
-            <MaterialIcon name="vpn_key" className="text-sm" />
-            BYOK
-          </button>
+            <MaterialIcon name="vpn_key" className="text-sm" />{ui("BYOK")}</button>
           {hasFreeCredits && (
             <button
               onClick={() => { setUseFreeCredits(true); }}
@@ -288,21 +281,17 @@ export function RouteComponent() {
                   : "bg-[var(--oat-light)] text-[var(--warm-charcoal)] hover:bg-[var(--oat-border)]"
               }`}
             >
-              <MaterialIcon name="stars" className="text-sm" />
-              Free Credits
-            </button>
+              <MaterialIcon name="stars" className="text-sm" />{ui("Free Credits")}</button>
           )}
           {useFreeCredits && (
-            <Link to="/settings" className="text-xs text-[var(--matcha-600)] underline ml-2">
-              Atur BYOK di Settings
-            </Link>
+            <Link to="/settings" className="text-xs text-[var(--matcha-600)] underline ml-2">{ui("Atur BYOK di Settings")}</Link>
           )}
         </div>
 
         {useFreeCredits && myCredit.data && (
           <div className="mt-4 pt-4 border-t border-[var(--oat-border)] space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[var(--warm-charcoal)]">Token kamu</span>
+              <span className="text-sm text-[var(--warm-charcoal)]">{ui("Token kamu")}</span>
               <span className={`text-lg font-headline font-bold ${tokenBalance > 0 ? "text-[var(--clay-black)]" : "text-[var(--clay-red)]"}`}>
                 {tokenBalance.toLocaleString()}
               </span>
@@ -319,18 +308,18 @@ export function RouteComponent() {
               <p className="flex items-center gap-1.5 text-xs text-[var(--sunbeam-800)] bg-[var(--sunbeam-300)]/30 px-3 py-1.5 rounded-[var(--radius-md)]">
                 <MaterialIcon name="schedule" className="text-base leading-none shrink-0" />
                 <span>
-                  Cooldown: {myCredit.data.cooldownRemaining} hari lagi untuk auto-refill.
+                  {locale === "zh-CN" ? `距离免费额度补充还有 ${myCredit.data.cooldownRemaining} 天。` : locale === "en-US" ? `${myCredit.data.cooldownRemaining} days until refill.` : `Cooldown: ${myCredit.data.cooldownRemaining} hari lagi untuk auto-refill.`}
                 </span>
               </p>
             )}
             {tokenBalance <= 0 && myCredit.data.cooldownRemaining === 0 && (
               <p className="text-xs text-[var(--matcha-700)] bg-[var(--matcha-300)]/30 px-3 py-1.5 rounded-[var(--radius-md)]">
-                Token habis. Auto-refill tersedia saat kamu generate.
+                {ui("Token habis. Auto-refill tersedia saat kamu generate.")}
               </p>
             )}
             {tokenBalance <= 0 && myCredit.data.cooldownRemaining > 0 && (
               <p className="text-xs text-[var(--clay-red)]/80 bg-[var(--clay-red)]/5 px-3 py-1.5 rounded-[var(--radius-md)]">
-                Token habis & dalam cooldown. Gunakan BYOK atau tunggu {myCredit.data.cooldownRemaining} hari.
+                {locale === "zh-CN" ? `Token 已用完，且仍在冷却期。请使用自己的 API 密钥，或等待 ${myCredit.data.cooldownRemaining} 天。` : locale === "en-US" ? `Tokens exhausted. Use your own API key or wait ${myCredit.data.cooldownRemaining} days.` : `Token habis & dalam cooldown. Gunakan BYOK atau tunggu ${myCredit.data.cooldownRemaining} hari.`}
               </p>
             )}
           </div>
@@ -338,12 +327,12 @@ export function RouteComponent() {
 
         {!useFreeCredits && hasConfigs && (
           <div className="mt-4 pt-4 border-t border-[var(--oat-border)]">
-            <label className="text-sm font-medium text-[var(--clay-black)] mb-2 block">Provider / API Key</label>
+            <label className="text-sm font-medium text-[var(--clay-black)] mb-2 block">{ui("Provider / API Key")}</label>
             <div className="flex gap-3">
               <Select value={selectedKeyId} onValueChange={(v) => v && setSelectedKeyId(v)}>
                 <SelectTrigger className="flex-1 h-11">
                   <SelectValue>
-                    {selectedConfig ? `${selectedConfig.name} · ${selectedConfig.modelName}` : "Pilih provider..."}
+                    {selectedConfig ? `${selectedConfig.name} · ${selectedConfig.modelName}` : ui("Pilih provider...")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -356,34 +345,26 @@ export function RouteComponent() {
               </Select>
               <Link to="/settings">
                 <Button variant="outline" size="xl" className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover">
-                  <MaterialIcon name="settings" className="mr-1" />
-                  Kelola
-                </Button>
+                  <MaterialIcon name="settings" className="mr-1" />{ui("Kelola")}</Button>
               </Link>
             </div>
           </div>
         )}
 
         {!useFreeCredits && !hasConfigs && !hasFreeCredits && (
-          <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-            Tambahkan API key di Settings dahulu.
-          </p>
+          <p className="mt-3 text-xs text-[var(--warm-charcoal)]">{ui("Tambahkan API key di Settings dahulu.")}</p>
         )}
 
         {!useFreeCredits && !hasConfigs && hasFreeCredits && (
           <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-            Belum ada API key?{" "}
-            <button onClick={() => setUseFreeCredits(true)} className="text-[var(--matcha-600)] underline">
-              Gunakan kredit gratis
-            </button>
-            {" "}atau tambah di Settings.
+            {ui("Belum ada API key?")}{" "}
+            <button onClick={() => setUseFreeCredits(true)} className="text-[var(--matcha-600)] underline">{ui("Gunakan kredit gratis")}</button>
+            {" "}{ui("atau tambah di Settings.")}
           </p>
         )}
 
         {useFreeCredits && !hasFreeCredits && (
-          <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-            Free credits sedang dinonaktifkan oleh admin.
-          </p>
+          <p className="mt-3 text-xs text-[var(--warm-charcoal)]">{ui("Free credits sedang dinonaktifkan oleh admin.")}</p>
         )}
       </div>
 
@@ -393,9 +374,9 @@ export function RouteComponent() {
 
           {/* Exam Type */}
           <div data-tour="generate-exam-type" className="flex flex-col gap-4">
-            <label className="font-headline text-xl font-bold text-[var(--clay-black)]">Jenis Ujian</label>
+            <label className="font-headline text-xl font-bold text-[var(--clay-black)]">{ui("Jenis Ujian")}</label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {EXAM_TYPES.map((t) => (
+              {EXAM_TYPES.filter((t) => t.id !== "CPNS").map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setExamType(t.id)}
@@ -415,9 +396,9 @@ export function RouteComponent() {
           {/* Section Selection — Multi-select */}
           <div data-tour="generate-section" className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">Section</label>
+              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">{ui("Section")}</label>
               <span className="text-xs text-[var(--warm-charcoal)]">
-                {selectedSections.length} dipilih
+                {selectedSections.length} {ui("dipilih")}
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -437,7 +418,7 @@ export function RouteComponent() {
                       name={isSelected ? "check_circle" : s.icon}
                       className={`text-base shrink-0 ${isSelected ? "text-[var(--matcha-400)]" : ""}`}
                     />
-                    {s.name}
+                    {ui(s.name)}
                   </button>
                 );
               })}
@@ -445,16 +426,14 @@ export function RouteComponent() {
             {selectedSections.length > 1 && (
               <p className="text-xs text-[var(--matcha-800)] bg-[var(--matcha-300)]/30 px-3 py-2 rounded-[var(--radius-md)]">
                 <MaterialIcon name="tips_and_updates" className="text-xs mr-1 inline" />
-                Kamu memilih {selectedSections.length} section. Mode Agentic dengan ≥20 soal akan otomatis membagi soal ke section yang dipilih.
+                {locale === "zh-CN" ? `已选择 ${selectedSections.length} 个科目。分步生成模式在题量达到 20 题时会自动分配到所选科目。` : locale === "en-US" ? `${selectedSections.length} sections selected. With 20 or more questions, step by step mode distributes them across sections.` : `Kamu memilih ${selectedSections.length} section. Mode Agentic dengan ≥20 soal akan otomatis membagi soal ke section yang dipilih.`}
               </p>
             )}
           </div>
 
           {/* Question Count */}
           <div data-tour="generate-count" className="flex flex-col gap-4">
-            <label className="font-headline text-xl font-bold text-[var(--clay-black)]">
-              Jumlah Soal
-              <span className="ml-2 text-sm font-normal text-[var(--warm-charcoal)]">{questionCount} soal</span>
+            <label className="font-headline text-xl font-bold text-[var(--clay-black)]">{ui("Jumlah Soal")}<span className="ml-2 text-sm font-normal text-[var(--warm-charcoal)]">{questionCount} {ui("soal")}</span>
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {QUESTION_COUNT_PRESETS.map((p) => {
@@ -472,14 +451,14 @@ export function RouteComponent() {
                         : "bg-[var(--pure-white)] text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] border-2 border-[var(--oat-border)]"
                   }`}
                 >
-                  <span>{p.label}</span>
-                  <span className={`text-xs ${questionCount === p.value ? "text-[var(--pure-white)]/70" : "text-[var(--warm-charcoal)]/70"}`}>{p.desc}</span>
+                  <span>{p.value} {ui("soal")}</span>
+                  <span className={`text-xs ${questionCount === p.value ? "text-[var(--pure-white)]/70" : "text-[var(--warm-charcoal)]/70"}`}>{ui(p.desc)}</span>
                 </button>
               );
               })}
             </div>
             <div className="flex items-center gap-3 mt-1">
-              <span className="text-xs font-medium text-[var(--warm-charcoal)] whitespace-nowrap">Custom:</span>
+              <span className="text-xs font-medium text-[var(--warm-charcoal)] whitespace-nowrap">{ui("Custom:")}</span>
               <input
                 type="range"
                 min={1}
@@ -495,11 +474,9 @@ export function RouteComponent() {
             {sectionSplits && (
               <div className="mt-2 p-4 rounded-[var(--radius-lg)] bg-[var(--matcha-300)]/30 border border-[var(--matcha-400)]">
                 <div className="flex items-center gap-2 mb-2 text-[var(--matcha-800)] font-semibold text-sm">
-                  <MaterialIcon name="auto_awesome" className="text-xs" />
-                  Auto Multi-Section
-                </div>
+                  <MaterialIcon name="auto_awesome" className="text-xs" />{ui("Auto Multi-Section")}</div>
                 <p className="text-[var(--matcha-800)]/80 text-xs mb-3">
-                  Mode Agentic dengan {questionCount} soal akan dibagi ke {sectionSplits.length} section:
+                  {locale === "zh-CN" ? `${questionCount} 道题将分配到 ${sectionSplits.length} 个科目：` : locale === "en-US" ? `${questionCount} questions will be split across ${sectionSplits.length} sections:` : `Mode Agentic dengan ${questionCount} soal akan dibagi ke ${sectionSplits.length} section:`}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {sectionSplits.map((s) => {
@@ -510,7 +487,7 @@ export function RouteComponent() {
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--pure-white)] text-[var(--matcha-800)] text-xs font-medium border border-[var(--matcha-400)]"
                       >
                         <MaterialIcon name={sec?.icon ?? "menu_book"} className="text-[10px]" />
-                        {sec?.name ?? s.section}: {s.count} soal
+                        {ui(sec?.name ?? s.section)}: {s.count} {ui("soal")}
                       </span>
                     );
                   })}
@@ -521,7 +498,7 @@ export function RouteComponent() {
 
           {/* Difficulty */}
           <div data-tour="generate-difficulty" className="flex flex-col gap-4">
-            <label className="font-headline text-xl font-bold text-[var(--clay-black)]">Tingkat Kesulitan</label>
+            <label className="font-headline text-xl font-bold text-[var(--clay-black)]">{ui("Tingkat Kesulitan")}</label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {DIFFICULTIES.map((d, i) => (
                 <button
@@ -534,7 +511,7 @@ export function RouteComponent() {
                   }`}
                 >
                   <span>{getDifficultyLabel(examType, i + 1)}</span>
-                  <span className={`text-[10px] mt-0.5 ${difficulty === i ? "text-white/60" : "text-[var(--warm-silver)]"}`}>{d}</span>
+                  <span className={`text-[10px] mt-0.5 ${difficulty === i ? "text-white/60" : "text-[var(--warm-silver)]"}`}>{ui(d)}</span>
                 </button>
               ))}
             </div>
@@ -543,9 +520,9 @@ export function RouteComponent() {
           {/* Format Selection */}
           <div data-tour="generate-format" className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">Format Soal</label>
+              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">{ui("Format Soal")}</label>
               <span className="text-xs text-[var(--warm-charcoal)]">
-                {selectedFormats.length} dipilih
+                {selectedFormats.length} {ui("dipilih")}
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -559,7 +536,7 @@ export function RouteComponent() {
                       : "bg-[var(--oat-light)] text-[var(--warm-charcoal)] hover:bg-[var(--matcha-300)] hover:text-[var(--matcha-800)]"
                   }`}
                 >
-                  {f.name}
+                  {ui(f.name)}
                   {selectedFormats.includes(f.id) && (
                     <MaterialIcon name="close" className="text-sm" />
                   )}
@@ -571,9 +548,9 @@ export function RouteComponent() {
           {/* Topic Focus */}
           <div data-tour="generate-topic" className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">Topik</label>
+              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">{ui("Topik")}</label>
               <span className="text-xs text-[var(--warm-charcoal)]">
-                {selectedTopics.length} dipilih
+                {selectedTopics.length} {ui("dipilih")}
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -583,7 +560,7 @@ export function RouteComponent() {
                   onClick={() => toggleTopic(topic)}
                   className="px-4 py-2 rounded-full bg-[var(--matcha-300)] text-[var(--matcha-800)] font-medium flex items-center gap-2 cursor-pointer transition-all hover:brightness-95 clay-hover min-h-[40px]"
                 >
-                  {topic} <MaterialIcon name="close" className="text-sm" />
+                  {ui(topic)} <MaterialIcon name="close" className="text-sm" />
                 </span>
               ))}
               {TOPICS.filter((t) => !selectedTopics.includes(t)).map((topic) => (
@@ -601,10 +578,8 @@ export function RouteComponent() {
           {/* Weakness Alignment */}
           <div data-tour="generate-weakness" className="flex flex-col gap-4">
             <div className="flex justify-between items-end">
-              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">Fokus Latihan</label>
-              <span className="text-sm font-medium text-[var(--matcha-800)] bg-[var(--matcha-300)] px-3 py-1 rounded-full">
-                Intelligent Focus
-              </span>
+              <label className="font-headline text-xl font-bold text-[var(--clay-black)]">{ui("Fokus Latihan")}</label>
+              <span className="text-sm font-medium text-[var(--matcha-800)] bg-[var(--matcha-300)] px-3 py-1 rounded-full">{ui("Intelligent Focus")}</span>
             </div>
             <div className="relative py-4">
               <input
@@ -616,8 +591,8 @@ export function RouteComponent() {
                 className="w-full h-2 bg-[var(--warm-silver)] rounded-full appearance-none cursor-pointer accent-[var(--clay-black)]"
               />
               <div className="flex justify-between mt-4 text-xs font-label uppercase tracking-widest text-[var(--warm-charcoal)]">
-                <span>Soal Seimbang</span>
-                <span>Fokus Kelemahan</span>
+                <span>{ui("Soal Seimbang")}</span>
+                <span>{ui("Fokus Kelemahan")}</span>
               </div>
             </div>
           </div>
@@ -649,25 +624,21 @@ export function RouteComponent() {
         {completedResults.length > 0 && (
           <div className="mt-12">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-headline font-bold text-[var(--clay-black)]">
-                Hasil Generate
-              </h2>
+              <h2 className="text-2xl font-headline font-bold text-[var(--clay-black)]">{ui("Hasil Generate")}</h2>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={resetAll}
                 className="text-[var(--warm-charcoal)] hover:text-[var(--pomegranate-400)]"
               >
-                <MaterialIcon name="delete_sweep" className="text-sm mr-1" />
-                Bersihkan
-              </Button>
+                <MaterialIcon name="delete_sweep" className="text-sm mr-1" />{ui("Bersihkan")}</Button>
             </div>
 
             {/* Tab Bar */}
             <div
               className="flex gap-1 mb-6 border-b border-[var(--oat-border)] overflow-x-auto"
               role="tablist"
-              aria-label="Hasil generate"
+              aria-label={ui("Hasil generate")}
               onKeyDown={(e) => {
                 if (completedResults.length === 0) return;
                 if (e.key === "ArrowRight") {
@@ -710,7 +681,7 @@ export function RouteComponent() {
                       {res.mode === "agentic" ? "Agentic" : "Quick"}
                     </span>
                     <span className="text-xs text-[var(--warm-charcoal)]">
-                      {questions.length} soal
+                      {questions.length} {ui("soal")}
                     </span>
                     <span
                       onClick={(e) => {
@@ -718,7 +689,7 @@ export function RouteComponent() {
                         dismissResult(res.jobId);
                       }}
                       role="button"
-                      aria-label={`Tutup tab ${res.mode}`}
+                      aria-label={`${ui("Tutup tab")} ${res.mode}`}
                       tabIndex={-1}
                       className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-[var(--pomegranate-400)]/10 text-[var(--warm-charcoal)] hover:text-[var(--pomegranate-400)] transition-colors cursor-pointer"
                     >
@@ -750,7 +721,7 @@ export function RouteComponent() {
       <PageTour
         storageKey={GENERATE_TOUR_KEY}
         autoDelay={600}
-        steps={generatePageSteps}
+        steps={locale === "zh-CN" ? generatePageStepsZh : locale === "en-US" ? generatePageStepsEn : generatePageSteps}
       />
       <TourHelpButton storageKey={GENERATE_TOUR_KEY} />
     </div>
@@ -809,3 +780,28 @@ const generatePageSteps: Step[] = [
     spotlightPadding: 8,
   },
 ];
+const generatePageStepsZh: Step[] = generatePageSteps.map((step, index) => ({
+  ...step,
+  title: ["考试类型", "科目", "题目数量", "难度", "题型", "主题", "智能侧重", "出题方案与生成"][index],
+  content: [
+    "选择要练习的考试，包括 IELTS、TOEFL、JLPT、HSK、Goethe、TOPIK、TOAFL 和 DELE。",
+    "选择一个或多个科目。分步生成模式在题量达到 20 题时会自动分配题目。",
+    "通过预设选项或滑块设置题量，每次最多生成 40 题。",
+    "选择难度；部分考试会显示对应的级别或分数。",
+    "选择题型，可选项取决于考试类型。",
+    "选择一个或多个练习主题。",
+    "设置练习侧重。当前滑块用于出题配置预览。",
+    "核对出题配置，选择快速或分步生成，然后开始。",
+  ][index],
+}));
+const generatePageStepsEn: Step[] = generatePageSteps.map((step, index) => ({
+  ...step,
+  title: ["Exam Type", "Section", "Question Count", "Difficulty", "Question Format", "Topic", "Practice Focus", "Blueprint and Generate"][index],
+  content: [
+    "Choose the exam you want to practice.", "Choose one or more sections.",
+    "Set the question count with a preset or slider, up to 40 per generation.",
+    "Choose a difficulty level for the selected exam.", "Choose an available question format.",
+    "Choose one or more practice topics.", "Set the practice focus for this generation.",
+    "Review the configuration, choose quick or step by step generation, and start.",
+  ][index],
+}));

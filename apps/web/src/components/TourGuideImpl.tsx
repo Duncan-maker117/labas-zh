@@ -1,6 +1,7 @@
 import { useState, useEffect, type CSSProperties } from "react";
 import { Joyride, type Step, type EventData } from "react-joyride";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
+import { useLocale } from "@/lib/locale";
 
 const joyrideOptions = {
   primaryColor: "var(--matcha-600)",
@@ -18,7 +19,11 @@ const joyrideStyles: Record<string, CSSProperties> = {
   tooltipTitle: { fontSize: "18px", fontWeight: 700, fontFamily: "Manrope, sans-serif" },
 };
 
-const joyrideLocale = { back: "Kembali", close: "Tutup", last: "Selesai", next: "Lanjut", skip: "Lewati" };
+const joyrideLocales = {
+  "zh-CN": { back: "上一步", close: "关闭", last: "完成", next: "下一步", skip: "跳过" },
+  "en-US": { back: "Back", close: "Close", last: "Finish", next: "Next", skip: "Skip" },
+  "id-ID": { back: "Kembali", close: "Tutup", last: "Selesai", next: "Lanjut", skip: "Lewati" },
+};
 
 export type { Step, EventData };
 
@@ -37,7 +42,27 @@ const globalSteps: Step[] = [
   { target: "body", placement: "center", title: "Siap Belajar?", content: "Setiap halaman punya panduan sendiri. Cari tombol ? di pojok kanan bawah halaman!", hideOverlay: true },
 ];
 
+const globalStepsZh: Step[] = [
+  { target: "body", placement: "center", title: "欢迎使用 Labas！", content: "这是一个 AI 语言考试练习平台。我们来看看主要功能。", hideOverlay: true },
+  { target: "[data-tour='dashboard-stats']", title: "学习概览", content: "这里显示练习次数、学习时长、答题数量和正确率。", spotlightPadding: 8 },
+  { target: "[data-tour='nav-generate']", title: "AI 出题", content: "选择考试、科目、题型和主题，生成练习题。", spotlightPadding: 4 },
+  { target: "[data-tour='nav-bank']", title: "题库与套题", content: "从题库中选择题目，组合成练习套题。", spotlightPadding: 4 },
+  { target: "[data-tour='nav-packages']", title: "开始练习", content: "选择已有套题或自己创建的套题进行练习。", spotlightPadding: 4 },
+  { target: "[data-tour='nav-analytics']", title: "学习分析", content: "查看分数、趋势和学习建议。", spotlightPadding: 4 },
+  { target: "body", placement: "center", title: "准备好了吗？", content: "每个页面右上角的问号按钮都可以打开页面指南。", hideOverlay: true },
+];
+const globalStepsEn: Step[] = [
+  { target: "body", placement: "center", title: "Welcome to Labas!", content: "Explore the main tools in this AI powered language exam practice platform.", hideOverlay: true },
+  { target: "[data-tour='dashboard-stats']", title: "Activity Summary", content: "Track practice sessions, study time, answered questions, and accuracy here.", spotlightPadding: 8 },
+  { target: "[data-tour='nav-generate']", title: "AI Question Generator", content: "Choose an exam, section, format, and topic to generate practice questions.", spotlightPadding: 4 },
+  { target: "[data-tour='nav-bank']", title: "Question Bank", content: "Organize questions into practice sets.", spotlightPadding: 4 },
+  { target: "[data-tour='nav-packages']", title: "Practice Sets", content: "Practice with existing or self-created sets.", spotlightPadding: 4 },
+  { target: "[data-tour='nav-analytics']", title: "Analytics", content: "Review scores, trends, and study suggestions.", spotlightPadding: 4 },
+  { target: "body", placement: "center", title: "Ready to learn?", content: "Use the question mark button at the top right of each page for a guide.", hideOverlay: true },
+];
+
 export function TourGuideImpl() {
+  const { locale } = useLocale();
   const [run, setRun] = useState(false);
 
   useEffect(() => {
@@ -60,9 +85,9 @@ export function TourGuideImpl() {
   };
 
   return (
-    <Joyride steps={globalSteps} run={run} continuous
+    <Joyride steps={locale === "zh-CN" ? globalStepsZh : locale === "en-US" ? globalStepsEn : globalSteps} run={run} continuous
       options={{ ...joyrideOptions, showProgress: true, buttons: ["back", "primary", "skip"] }}
-      locale={joyrideLocale} styles={joyrideStyles} onEvent={handleEvent}
+      locale={joyrideLocales[locale]} styles={joyrideStyles} onEvent={handleEvent}
     />
   );
 }
@@ -76,6 +101,7 @@ interface PageTourProps {
 }
 
 export function PageTourImpl({ storageKey, steps, autoDelay }: PageTourProps) {
+  const { locale } = useLocale();
   const [run, setRun] = useState(false);
 
   useEffect(() => {
@@ -100,7 +126,7 @@ export function PageTourImpl({ storageKey, steps, autoDelay }: PageTourProps) {
   return (
     <Joyride steps={steps} run={run} continuous
       options={{ ...joyrideOptions, showProgress: true, buttons: ["back", "primary", "skip"] }}
-      locale={joyrideLocale} styles={joyrideStyles} onEvent={handleEvent}
+      locale={joyrideLocales[locale]} styles={joyrideStyles} onEvent={handleEvent}
     />
   );
 }

@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import type { Step } from "react-joyride";
+import { useLocale } from "@/lib/locale";
 
 const TourGuideImpl = lazy(() => import("./TourGuideImpl").then((m) => ({ default: m.TourGuideImpl })));
 const PageTourImpl = lazy(() => import("./TourGuideImpl").then((m) => ({ default: m.PageTourImpl })));
@@ -49,11 +50,13 @@ interface TourHelpButtonProps {
   label?: string;
 }
 
-export function TourHelpButton({ storageKey, label = "Panduan Halaman" }: TourHelpButtonProps) {
+export function TourHelpButton({ storageKey, label }: TourHelpButtonProps) {
+  const { locale } = useLocale();
   return (
     <button
       onClick={() => triggerPageTour(storageKey)}
-      title={label}
+      title={label ?? (locale === "zh-CN" ? "页面指南" : locale === "en-US" ? "Page guide" : "Panduan Halaman")}
+      aria-label={label ?? (locale === "zh-CN" ? "页面指南" : locale === "en-US" ? "Page guide" : "Panduan Halaman")}
       className="fixed top-4 right-4 z-40 w-10 h-10 flex items-center justify-center bg-[var(--clay-black)] text-[var(--pure-white)] shadow-lg hover:bg-[var(--warm-charcoal)] transition-all clay-hover cursor-pointer hover:scale-105 active:scale-95 rounded-full"
     >
       <MaterialIcon name="help" className="text-lg" />
