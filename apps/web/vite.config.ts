@@ -7,6 +7,8 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   server: {
     port: 3001,
+    host: "127.0.0.1",
+    strictPort: true,
   },
   resolve: {
     tsconfigPaths: true,

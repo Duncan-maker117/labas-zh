@@ -90,10 +90,9 @@ export const questionRouter = router({
 
       if (input?.isPublic !== undefined) {
         conditions.push(eq(question.isPublic, input.isPublic));
-      } else if (!input?.creatorUserId) {
-        const vis = buildVisibilityCondition(question, userId);
-        if (vis) conditions.push(vis);
       }
+      const vis = buildVisibilityCondition(question, userId);
+      if (vis) conditions.push(vis);
 
       if (input?.search) {
         const searchCond = buildSearchCondition(input.search);

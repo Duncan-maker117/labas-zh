@@ -84,10 +84,10 @@ export default function SignInForm() {
     <Card className="mx-auto w-full max-w-md shadow-lg border-muted rounded-xl">
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-3xl font-bold tracking-tight">{isSignUp ? "创建账号" : "欢迎回来"}</CardTitle>
-        <CardDescription>{isSignUp ? "注册后开始你的语言考试练习" : "使用 Google 或邮箱密码登录"}</CardDescription>
+        <CardDescription>{isSignUp ? "注册后开始你的语言考试练习" : "使用邮箱和密码登录"}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Button
+        {env.VITE_GOOGLE_AUTH_ENABLED && <><Button
           type="button"
           variant="outline"
           size="xl"
@@ -122,7 +122,7 @@ export default function SignInForm() {
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">或</span>
           </div>
-        </div>
+        </div></>}
 
         <form
           onSubmit={(e) => {
@@ -193,7 +193,7 @@ export default function SignInForm() {
           >
             {({ canSubmit, isSubmitting }) => (
               <Button type="submit" size="xl" className="w-full rounded-[var(--radius-lg)]" disabled={!canSubmit || isSubmitting}>
-                {isSubmitting ? "正在登录…" : "登录"}
+                {isSubmitting ? (isSignUp ? "正在注册…" : "正在登录…") : (isSignUp ? "注册" : "登录")}
               </Button>
             )}
           </form.Subscribe>

@@ -1,7 +1,7 @@
 import { db } from "@labas/db";
-import { verification, user, account } from "@labas/db/schema/auth";
+import { verification, user, account, session } from "@labas/db/schema/auth";
 import { TRPCError } from "@trpc/server";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "better-auth/crypto";
 import crypto from "node:crypto";
 import { eq, and, gt, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -200,7 +200,7 @@ export const verificationRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid or expired OTP" });
       }
 
-      const passwordHash = await bcrypt.hash(input.newPassword, 10);
+      const passwordHash = await hashPassword(input.newPassword);
 
       const [userRecord] = await db
         .select({ id: user.id, name: user.name })
@@ -212,14 +212,16 @@ export const verificationRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
       }
 
-      await db
-        .update(account)
-        .set({ password: passwordHash })
-        .where(
-          and(eq(account.providerId, "credential"), eq(account.userId, userRecord.id)),
-        );
-
-      await db.delete(verification).where(eq(verification.id, record.id));
+      await db.transaction(async (tx) => {
+        // Claim the unexpired OTP atomically; two reset requests cannot reuse it.
+        const [claimed] = await tx.delete(verification)
+          .where(and(eq(verification.id, record.id), gt(verification.expiresAt, sql`now()`)))
+          .returning({ id: verification.id });
+        if (!claimed) throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid or expired OTP" });
+        await tx.update(account).set({ password: passwordHash })
+          .where(and(eq(account.providerId, "credential"), eq(account.userId, userRecord.id)));
+        await tx.delete(session).where(eq(session.userId, userRecord.id));
+      });
 
       return { success: true };
     }),

@@ -36,10 +36,9 @@ export const comboRouter = router({
 
       if (input?.isPublic !== undefined) {
         conditions.push(eq(comboPackage.isPublic, input.isPublic));
-      } else {
-        const vis = buildVisibilityCondition(comboPackage, userId);
-        if (vis) conditions.push(vis);
       }
+      const vis = buildVisibilityCondition(comboPackage, userId);
+      if (vis) conditions.push(vis);
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
 

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { env } from "@labas/env/server";
 import { publicProcedure, router } from "../index";
+import { throwNotFound } from "../lib/errors";
 
 export const blogRouter = router({
   posts: publicProcedure
@@ -15,6 +16,7 @@ export const blogRouter = router({
         .optional(),
     )
     .query(async ({ input }) => {
+      if (!env.BLOG_PROJECT_SLUG || !env.BLOG_API_KEY) throwNotFound("Blog integration");
       const { page = 1, perPage = 10, search, orderBy = "desc" } = input ?? {};
       const url = new URL(
         `${env.BLOG_API_URL}/public/projects/${env.BLOG_PROJECT_SLUG}/posts`,
@@ -39,6 +41,7 @@ export const blogRouter = router({
   postBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input }) => {
+      if (!env.BLOG_PROJECT_SLUG || !env.BLOG_API_KEY) throwNotFound("Blog integration");
       const url = `${env.BLOG_API_URL}/public/projects/${env.BLOG_PROJECT_SLUG}/posts/${input.slug}`;
       const res = await fetch(url, {
         headers: { "x-api-key": env.BLOG_API_KEY },

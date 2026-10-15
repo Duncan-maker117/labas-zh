@@ -8,10 +8,10 @@ const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
   port: smtpPort,
   secure: smtpPort === 465,
-  auth: {
+  auth: env.SMTP_USER && env.SMTP_PASS ? {
     user: env.SMTP_USER,
     pass: env.SMTP_PASS,
-  },
+  } : undefined,
 });
 
 const subjects: Record<string, string> = {

@@ -20,6 +20,7 @@
     "@labas/env": "workspace:*",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
+    "better-auth": "catalog:",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.76.2",
     "dotenv": "catalog:",

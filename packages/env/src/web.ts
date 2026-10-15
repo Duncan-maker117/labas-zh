@@ -7,6 +7,7 @@ export const env = createEnv({
     VITE_SERVER_URL: z.url(),
     VITE_SITE_URL: z.url().default("http://localhost:5173"),
     VITE_CLOUDFLARE_TURNSTILE_SITE_KEY: z.string().optional(),
+    VITE_GOOGLE_AUTH_ENABLED: z.string().default("false").transform((v) => v === "true"),
     VITE_BLOG_ENABLED: z
       .string()
       .default("false")

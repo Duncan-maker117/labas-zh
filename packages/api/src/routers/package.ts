@@ -43,10 +43,9 @@ export const packageRouter = router({
 
       if (input?.isPublic !== undefined) {
         conditions.push(eq(testPackage.isPublic, input.isPublic));
-      } else {
-        const vis = buildVisibilityCondition(testPackage, userId);
-        if (vis) conditions.push(vis);
       }
+      const vis = buildVisibilityCondition(testPackage, userId);
+      if (vis) conditions.push(vis);
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
 

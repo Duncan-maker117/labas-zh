@@ -4,11 +4,12 @@ import { appRouter } from "@labas/api/routers/index";
 import { recordBounce } from "@labas/api/lib/bounce";
 import { auth } from "@labas/auth";
 import { env } from "@labas/env/server";
+import { db } from "@labas/db";
+import { generationQueue } from "@labas/api/queue";
 import { withRequestId } from "@labas/api/logger";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-
-import "@labas/api/queue";
+import { timingSafeEqual } from "node:crypto";
 
 const app = new Hono();
 
@@ -59,6 +60,13 @@ app.use(
 
 // Webhook endpoint for email bounce notifications from ESPs (SendGrid, Mailgun, SES)
 app.post("/api/webhooks/email-bounce", async (c) => {
+  const secret = env.EMAIL_BOUNCE_WEBHOOK_SECRET;
+  if (!secret) return c.notFound();
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const provided = Buffer.from(c.req.header("Authorization") ?? "");
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
   const body = await c.req.json<{ Email?: string; email?: string; Reason?: string; reason?: string }>();
   const email = body.Email ?? body.email;
   const reason = body.Reason ?? body.reason;
@@ -95,4 +103,21 @@ app.get("/", (c) => {
   return c.text("OK");
 });
 
-export default app;
+app.get("/health/ready", async (c) => {
+  try {
+    // Verify the migrated schema, not just whether PostgreSQL accepts connections.
+    await db.execute('select 1 from "platform_config" limit 1');
+    const redis = await generationQueue.client;
+    await redis.ping();
+    return c.json({ status: "ok", database: "ok", queue: "ok" });
+  } catch {
+    return c.json({ status: "unavailable" }, 503);
+  }
+});
+
+export { app };
+export default {
+  port: env.PORT,
+  hostname: env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1",
+  fetch: app.fetch,
+};

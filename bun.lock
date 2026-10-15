@@ -116,6 +116,7 @@
         "@trpc/client": "catalog:",
         "@trpc/server": "catalog:",
         "bcryptjs": "^3.0.3",
+        "better-auth": "catalog:",
         "bullmq": "^5.76.2",
         "dotenv": "catalog:",
         "drizzle-orm": "^0.45.1",
