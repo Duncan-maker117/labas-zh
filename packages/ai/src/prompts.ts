@@ -14,7 +14,7 @@ export function buildQuickModePrompt(input: GenerationInput): string {
     return buildCpnsQuickModePrompt(input);
   }
 
-  const questionSchemaJson = getQuestionJsonSchemaDescription();
+  const questionSchemaJson = getQuestionJsonSchemaDescription(formats);
 
   const avoidContext = input.avoidTopics?.length
     ? `\nThe following topics are ALREADY covered by other questions. Generate questions about DIFFERENT topics:\n${input.avoidTopics.map(t => `  - "${t}"`).join("\n")}\n`

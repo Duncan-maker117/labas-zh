@@ -1,3 +1,4 @@
+import { aiServiceCopy } from "@/lib/ai-service-copy";
 import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, startTransition } from "react";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -207,7 +208,8 @@ export function RouteComponent() {
   const [isAdding, setIsAdding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const activeTab: Tab = search.tab ?? "api-keys";
+  const activeTab: Tab = search.tab ?? "account";
+  const aiText = aiServiceCopy(locale);
 
   const setTab = (tab: string) => {
     startTransition(() => {
@@ -292,7 +294,7 @@ export function RouteComponent() {
           {locale === "zh-CN" ? "设置" : locale === "en-US" ? "Settings" : "Pengaturan"}
         </h1>
         <p className="text-lg text-[var(--warm-charcoal)] mt-2">
-          {locale === "zh-CN" ? "管理 API 密钥、Token 用量和账号偏好。" : locale === "en-US" ? "Manage API keys, token usage, and account preferences." : "Kelola API key, pantau penggunaan token, dan preferensi akun."}
+          {aiText.settingsDescription}
         </p>
       </section>
 
@@ -314,13 +316,14 @@ export function RouteComponent() {
 
       <Tabs value={activeTab} onValueChange={setTab} className="w-full">
         <TabsList variant="line" className="mb-6">
-          <TabsTrigger value="api-keys">{locale === "zh-CN" ? "API 密钥" : "API Keys"}</TabsTrigger>
-          <TabsTrigger value="token-usage">{locale === "zh-CN" ? "Token 用量" : "Token Usage"}</TabsTrigger>
+          <TabsTrigger value="api-keys">{aiText.settingsTitle}</TabsTrigger>
+          <TabsTrigger value="token-usage">{aiText.usageTab}</TabsTrigger>
           <TabsTrigger value="account">{locale === "zh-CN" ? "账号" : locale === "en-US" ? "Account" : "Akun"}</TabsTrigger>
           <TabsTrigger value="security">{locale === "zh-CN" ? "安全" : locale === "en-US" ? "Security" : "Keamanan"}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="api-keys" className="space-y-8">
+          <p className="text-sm text-muted-foreground">{aiText.settingsHelp}</p>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div className="lg:col-span-7 space-y-8">
               <ApiKeyList

@@ -8,6 +8,12 @@ import {
 } from "../schema-to-prompt";
 
 describe("getQuestionJsonSchemaDescription", () => {
+  it("only sends the selected formats to the provider", () => {
+    const result = getQuestionJsonSchemaDescription(["multiple_choice"]);
+    expect(result).toContain("multiple_choice");
+    expect(result).not.toContain("situational_judgment");
+    expect(result).not.toContain("kanji_reading");
+  });
   it("returns valid JSON string", () => {
     const result = getQuestionJsonSchemaDescription();
     expect(typeof result).toBe("string");

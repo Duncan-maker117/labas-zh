@@ -12,6 +12,8 @@ import {
   generatePassageForInput,
   generateQuestionsAgenticFromPassage,
   GenerationError,
+  withTokenBudget,
+  getTokenBudgetUsage,
   type AgenticProgress,
   type GenerationInput,
   type GenerationResult,
@@ -30,7 +32,8 @@ import {
   user,
 } from "@labas/db";
 import { and, eq, notInArray, sql } from "drizzle-orm";
-import { encryptApiKey, decryptApiKey } from "./lib/encryption";
+import { decryptApiKey } from "./lib/encryption";
+import { createGenerationJob, settleGenerationCredit, type PlatformGenerationInput } from "./lib/platform-generation";
 import {
   collectShardFailureCause,
   isNonRetryableProviderError,
@@ -607,20 +610,26 @@ async function completeJobWithResult(params: {
         notInArray(generationJob.status, ["cancelled"]),
       ),
     );
+}
 
-  // Deduct from user credit if using platform generation
-  const inputAny = params.input as any;
-  if (inputAny._isPlatformGeneration && params.totalTokens > 0) {
-    const [jobRow] = await db
-      .select({ userId: generationJob.userId })
-      .from(generationJob)
-      .where(eq(generationJob.id, params.jobId))
-      .limit(1);
-    if (jobRow) {
-      const { deductCredit } = await import("@labas/api/lib/credit");
-      await deductCredit(jobRow.userId, params.totalTokens).catch(() => {});
+async function runBudgetedGeneration<T extends FastJobData>(job: Job<T>, run: (onClaimed: () => void) => Promise<void>) {
+  // Redis and Postgres both retain encrypted credentials; decrypt only in memory.
+  job.data.input = decryptInputFromDb(job.data.input);
+  const input = job.data.input as PlatformGenerationInput;
+  let ownsExecution = false;
+  return withTokenBudget(input._isPlatformGeneration ? input._platformTokenBudget : undefined, async () => {
+    try {
+      await run(() => { ownsExecution = true; });
+    } catch (error) {
+      await db.update(generationJob).set({ status: "failed", errorMessage: "AI task interrupted", completedAt: new Date() })
+        .where(and(eq(generationJob.id, job.data.jobId), notInArray(generationJob.status, ["completed", "completed_partial", "failed", "cancelled"])));
+      throw error;
+    } finally {
+      if (input._isPlatformGeneration && ownsExecution) {
+        await settleGenerationCredit(job.data.jobId, Math.ceil(getTokenBudgetUsage() ?? 0));
+      }
     }
-  }
+  });
 }
 
 export type CancelGenerationJobResult =
@@ -659,21 +668,25 @@ export async function cancelGenerationJob(
     return { ok: false, reason: "not_cancellable" };
   }
 
-  await db
+  const cancelled = await db
     .update(generationJob)
     .set({
       status: "cancelled",
       errorMessage: "Dibatalkan pengguna",
       completedAt: new Date(),
     })
-    .where(eq(generationJob.id, jobId));
+    .where(and(eq(generationJob.id, jobId), notInArray(generationJob.status, ["completed", "completed_partial", "failed", "cancelled"])))
+    .returning({ id: generationJob.id });
+  if (!cancelled.length) return { ok: false, reason: "not_cancellable" };
 
+  let removedPending = false;
   for (const queue of [generationQueue, generationQualityQueue]) {
     try {
       const bullJob = await queue.getJob(jobId);
       if (bullJob) {
         try {
           await bullJob.remove();
+          if (queue === generationQueue && row.status === "pending") removedPending = true;
         } catch {
           log("debug", "[QUEUE] Could not remove active job.", { jobId });
         }
@@ -683,42 +696,45 @@ export async function cancelGenerationJob(
     }
   }
 
+  if (removedPending) await settleGenerationCredit(jobId, 0);
+
   return { ok: true };
 }
 
 export const generationWorker = new Worker<FastJobData>(
   FAST_QUEUE_NAME,
-  async (job: Job<FastJobData>) => {
+  async (job: Job<FastJobData>) => runBudgetedGeneration(job, async (onClaimed) => {
     const { input, jobId } = job.data;
     const start = Date.now();
 
     const [initialRow] = await db
-      .select({ status: generationJob.status })
+      .select({ status: generationJob.status, progress: generationJob.progress })
       .from(generationJob)
       .where(eq(generationJob.id, jobId))
       .limit(1);
 
-    if (
-      !initialRow ||
-      initialRow.status === "cancelled" ||
-      initialRow.status === "completed" ||
-      initialRow.status === "completed_partial"
-    ) {
+    if (!initialRow || initialRow.status !== "pending") {
+      if (initialRow?.status === "cancelled" && initialRow.progress === 0) await settleGenerationCredit(jobId, 0);
       return;
     }
 
     const claimed = await db
       .update(generationJob)
-      .set({ status: "running_fast" })
+      .set({ status: "running_fast", progress: 1 })
       .where(
         and(
           eq(generationJob.id, jobId),
-          notInArray(generationJob.status, ["cancelled", "completed", "completed_partial"]),
+          eq(generationJob.status, "pending"),
         ),
       )
       .returning({ id: generationJob.id });
 
-    if (!claimed.length) return;
+    if (!claimed.length) {
+      const [latest] = await db.select({ status: generationJob.status, progress: generationJob.progress }).from(generationJob).where(eq(generationJob.id, jobId));
+      if (latest?.status === "cancelled" && latest.progress === 0) await settleGenerationCredit(jobId, 0);
+      return;
+    }
+    onClaimed();
 
     const cancelPoll = createCancellationPoller(jobId);
     let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
@@ -1184,7 +1200,7 @@ export const generationWorker = new Worker<FastJobData>(
       stopHeartbeat();
       cancelPoll.stop();
     }
-  },
+  }),
   {
     connection: new IORedis(env.REDIS_URL, connectionOptions),
     concurrency: 5,
@@ -1193,7 +1209,7 @@ export const generationWorker = new Worker<FastJobData>(
 
 export const generationQualityWorker = new Worker<QualityJobData>(
   QUALITY_QUEUE_NAME,
-  async (job: Job<QualityJobData>) => {
+  async (job: Job<QualityJobData>) => runBudgetedGeneration(job, async (onClaimed) => {
     const { input, jobId, sectionSplits, fastQuestions, fastMeta } = job.data;
     const qualityStart = Date.now();
 
@@ -1212,6 +1228,7 @@ export const generationQualityWorker = new Worker<QualityJobData>(
       return;
     }
 
+    onClaimed();
     const cancelPoll = createCancellationPoller(jobId);
     let approxTokens = 0;
     let maxProgress = 0;
@@ -1400,7 +1417,7 @@ export const generationQualityWorker = new Worker<QualityJobData>(
     } finally {
       cancelPoll.stop();
     }
-  },
+  }),
   {
     connection: new IORedis(env.REDIS_URL, connectionOptions),
     concurrency: 1,
@@ -1409,42 +1426,27 @@ export const generationQualityWorker = new Worker<QualityJobData>(
 
 export async function enqueueGeneration(
   userId: string,
-  input: GenerationInput,
+  input: PlatformGenerationInput,
 ): Promise<string> {
-  const encryptedInput = {
-    ...input,
-    apiKeyConfig: {
-      ...input.apiKeyConfig,
-      apiKey: encryptApiKey(input.apiKeyConfig.apiKey),
-    },
-  };
-
-  const [jobRecord] = await db
-    .insert(generationJob)
-    .values({
-      userId,
-      mode: input.mode,
-      examTypeId: input.examType,
-      sectionTypeId: input.section,
-      questionCount: input.questionCount,
-      status: "pending",
-      progress: 0,
-      inputJson: encryptedInput as any,
-    })
-    .returning();
-
-  if (!jobRecord) throw new Error("Failed to create generation job");
-
-  await generationQueue.add(
-    "generate-fast",
-    { input, jobId: jobRecord.id },
-    {
-      jobId: jobRecord.id,
-      removeOnComplete: { count: 100 },
-      removeOnFail: { count: 100 },
-      attempts: 1,
-    },
-  );
+  const jobRecord = await createGenerationJob(userId, input);
+  try {
+    await generationQueue.add(
+      "generate-fast",
+      { input: jobRecord.inputJson as GenerationInput, jobId: jobRecord.id },
+      {
+        jobId: jobRecord.id,
+        removeOnComplete: { count: 100 },
+        removeOnFail: { count: 100 },
+        attempts: 1,
+      },
+    );
+  } catch (error) {
+    // Do not refund an ambiguous Redis delivery if a worker already claimed it.
+    const failed = await db.update(generationJob).set({ status: "failed", errorMessage: "AI queue unavailable", completedAt: new Date() })
+      .where(and(eq(generationJob.id, jobRecord.id), eq(generationJob.status, "pending"))).returning({ id: generationJob.id });
+    if (failed.length) await settleGenerationCredit(jobRecord.id, 0);
+    throw error;
+  }
 
   return jobRecord.id;
 }

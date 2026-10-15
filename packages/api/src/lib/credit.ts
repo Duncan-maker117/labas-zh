@@ -1,4 +1,4 @@
-import { eq, sql, and, desc, sum, gte } from "drizzle-orm";
+import { eq, sql, and, desc, sum, gte, notInArray } from "drizzle-orm";
 import { db } from "@labas/db";
 import { userCredit, creditTransaction, user, platformConfig } from "@labas/db";
 import { TRPCError } from "@trpc/server";
@@ -61,43 +61,33 @@ export async function deductCredit(
   userId: string,
   tokens: number,
 ): Promise<{ newBalance: number }> {
+  if (!Number.isSafeInteger(tokens) || tokens <= 0) {
+    throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid credit amount" });
+  }
   await ensureUserCreditRow(userId);
+  return db.transaction(async (tx) => {
+    const [updated] = await tx
+      .update(userCredit)
+      .set({
+        tokenBalance: sql`token_balance - ${tokens}`,
+        lifetimeTokensUsed: sql`lifetime_tokens_used + ${tokens}`,
+      })
+      .where(and(eq(userCredit.userId, userId), gte(userCredit.tokenBalance, tokens)))
+      .returning();
 
-  const [current] = await db
-    .select({ balance: userCredit.tokenBalance })
-    .from(userCredit)
-    .where(eq(userCredit.userId, userId))
-    .limit(1);
+    if (!updated) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient credits" });
+    }
 
-  if (!current) {
-    throw new TRPCError({ code: "BAD_REQUEST", message: "No credits available" });
-  }
+    await tx.insert(creditTransaction).values({
+      userId,
+      amount: -tokens,
+      type: "generation_spend",
+      tokensUsed: tokens,
+    });
 
-  if (current.balance < tokens) {
-    throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient credits" });
-  }
-
-  const [updated] = await db
-    .update(userCredit)
-    .set({
-      tokenBalance: sql`token_balance - ${tokens}`,
-      lifetimeTokensUsed: sql`lifetime_tokens_used + ${tokens}`,
-    })
-    .where(eq(userCredit.userId, userId))
-    .returning();
-
-  if (!updated) {
-    throw new TRPCError({ code: "BAD_REQUEST", message: "Failed to deduct credits" });
-  }
-
-  await db.insert(creditTransaction).values({
-    userId,
-    amount: -tokens,
-    type: "generation_spend",
-    tokensUsed: tokens,
+    return { newBalance: updated.tokenBalance };
   });
-
-  return { newBalance: updated.tokenBalance };
 }
 
 export async function isUserSuspended(userId: string): Promise<boolean> {
@@ -136,7 +126,7 @@ export async function getPoolUsage() {
   const [agg] = await db
     .select({ totalDistributed: sum(creditTransaction.amount) })
     .from(creditTransaction)
-    .where(gte(creditTransaction.amount, 0));
+    .where(and(gte(creditTransaction.amount, 0), notInArray(creditTransaction.type, ["generation_settlement"])));
 
   const totalDistributed = Number(agg?.totalDistributed ?? 0);
 
@@ -155,6 +145,7 @@ export async function getLastRefillAt(userId: string) {
       and(
         eq(creditTransaction.userId, userId),
         gte(creditTransaction.amount, 0),
+        notInArray(creditTransaction.type, ["generation_settlement"]),
       ),
     )
     .orderBy(desc(creditTransaction.createdAt))
@@ -177,40 +168,50 @@ export async function autoRefillIfEligible(
   if (!(await isFreeCreditsEnabled())) {
     return { refilled: false, message: "Free credits are currently disabled." };
   }
+  const maxPool = await getFreeCreditsMaxPool();
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(770011)`);
+    const [reservation] = await tx.select({ id: creditTransaction.id }).from(creditTransaction).where(and(
+      eq(creditTransaction.userId, userId), eq(creditTransaction.type, "generation_reserve"),
+      sql`not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${creditTransaction.description})`,
+    )).limit(1);
+    if (reservation) return { refilled: false, message: "Generation already in progress" };
+    const [current] = await tx.select().from(userCredit).where(eq(userCredit.userId, userId));
+    if (current && current.tokenBalance > 0) return { refilled: false, message: "AI allowance is still available" };
+    const [distributed] = await tx.select({ total: sum(creditTransaction.amount) }).from(creditTransaction)
+      .where(and(gte(creditTransaction.amount, 0), notInArray(creditTransaction.type, ["generation_settlement"])));
+    const amount = Number(env.DEFAULT_SIGNUP_CREDIT_TOKENS);
+    if (maxPool - Number(distributed?.total ?? 0) < amount) {
+      return { refilled: false, message: "Free credit pool is exhausted. Contact admin." };
+    }
 
-  const pool = await getPoolUsage();
-  const amount = env.DEFAULT_SIGNUP_CREDIT_TOKENS;
+    const [lastRefill] = await tx.select({ createdAt: creditTransaction.createdAt }).from(creditTransaction)
+      .where(and(eq(creditTransaction.userId, userId), gte(creditTransaction.amount, 0), notInArray(creditTransaction.type, ["generation_settlement"])))
+      .orderBy(desc(creditTransaction.createdAt)).limit(1);
+    const cooldown = calcCooldownRemaining(lastRefill?.createdAt ?? null);
 
-  if (pool.remaining < amount) {
-    return { refilled: false, message: "Free credit pool is exhausted. Contact admin." };
-  }
+    if (cooldown > 0) {
+      return { refilled: false, message: `Cooldown active. Try again in ${cooldown} day(s).` };
+    }
 
-  const lastRefill = await getLastRefillAt(userId);
-  const cooldown = calcCooldownRemaining(lastRefill?.createdAt ?? null);
+    await tx.insert(userCredit).values({ userId, tokenBalance: 0 }).onConflictDoNothing();
 
-  if (cooldown > 0) {
-    return { refilled: false, message: `Cooldown active. Try again in ${cooldown} day(s).` };
-  }
+    const [updated] = await tx
+      .update(userCredit)
+      .set({
+        tokenBalance: sql`token_balance + ${amount}`,
+      })
+      .where(eq(userCredit.userId, userId)).returning();
 
-  await ensureUserCreditRow(userId);
+    await tx.insert(creditTransaction).values({
+      userId,
+      amount,
+      type: "auto_refill",
+      description: "Auto-refill from free credit pool",
+    });
 
-  await db
-    .update(userCredit)
-    .set({
-      tokenBalance: sql`token_balance + ${amount}`,
-    })
-    .where(eq(userCredit.userId, userId));
-
-  await db.insert(creditTransaction).values({
-    userId,
-    amount,
-    type: "auto_refill",
-    description: "Auto-refill from free credit pool",
+    return { refilled: true, message: `Refilled ${amount.toLocaleString()} tokens from free pool.`, newBalance: updated!.tokenBalance };
   });
-
-  const credit = await getUserCredit(userId);
-
-  return { refilled: true, message: `Refilled ${amount.toLocaleString()} tokens from free pool.`, newBalance: credit.tokenBalance };
 }
 
 export function maskApiKey(key: string): string {

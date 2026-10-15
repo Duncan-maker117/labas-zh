@@ -59,6 +59,14 @@ describe("Credit Utility", () => {
   // ── Credit Deduction ──────────────────────────────────────
 
   describe("deductCredit", () => {
+    it("does not overdraw credits when deductions arrive concurrently", async () => {
+      const uid = makeUserId("concurrent");
+      await db.insert(schema.user).values({ id: uid, name: uid, email: `${uid}@test.com` });
+      await db.insert(schema.userCredit).values({ userId: uid, tokenBalance: 1000 });
+      const results = await Promise.allSettled([credit.deductCredit(uid, 800), credit.deductCredit(uid, 800)]);
+      expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+      expect((await credit.getUserCredit(uid)).tokenBalance).toBe(200);
+    });
     it("deducts tokens from balance", async () => {
       const uid = makeUserId("deduct");
       await db.insert(schema.user).values({ id: uid, name: uid, email: `${uid}@test.com` });
@@ -167,6 +175,21 @@ describe("Credit Utility", () => {
   });
 
   describe("autoRefillIfEligible", () => {
+    it("does not grant the initial allowance twice on concurrent reads", async () => {
+      const uid = makeUserId("refill-race");
+      await db.insert(schema.user).values({ id: uid, name: uid, email: `${uid}@test.com` });
+      const results = await Promise.all([credit.autoRefillIfEligible(uid), credit.autoRefillIfEligible(uid)]);
+      expect(results.filter((result) => result.refilled)).toHaveLength(1);
+      expect((await credit.getUserCredit(uid)).tokenBalance).toBe(50000);
+    });
+    it("does not treat a reservation refund as newly distributed credit or a refill", async () => {
+      const uid = makeUserId("settled");
+      await db.insert(schema.user).values({ id: uid, name: uid, email: `${uid}@test.com` });
+      const before = await credit.getPoolUsage();
+      await db.insert(schema.creditTransaction).values({ userId: uid, amount: 25000, type: "generation_settlement", description: "generation:test", tokensUsed: 3000 });
+      expect((await credit.getPoolUsage()).totalDistributed).toBe(before.totalDistributed);
+      expect(await credit.getLastRefillAt(uid)).toBeNull();
+    });
     it("grants initial free credits to new user with zero balance", async () => {
       const uid = makeUserId("refill");
       await db.insert(schema.user).values({ id: uid, name: uid, email: `${uid}@test.com` });

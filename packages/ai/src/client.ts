@@ -1,3 +1,4 @@
+import { reserveTokenBudget } from "./token-budget";
 import {
   extractContentFromCompletionBody,
   isLikelyTruncatedJson,
@@ -210,7 +211,9 @@ export class OpenAICompatibleClient {
       temperature: opts.temperature ?? 0.7,
       stream,
     };
-    if (opts.max_tokens) body.max_tokens = opts.max_tokens;
+    const budget = reserveTokenBudget(opts.messages, opts.max_tokens ?? 4096);
+    if (budget) body.stream_options = { include_usage: true };
+    if (opts.max_tokens || budget) body.max_tokens = budget?.maxOutput ?? opts.max_tokens;
     if (opts.response_format && !ctx.retriedForResponseFormat) {
       body.response_format = opts.response_format;
     }
@@ -241,6 +244,7 @@ export class OpenAICompatibleClient {
     });
 
     if (!res.ok) {
+      budget?.settle(0);
       const text = await res.text();
       const preview = sanitizeForLog(text, 500);
       log("error", "API request failed", {
@@ -276,10 +280,16 @@ export class OpenAICompatibleClient {
     }
 
     const reader = res.body.getReader() as any;
-    const streamResult = await readSSEStream(
-      reader,
-      callbacks ?? { onToken: () => {} },
-    );
+    let streamResult: Awaited<ReturnType<typeof readSSEStream>>;
+    try {
+      streamResult = await readSSEStream(reader, callbacks ?? { onToken: () => {} });
+    } finally {
+      // Also stop the upstream stream when a cancellation callback throws.
+      await reader.cancel().catch(() => {});
+    }
+    const reportedTokens = streamResult.usage?.total_tokens;
+    budget?.settle(typeof reportedTokens === "number" && Number.isSafeInteger(reportedTokens) && reportedTokens >= 0
+      ? reportedTokens : budget.estimateOutput(streamResult.content, streamResult.reasoning));
     const result = {
       ...streamResult,
       content: stripReasoningBlocks(streamResult.content),

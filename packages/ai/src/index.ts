@@ -1,4 +1,5 @@
 export { OpenAICompatibleClient } from "./client";
+export { withTokenBudget, getTokenBudgetUsage } from "./token-budget";
 export { generateQuestionsQuick } from "./pipeline";
 export { generateQuestionsAgentic, generatePassageForInput, generateQuestionsAgenticFromPassage } from "./agentic";
 export { getTargetLanguage, buildContentLanguageRules } from "./language-rules";

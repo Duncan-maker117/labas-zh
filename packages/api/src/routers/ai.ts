@@ -1,18 +1,15 @@
 import { z } from "zod";
 import { eq, desc, and, gte, sql, count } from "drizzle-orm";
 import { router, protectedProcedure } from "../index";
-import { type GenerationInput, generationInputSchema } from "@labas/ai/schemas";
+import { generationInputSchema } from "@labas/ai/schemas";
 import { cancelGenerationJob, enqueueGeneration } from "../queue";
 import { db } from "@labas/db";
 import { question, generationJob } from "@labas/db";
 import { paginationSchema, paginateDefaults } from "../lib/pagination";
 import { throwNotFound, throwForbidden, throwBadRequest } from "../lib/errors";
-import { checkDailyBudget } from "../lib/rate-limit";
+import { resolveGenerationInput } from "../lib/generation-config";
 import { decryptApiKey } from "../lib/encryption";
-import { isUserSuspended, getUserCredit, autoRefillIfEligible, getConfig, getConfigRaw, getPlatformAiConfig } from "../lib/credit";
-import { env } from "@labas/env/server";
-
-const DAILY_TOKEN_BUDGET = 500_000;
+import { isUserSuspended } from "../lib/credit";
 
 const generateInputSchema = generationInputSchema.extend({
   apiKeyConfig: generationInputSchema.shape.apiKeyConfig.optional(),
@@ -30,53 +27,7 @@ export const aiRouter = router({
       const suspended = await isUserSuspended(ctx.session.user.id);
       if (suspended) throwForbidden("Account is suspended");
 
-      const hasApiKey = !!input.apiKeyConfig?.apiKey;
-      let resolvedInput: GenerationInput;
-
-      if (!hasApiKey) {
-        const freeCreditsEnabled = await getConfig("free_credits_enabled", () => String(env.FREE_CREDITS_ENABLED));
-        if (freeCreditsEnabled !== "true") {
-          throwBadRequest("Free credits are currently disabled. Use BYOK or contact admin.");
-        }
-        const platformCfg = await getPlatformAiConfig();
-        let platformApiKey = platformCfg.apiKey;
-        if (platformApiKey) {
-          try {
-            platformApiKey = decryptApiKey(platformApiKey);
-          } catch {
-            // stored as plaintext, use as-is
-          }
-        } else {
-          platformApiKey = env.PLATFORM_AI_API_KEY ?? null;
-        }
-        if (!platformApiKey) {
-          throwBadRequest("Platform AI is not configured. Add your own API key in Settings.");
-        }
-        const credit = await getUserCredit(ctx.session.user.id);
-        if (credit.tokenBalance <= 0) {
-          const refill = await autoRefillIfEligible(ctx.session.user.id);
-          if (!refill.refilled) {
-            throwBadRequest(refill.message);
-          }
-        }
-        resolvedInput = {
-          ...input,
-          apiKeyConfig: {
-            baseUrl: platformCfg.baseUrl,
-            apiKey: platformApiKey,
-            model: platformCfg.model,
-            maxTokens: 4096,
-          },
-          _isPlatformGeneration: true,
-        } as GenerationInput;
-      } else {
-        resolvedInput = input as GenerationInput;
-      }
-
-      const withinBudget = await checkDailyBudget(ctx.session.user.id, DAILY_TOKEN_BUDGET);
-      if (!withinBudget) {
-        throwBadRequest(`Daily token budget (${DAILY_TOKEN_BUDGET.toLocaleString()}) exceeded. Try again tomorrow.`);
-      }
+      const resolvedInput = await resolveGenerationInput(input, ctx.session.user.id);
       const jobId = await enqueueGeneration(ctx.session.user.id, resolvedInput);
       return { jobId };
     }),
@@ -374,16 +325,16 @@ export const aiRouter = router({
       const sectionTypeId = jobInput.sectionTypeId ?? "";
 
       // Decrypt the stored apiKey before re-enqueuing
-      const decryptedInput = {
+      const retryInput = {
         ...jobInput,
         questionCount: remainingCount,
         ...(existingPackageId ? { _retryPackageId: existingPackageId, _retrySectionTypeId: sectionTypeId } : {}),
-        apiKeyConfig: {
+        apiKeyConfig: jobInput._isPlatformGeneration ? undefined : {
           ...jobInput.apiKeyConfig,
           apiKey: decryptApiKey(jobInput.apiKeyConfig.apiKey),
         },
       };
-
+      const decryptedInput = await resolveGenerationInput(retryInput, ctx.session.user.id);
       const newJobId = await enqueueGeneration(ctx.session.user.id, decryptedInput);
       return { jobId: newJobId, remainingCount, alreadyCount };
     }),

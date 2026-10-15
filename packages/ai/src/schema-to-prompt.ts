@@ -1,13 +1,14 @@
-import { toJSONSchema } from "zod";
+import { toJSONSchema, z } from "zod";
 import { questionSchema, cpnsQuestionSchema } from "./schemas";
 
 /**
  * Generate a concise JSON-schema description of the question schema
  * suitable for embedding into an LLM prompt.
  */
-export function getQuestionJsonSchemaDescription(): string {
-  const jsonSchema = toJSONSchema(questionSchema);
-  return JSON.stringify(jsonSchema, null, 2);
+export function getQuestionJsonSchemaDescription(formats?: readonly string[]): string {
+  const selected = formats?.length ? questionSchema.options.filter((option) => formats.includes(option.shape.format.value)) : null;
+  const jsonSchema = toJSONSchema(selected ? z.union(selected) : questionSchema);
+  return selected ? JSON.stringify(jsonSchema) : JSON.stringify(jsonSchema, null, 2);
 }
 
 /**

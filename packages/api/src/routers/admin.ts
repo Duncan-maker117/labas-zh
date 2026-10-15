@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, desc, sql, count, sum, ilike, or, and, inArray, gte, lte, type SQL } from "drizzle-orm";
+import { eq, desc, sql, count, ilike, or, and, inArray, gte, lte, type SQL } from "drizzle-orm";
 import { adminProcedure, protectedProcedure, router } from "../index";
 import * as schema from "@labas/db";
 import { db } from "@labas/db";
@@ -8,6 +8,7 @@ import { throwNotFound, throwForbidden, throwBadRequest } from "../lib/errors";
 import { getUserCredit, getLastRefillAt, getPoolUsage, getConfig, getConfigRaw, setConfig, autoRefillIfEligible, getPlatformAiConfig, maskApiKey } from "../lib/credit";
 import { encryptApiKey } from "../lib/encryption";
 import { env } from "@labas/env/server";
+import { cancelGenerationJob } from "../queue";
 
 function audit(adminUserId: string, action: string, targetUserId: string | null, details?: Record<string, unknown>) {
   return db.insert(schema.adminAuditLog).values({
@@ -25,10 +26,12 @@ export const adminRouter = router({
   }),
 
   getMyCredit: protectedProcedure.query(async ({ ctx }) => {
+    const config = await getPlatformAiConfig();
+    const platformAiReady = !!(config.apiKey || env.PLATFORM_AI_API_KEY);
     let credit = await getUserCredit(ctx.session.user.id);
 
     // Proactively grant first free-credit refill so new users see balance before clicking Generate.
-    if (credit.tokenBalance <= 0) {
+    if (platformAiReady && credit.tokenBalance <= 0) {
       const refill = await autoRefillIfEligible(ctx.session.user.id);
       if (refill.refilled && refill.newBalance !== undefined) {
         credit = { ...credit, tokenBalance: refill.newBalance };
@@ -42,11 +45,19 @@ export const adminRouter = router({
     const cooldownRemaining = Math.max(0, Math.ceil((cooldownEnd - Date.now()) / (24 * 60 * 60 * 1000)));
 
     const enabledVal = await getConfig("free_credits_enabled", () => String(env.FREE_CREDITS_ENABLED));
+    const [reservation] = await db.select({ amount: sql<number>`coalesce(-sum(${schema.creditTransaction.amount}), 0)` })
+      .from(schema.creditTransaction).where(and(
+        eq(schema.creditTransaction.userId, ctx.session.user.id),
+        eq(schema.creditTransaction.type, "generation_reserve"),
+        sql`not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${schema.creditTransaction.description})`,
+      ));
 
     return {
       tokenBalance: credit.tokenBalance,
       lifetimeTokensUsed: credit.lifetimeTokensUsed,
       freeCreditsEnabled: enabledVal === "true",
+      platformAiReady,
+      reservedAllowance: Number(reservation?.amount ?? 0),
       lastRefillAt: lastRefill?.createdAt ?? null,
       cooldownDays: 7,
       cooldownRemaining,
@@ -552,15 +563,9 @@ export const adminRouter = router({
         .limit(1);
       if (!job) throwNotFound("Job");
 
-      if (job.status !== "pending" && job.status !== "running") {
-        throwBadRequest("Only pending or running jobs can be cancelled");
-      }
-
-      const [updated] = await db
-        .update(schema.generationJob)
-        .set({ status: "cancelled", completedAt: new Date() })
-        .where(eq(schema.generationJob.id, input.jobId))
-        .returning();
+      const result = await cancelGenerationJob(job.userId, input.jobId);
+      if (!result.ok) throwBadRequest("Only active jobs can be cancelled");
+      const [updated] = await db.select().from(schema.generationJob).where(eq(schema.generationJob.id, input.jobId));
 
       await audit(ctx.session.user.id, "cancel_job", job.userId, { jobId: input.jobId });
       return updated;
@@ -1205,7 +1210,7 @@ export const adminRouter = router({
       provider: config.provider,
       baseUrl: config.baseUrl,
       model: config.model,
-      apiKeyConfigured: !!config.apiKey,
+      apiKeyConfigured: !!(config.apiKey || env.PLATFORM_AI_API_KEY),
       apiKeyPreview: config.apiKey ? maskApiKey(config.apiKey) : null,
     };
   }),
