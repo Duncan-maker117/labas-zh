@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
@@ -31,7 +32,7 @@ export function ActiveUsersPanel({ data, isLoading }: ActiveUsersPanelProps) {
       <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Sedang Latihan Sekarang
+            <LocalizedText source={"Sedang Latihan Sekarang"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -54,7 +55,7 @@ export function ActiveUsersPanel({ data, isLoading }: ActiveUsersPanelProps) {
           <div className="flex items-center gap-2">
             <MaterialIcon name="bolt" className="text-xl text-[var(--chart-3)]" />
             <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-              Sedang Latihan Sekarang
+              <LocalizedText source={"Sedang Latihan Sekarang"} />
             </CardTitle>
             {count > 0 && (
               <span className="text-xs font-bold bg-[var(--chart-3)]/15 text-[var(--chart-3)] px-2 py-0.5 rounded-full">
@@ -67,7 +68,7 @@ export function ActiveUsersPanel({ data, isLoading }: ActiveUsersPanelProps) {
             search={{ page: 1, sortDir: "desc" as const, status: "in_progress" }}
             className="text-xs text-[var(--matcha-700)] hover:underline font-medium"
           >
-            Lihat semua
+            <LocalizedText source={"Lihat semua"} />
           </Link>
         </div>
       </CardHeader>
@@ -75,7 +76,7 @@ export function ActiveUsersPanel({ data, isLoading }: ActiveUsersPanelProps) {
         {count === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 text-[var(--warm-charcoal)]">
             <MaterialIcon name="self_improvement" className="text-3xl text-[var(--warm-silver)] mb-2" />
-            <p className="text-sm">Tidak ada yang sedang latihan</p>
+            <p className="text-sm"><LocalizedText source={"Tidak ada yang sedang latihan"} /></p>
           </div>
         ) : (
           <div className="space-y-2 max-h-[300px] overflow-y-auto">

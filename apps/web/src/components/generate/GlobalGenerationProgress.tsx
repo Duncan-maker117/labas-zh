@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useRef, useEffect } from "react";
 import { useRouterState, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
@@ -37,7 +39,7 @@ function DetailsContent({ details }: { details: string }) {
       <div className="mt-2 pt-2 border-t border-[var(--matcha-400)]/40">
         <div className="flex items-center gap-1 text-[var(--matcha-400)] text-[8px] font-semibold mb-1">
           <MaterialIcon name="psychology" className="text-xs" />
-          AI Thinking
+          <LocalizedText source={"AI Thinking"} />
         </div>
         <div className="text-[var(--matcha-300)]/90 italic">{reasoning}</div>
       </div>
@@ -83,7 +85,7 @@ function TerminalLog({ logs, isRunning }: { logs: LogEntry[]; isRunning: boolean
       <div className="mt-2 rounded-lg bg-black/40 p-2 border border-white/5">
         <div className="flex items-center gap-2 text-white/40 text-[10px] font-mono">
           <MaterialIcon name="psychology" className="text-[10px] animate-pulse" />
-          AI sedang mempersiapkan...
+          <LocalizedText source={"AI sedang mempersiapkan..."} />
         </div>
       </div>
     );
@@ -187,7 +189,7 @@ function SingleJobCard({
           <div className="min-w-0">
             <span className="text-xs font-semibold block truncate">{message}</span>
             {isAgentic && (
-              <span className="text-[10px] text-[var(--matcha-400)]">Agentic</span>
+              <span className="text-[10px] text-[var(--matcha-400)]"><LocalizedText source={"Agentic"} /></span>
             )}
             {sectionLabel && (
               <span className="text-[10px] text-[var(--blueberry-500)] ml-1">· {sectionLabel}</span>
@@ -231,6 +233,7 @@ function SingleJobCard({
 }
 
 export function GlobalGenerationProgress() {
+  const { ui } = useLocale();
   const { activeJobs, isGenerating, removeJob, setError } = useGenerationJobs();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -266,7 +269,7 @@ export function GlobalGenerationProgress() {
           name="psychology"
           className="text-[var(--matcha-400)] animate-pulse text-sm"
         />
-        <span>{activeJobs.length} active</span>
+        <span>{activeJobs.length} <LocalizedText source={"active"} /></span>
       </button>
     );
   }
@@ -286,21 +289,21 @@ export function GlobalGenerationProgress() {
             className="text-[var(--matcha-400)] animate-pulse text-base"
           />
           <span className="text-sm font-semibold">
-            AI Generation{activeJobs.length > 1 ? ` (${activeJobs.length})` : ""}
+            <LocalizedText source={"AI Generation"} />{activeJobs.length > 1 ? ` (${activeJobs.length})` : ""}
           </span>
         </div>
         <div className="flex items-center gap-1">
           <Link
             to="/generate"
             className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-            title="Buka halaman generate"
+            title={ui("Buka halaman generate")}
           >
             <MaterialIcon name="open_in_new" className="text-sm" />
           </Link>
           <button
             onClick={() => setCollapsed(true)}
             className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-            title="Minimize"
+            title={ui("Minimize")}
           >
             <MaterialIcon name="expand_more" className="text-sm" />
           </button>

@@ -1,3 +1,5 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import {
   AreaChart,
   Area,
@@ -30,12 +32,13 @@ interface DailyGenerationChartProps {
 }
 
 export function DailyGenerationChart({ genData, signupData, isLoading }: DailyGenerationChartProps) {
+  const { locale, ui } = useLocale();
   if (isLoading) {
     return (
       <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Generate & Signup Harian
+            <LocalizedText source={"Generate & Signup Harian"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -53,14 +56,14 @@ export function DailyGenerationChart({ genData, signupData, isLoading }: DailyGe
       <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Generate & Signup Harian
+            <LocalizedText source={"Generate & Signup Harian"} />
           </CardTitle>
         </CardHeader>
         <CardContent className="h-64 flex flex-col items-center justify-center text-[var(--warm-charcoal)]">
           <MaterialIcon name="auto_awesome" className="text-4xl text-[var(--warm-silver)] mb-3" />
-          <p className="font-semibold">Belum ada data harian</p>
+          <p className="font-semibold"><LocalizedText source={"Belum ada data harian"} /></p>
           <p className="text-xs text-[var(--warm-silver)] mt-1">
-            Data akan muncul setelah user generate soal atau mendaftar.
+            <LocalizedText source={"Data akan muncul setelah user generate soal atau mendaftar."} />
           </p>
         </CardContent>
       </Card>
@@ -81,7 +84,7 @@ export function DailyGenerationChart({ genData, signupData, isLoading }: DailyGe
     <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
       <CardHeader>
         <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-          Generate & Signup Harian (30 Hari)
+          <LocalizedText source={"Generate & Signup Harian (30 Hari)"} />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -121,9 +124,9 @@ export function DailyGenerationChart({ genData, signupData, isLoading }: DailyGe
               formatter={(value: unknown, name: unknown) => {
                 const num = typeof value === "number" ? value : 0;
                 const n = typeof name === "string" ? name : "";
-                if (n === "count") return [num.toLocaleString("id-ID"), "Generate"];
-                if (n === "signups") return [num.toLocaleString("id-ID"), "Signup"];
-                if (n === "totalTokens") return [num.toLocaleString("id-ID"), "Token Digunakan"];
+                if (n === "count") return [num.toLocaleString(locale), ui("Generate")];
+                if (n === "signups") return [num.toLocaleString(locale), ui("Signup")];
+                if (n === "totalTokens") return [num.toLocaleString(locale), ui("Token Digunakan")];
                 return [num, n];
               }}
             />

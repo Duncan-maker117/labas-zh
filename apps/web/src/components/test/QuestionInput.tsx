@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Input } from "@labas/ui/components/input";
 
@@ -56,6 +58,7 @@ function DebouncedTextInput({
   placeholder?: string;
   className?: string;
 }) {
+  const { ui } = useLocale();
   const [localValue, setLocalValue] = useState(value);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -83,7 +86,7 @@ function DebouncedTextInput({
 
   return (
     <Input
-      aria-label="Jawaban esai"
+      aria-label={ui("Jawaban esai")}
       value={localValue}
       onChange={handleChange}
       onBlur={handleBlur}
@@ -128,6 +131,7 @@ export function QuestionInput({
   onChange: (val: string) => void;
   disabled?: boolean;
 }) {
+  const { ui } = useLocale();
   const format = question.format;
   const options = question.options as Array<{ key: string; text: string }> | undefined;
 
@@ -135,7 +139,7 @@ export function QuestionInput({
     if (!options || options.length === 0) {
       return (
         <div className="text-sm text-[var(--warm-silver)] italic">
-          Tidak ada opsi tersedia untuk soal ini.
+          <LocalizedText source={"Tidak ada opsi tersedia untuk soal ini."} />
         </div>
       );
     }
@@ -171,8 +175,8 @@ export function QuestionInput({
                 value={matched}
                 onChange={(e) => updateMapping(opt.key, e.target.value)}
                 disabled={disabled}
-                placeholder="Padanan..."
-                aria-label="Padanan jawaban"
+                placeholder={ui("Padanan...")}
+                aria-label={ui("Padanan jawaban")}
                 className="w-24 px-3 py-2 text-sm rounded-[var(--radius-md)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] focus:outline-none focus:border-[var(--matcha-600)]"
               />
             </div>
@@ -186,7 +190,7 @@ export function QuestionInput({
     if (!options || options.length === 0) {
       return (
         <div className="text-sm text-[var(--warm-silver)] italic">
-          Tidak ada opsi tersedia untuk soal ini.
+          <LocalizedText source={"Tidak ada opsi tersedia untuk soal ini."} />
         </div>
       );
     }
@@ -256,7 +260,7 @@ export function QuestionInput({
     if (!options || options.length === 0) {
       return (
         <div className="text-sm text-[var(--warm-silver)] italic">
-          Tidak ada opsi tersedia untuk soal ini.
+          <LocalizedText source={"Tidak ada opsi tersedia untuk soal ini."} />
         </div>
       );
     }
@@ -378,7 +382,7 @@ export function QuestionInput({
       value={value}
       onChange={onChange}
       disabled={disabled}
-      placeholder="Ketik jawaban Anda..."
+      placeholder={ui("Ketik jawaban Anda...")}
       className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-lg)]"
     />
   );

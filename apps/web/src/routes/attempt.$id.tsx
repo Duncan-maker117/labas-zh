@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -180,9 +181,9 @@ function AttemptResultComponent() {
       <div className="min-h-screen pt-8 pb-32 px-6 md:px-12 lg:px-16 max-w-4xl mx-auto bg-[var(--warm-cream)]">
         <div className="text-center py-20">
           <MaterialIcon name="error_outline" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-          <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Hasil tidak ditemukan</p>
+          <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Hasil tidak ditemukan"} /></p>
           <Link to={packagesLink} className="text-[var(--matcha-600)] font-semibold mt-4 inline-block">
-            Kembali ke Paket
+            <LocalizedText source={"Kembali ke Paket"} />
           </Link>
         </div>
       </div>
@@ -209,10 +210,10 @@ function AttemptResultComponent() {
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs text-[var(--warm-charcoal)] mb-3">
             <Link to={packagesLink} className="hover:text-[var(--clay-black)] transition-colors">
-              Paket
+              <LocalizedText source={"Paket"} />
             </Link>
             <MaterialIcon name="chevron_right" className="text-[10px]" />
-            <span className="text-[var(--clay-black)] font-medium">Hasil Latihan</span>
+            <span className="text-[var(--clay-black)] font-medium"><LocalizedText source={"Hasil Latihan"} /></span>
           </div>
 
           {/* Title + score summary + actions */}
@@ -229,10 +230,10 @@ function AttemptResultComponent() {
               </div>
               <div>
                 <h1 className="text-lg font-headline font-extrabold text-[var(--clay-black)] leading-tight">
-                  Hasil Latihan
+                  <LocalizedText source={"Hasil Latihan"} />
                 </h1>
                 <p className="text-xs text-[var(--warm-charcoal)]">
-                  {questionStats.correct}/{questionStats.total} benar · {formatTime(durationSec)}
+                  {questionStats.correct}/{questionStats.total} <LocalizedText source={"benar ·"} /> {formatTime(durationSec)}
                 </p>
               </div>
             </div>
@@ -242,7 +243,7 @@ function AttemptResultComponent() {
               <Link to="/package/$id/take" params={{ id: attempt.packageId! }}>
                 <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)]">
                   <MaterialIcon name="replay" />
-                  <span className="ml-1.5">Coba Lagi</span>
+                  <span className="ml-1.5"><LocalizedText source={"Coba Lagi"} /></span>
                 </Button>
               </Link>
               <Link to={packagesLink}>
@@ -251,7 +252,7 @@ function AttemptResultComponent() {
                   className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
                 >
                   <MaterialIcon name="arrow_back" />
-                  <span className="ml-1.5 hidden sm:inline">Kembali</span>
+                  <span className="ml-1.5 hidden sm:inline"><LocalizedText source={"Kembali"} /></span>
                 </Button>
               </Link>
             </div>
@@ -277,13 +278,13 @@ function AttemptResultComponent() {
 
                 <div className="flex-1 space-y-2 text-center md:text-left">
                   <p className="text-lg font-semibold text-[var(--clay-black)]">
-                    {percentage >= 80
+                    <LocalizedValue value={percentage >= 80
                       ? "Sempurna!"
                       : percentage >= 60
                         ? "Bagus, terus berlatih!"
                         : percentage >= 40
                           ? "Perlu latihan lebih"
-                          : "Jangan menyerah, coba lagi!"}
+                          : "Jangan menyerah, coba lagi!"} />
                   </p>
                   <div className="flex flex-wrap gap-4 text-sm text-[var(--warm-charcoal)] justify-center md:justify-start">
                     <span className="flex items-center gap-1">
@@ -292,21 +293,21 @@ function AttemptResultComponent() {
                     </span>
                     <span className="flex items-center gap-1">
                       <MaterialIcon name="quiz" className="text-sm" />
-                      {questionStats.total} soal
+                      {questionStats.total} <LocalizedText source={"soal"} />
                     </span>
                     <span className="flex items-center gap-1">
                       <MaterialIcon name="check_circle" className="text-sm text-[var(--matcha-600)]" />
-                      {questionStats.correct} benar
+                      {questionStats.correct} <LocalizedText source={"benar"} />
                     </span>
                     <span className="flex items-center gap-1">
                       <MaterialIcon name="cancel" className="text-sm text-[var(--pomegranate-400)]" />
-                      {questionStats.wrong} salah
+                      {questionStats.wrong} <LocalizedText source={"salah"} />
                     </span>
                   </div>
 
                   {/* Package Rating */}
                   <div className="flex items-center gap-2 justify-center md:justify-start pt-2">
-                    <span className="text-xs text-[var(--warm-charcoal)]">Nilai paket:</span>
+                    <span className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Nilai paket:"} /></span>
                     <div className="flex gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -336,7 +337,7 @@ function AttemptResultComponent() {
 
         {/* Section Breakdown */}
         <div className="mb-8">
-          <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-4">Per Section</h2>
+          <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-4"><LocalizedText source={"Per Section"} /></h2>
           <div className="space-y-3">
             {attempt.sections.map((sec) => {
               const secPct = sec.maxScore && sec.maxScore > 0
@@ -349,7 +350,7 @@ function AttemptResultComponent() {
                       <div>
                         <p className="font-semibold text-[var(--clay-black)]">{sec.title}</p>
                         <p className="text-sm text-[var(--warm-charcoal)]">
-                          {sec.score ?? 0}/{sec.maxScore ?? 0} benar
+                          {sec.score ?? 0}/{sec.maxScore ?? 0} <LocalizedText source={"benar"} />
                         </p>
                         {sec.timeSpentSec != null && (
                           <p className="text-xs text-[var(--warm-silver)] mt-1 flex items-center gap-1">
@@ -372,9 +373,9 @@ function AttemptResultComponent() {
         {/* Skill Breakdown */}
         <div className="mb-8">
           <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-1">
-            Kemampuan per Topik
+            <LocalizedText source={"Kemampuan per Topik"} />
           </h2>
-          <p className="text-sm text-[var(--warm-charcoal)] mb-4">Klik topik untuk filter soal</p>
+          <p className="text-sm text-[var(--warm-charcoal)] mb-4"><LocalizedText source={"Klik topik untuk filter soal"} /></p>
           <SkillBreakdown
             questions={allQuestions.map(({ q, ans }) => ({
               skillTags: q.skillTags ?? [],
@@ -389,11 +390,11 @@ function AttemptResultComponent() {
         <div className="mb-8">
           <div className="flex items-baseline gap-2 mb-4">
             <h2 className="text-xl font-headline font-bold text-[var(--clay-black)]">
-              Pembahasan Soal
+              <LocalizedText source={"Pembahasan Soal"} />
             </h2>
             {filterStatus !== "all" && (
               <span className="text-sm text-[var(--warm-charcoal)]">
-                {filteredQuestions.length} soal
+                {filteredQuestions.length} <LocalizedText source={"soal"} />
               </span>
             )}
           </div>
@@ -425,7 +426,7 @@ function AttemptResultComponent() {
                 <div key={q.id}>
                   {isFirstInGroup && hasSharedPassage && (
                     <div className="bg-[var(--oat-light)] rounded-[var(--radius-lg)] p-4 mb-3 text-sm text-[var(--warm-charcoal)] whitespace-pre-wrap leading-relaxed max-w-prose border-l-4 border-[var(--matcha-400)]">
-                      <span className="font-semibold text-[var(--clay-black)] block mb-1">Teks Bacaan:</span>
+                      <span className="font-semibold text-[var(--clay-black)] block mb-1"><LocalizedText source={"Teks Bacaan:"} /></span>
                       {q.passageText}
                     </div>
                   )}
@@ -446,12 +447,12 @@ function AttemptResultComponent() {
             {filteredQuestions.length === 0 && (
               <div className="text-center py-12">
                 <MaterialIcon name="search_off" className="text-4xl text-[var(--warm-silver)] mx-auto mb-3" />
-                <p className="text-sm text-[var(--warm-charcoal)]">Tidak ada soal yang sesuai filter.</p>
+                <p className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Tidak ada soal yang sesuai filter."} /></p>
                 <button
                   onClick={() => { setFilterStatus("all"); setFilterSkills([]); }}
                   className="text-sm text-[var(--matcha-600)] font-semibold mt-2 hover:underline cursor-pointer"
                 >
-                  Reset filter
+                  <LocalizedText source={"Reset filter"} />
                 </button>
               </div>
             )}

@@ -1,3 +1,5 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import { useState } from "react";
 import {
   AreaChart,
@@ -35,6 +37,7 @@ function formatTokenValue(value: number): string {
 }
 
 export function TokenUsageChart() {
+  const { locale, ui } = useLocale();
   const [period, setPeriod] = useState<Period>("daily");
 
   const { data, isLoading } = useQuery(
@@ -58,7 +61,7 @@ export function TokenUsageChart() {
             <MaterialIcon name="show_chart" className="text-xl" />
             <div>
               <CardTitle className="font-headline text-[var(--clay-black)]">
-                Tren Penggunaan Token
+                <LocalizedText source={"Tren Penggunaan Token"} />
               </CardTitle>
               <CardDescription className="text-[var(--warm-charcoal)]">
                 {period === "daily" && "7 hari terakhir"}
@@ -72,9 +75,9 @@ export function TokenUsageChart() {
             onValueChange={(v: string | null) => setPeriod((v as Period) ?? "daily")}
           >
             <TabsList variant="line" className="h-8">
-              <TabsTrigger value="daily" className="text-xs px-3">Harian</TabsTrigger>
-              <TabsTrigger value="weekly" className="text-xs px-3">Mingguan</TabsTrigger>
-              <TabsTrigger value="monthly" className="text-xs px-3">Bulanan</TabsTrigger>
+              <TabsTrigger value="daily" className="text-xs px-3"><LocalizedText source={"Harian"} /></TabsTrigger>
+              <TabsTrigger value="weekly" className="text-xs px-3"><LocalizedText source={"Mingguan"} /></TabsTrigger>
+              <TabsTrigger value="monthly" className="text-xs px-3"><LocalizedText source={"Bulanan"} /></TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -85,9 +88,9 @@ export function TokenUsageChart() {
         ) : !hasData ? (
           <div className="h-64 flex flex-col items-center justify-center text-[var(--warm-charcoal)]">
             <MaterialIcon name="receipt_long" className="text-4xl text-[var(--warm-silver)] mb-3" />
-            <p className="font-semibold">Belum ada data penggunaan</p>
+            <p className="font-semibold"><LocalizedText source={"Belum ada data penggunaan"} /></p>
             <p className="text-xs text-[var(--warm-silver)] mt-1">
-              Generate soal untuk melihat statistik penggunaan token.
+              <LocalizedText source={"Generate soal untuk melihat statistik penggunaan token."} />
             </p>
           </div>
         ) : (
@@ -134,7 +137,7 @@ export function TokenUsageChart() {
                 formatter={(value: unknown, name: unknown) => {
                   const num = typeof value === "number" ? value : 0;
                   const n = typeof name === "string" ? name : "";
-                  if (n === "totalTokens") return [num.toLocaleString("id-ID"), "Token"];
+                  if (n === "totalTokens") return [num.toLocaleString(locale), ui("Token")];
                   if (n === "jobCount") return [num, "Job"];
                   return [num, n];
                 }}

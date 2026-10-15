@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { motion } from "motion/react";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
@@ -50,17 +51,17 @@ export function MyRankCard({
             </div>
             <div className="flex-1">
               <p className="text-sm font-headline font-bold text-[var(--clay-black)]">
-                Posisimu
+                <LocalizedText source={"Posisimu"} />
               </p>
               <p className="text-xs text-[var(--warm-charcoal)]">
-                Belum ada data untuk periode ini.
+                <LocalizedText source={"Belum ada data untuk periode ini."} />
               </p>
             </div>
             <Link
               to="/bank"
               className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
             >
-              Mulai Latihan
+              <LocalizedText source={"Mulai Latihan"} />
             </Link>
           </div>
         </CardContent>
@@ -84,14 +85,14 @@ export function MyRankCard({
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-headline font-bold text-[var(--clay-black)]">
-                Peringkat #{data.rank} dari {data.totalParticipants}
+                <LocalizedText source={"Peringkat #"} />{data.rank} <LocalizedText source={"dari"} /> {data.totalParticipants}
               </p>
               <p className="text-xs text-[var(--warm-charcoal)]">
-                {data.avgScorePct}% avg &middot; {data.attemptsCount} latihan &middot; {data.totalScore} pts
+                {data.avgScorePct}<LocalizedText source={"% avg ·"} /> {data.attemptsCount} <LocalizedText source={"latihan ·"} /> {data.totalScore} <LocalizedText source={"pts"} />
               </p>
               {pointsBehindNext !== null && pointsBehindNext > 0 && (
                 <p className="text-xs font-semibold text-[var(--pomegranate-600)] mt-1">
-                  Butuh {pointsBehindNext} pts lagi untuk naik ke #{nextRankPosition}
+                  <LocalizedText source={"Butuh"} /> {pointsBehindNext} <LocalizedText source={"pts lagi untuk naik ke #"} />{nextRankPosition}
                 </p>
               )}
             </div>
@@ -99,7 +100,7 @@ export function MyRankCard({
               to="/bank"
               className="shrink-0 px-4 py-2 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
             >
-              Kejar
+              <LocalizedText source={"Kejar"} />
             </Link>
           </div>
         </CardContent>

@@ -1,3 +1,4 @@
+import { useLocale } from "@/lib/locale";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/utils/trpc";
@@ -22,6 +23,7 @@ const SEVERITY_CONFIG = {
 } as const;
 
 export function AnnouncementBanner() {
+  const { ui } = useLocale();
   const { data } = useQuery({
     ...trpc.announcement.getActive.queryOptions(),
     staleTime: 60_000,
@@ -71,7 +73,7 @@ export function AnnouncementBanner() {
         <p className={`text-sm font-medium flex-1 ${cfg.textColor}`}>{data.message}</p>
         <button
           onClick={handleDismiss}
-          aria-label="Tutup pengumuman"
+          aria-label={ui("Tutup pengumuman")}
           className="shrink-0 text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors cursor-pointer"
         >
           <MaterialIcon name="close" className="text-lg" />

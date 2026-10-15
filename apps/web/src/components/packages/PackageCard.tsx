@@ -1,3 +1,5 @@
+import { uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent } from "@labas/ui/components/card";
@@ -70,7 +72,7 @@ export function PackageCard({
                       : "bg-[var(--oat-light)] text-[var(--warm-charcoal)]"
                   }`}>
                     <MaterialIcon name={isSelected ? "check_circle" : "radio_button_unchecked"} className="text-xs" />
-                    {isSelected ? "Terpilih" : "Pilih"}
+                    <LocalizedValue value={isSelected ? "Terpilih" : "Pilih"} />
                   </span>
                 )}
                 {pkg.examTypeName && (
@@ -111,12 +113,12 @@ export function PackageCard({
               {pkg.estimatedDurationMin && (
                 <span className="flex items-center gap-1">
                   <MaterialIcon name="timer" className="text-xs" />
-                  {pkg.estimatedDurationMin}m
+                  {pkg.estimatedDurationMin}<LocalizedText source={"m"} />
                 </span>
               )}
             </div>
             <span className="text-xs text-[var(--warm-silver)]">
-              {pkg.usageCount}x digunakan
+              {pkg.usageCount}<LocalizedText source={"x digunakan"} />
             </span>
           </div>
         </div>
@@ -146,11 +148,11 @@ export function PackageCard({
               />
               {/* Default label */}
               <span className="group-hover:hidden">
-                {pkg.isPublic ? "Publik" : "Privat"}
+                <LocalizedValue value={pkg.isPublic ? "Publik" : "Privat"} />
               </span>
               {/* Hover label */}
               <span className="hidden group-hover:inline">
-                {pkg.isPublic ? "Jadikan Privat" : "Jadikan Publik"}
+                <LocalizedValue value={pkg.isPublic ? "Jadikan Privat" : "Jadikan Publik"} />
               </span>
             </button>
 
@@ -159,12 +161,12 @@ export function PackageCard({
                 onClick={() => {
                   const url = `${window.location.origin}/package/${pkg.id}`;
                   navigator.clipboard.writeText(url);
-                  toast.success("Link paket disalin!");
+                  toast.success(uiMessage("Link paket disalin!"));
                 }}
                 className="text-xs text-[var(--matcha-600)] hover:bg-[var(--matcha-300)]/20 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <MaterialIcon name="share" className="text-xs" />
-                Bagikan
+                <LocalizedText source={"Bagikan"} />
               </button>
             )}
           </div>
@@ -179,7 +181,7 @@ export function PackageCard({
               size="xl"
             >
               <MaterialIcon name="play_arrow" className="mr-2" />
-              Mulai Latihan
+              <LocalizedText source={"Mulai Latihan"} />
             </Button>
           </div>
         )}

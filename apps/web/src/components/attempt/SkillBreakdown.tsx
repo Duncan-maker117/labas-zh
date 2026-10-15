@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useMemo } from "react";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 
@@ -62,7 +63,7 @@ export function SkillBreakdown({ questions, onSkillClick, activeSkills }: SkillB
               />
             </div>
             <div className="flex justify-between mt-0.5">
-              <span className="text-[10px] text-[var(--warm-silver)]">{pct}% benar</span>
+              <span className="text-[10px] text-[var(--warm-silver)]">{pct}<LocalizedText source={"% benar"} /></span>
             </div>
           </button>
         );

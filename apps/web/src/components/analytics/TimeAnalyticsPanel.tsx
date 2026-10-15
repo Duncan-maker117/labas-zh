@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import {
   BarChart,
   Bar,
@@ -43,19 +45,20 @@ function EmptyTimeBox({ message }: { message: string }) {
         to="/bank"
         className="mt-3 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
       >
-        Mulai Latihan
+        <LocalizedText source={"Mulai Latihan"} />
       </Link>
     </div>
   );
 }
 
 export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: TimeAnalyticsPanelProps) {
+  const { ui } = useLocale();
   return (
     <div className="space-y-6">
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Waktu per Section
+            <LocalizedText source={"Waktu per Section"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -83,7 +86,7 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
               ))}
             </div>
           ) : (
-            <EmptyTimeBox message="Belum ada data waktu per section." />
+            <EmptyTimeBox message={ui("Belum ada data waktu per section.")} />
           )}
         </CardContent>
       </Card>
@@ -91,7 +94,7 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Waktu per Format Soal
+            <LocalizedText source={"Waktu per Format Soal"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -119,7 +122,7 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
               ))}
             </div>
           ) : (
-            <EmptyTimeBox message="Belum ada data waktu per format soal." />
+            <EmptyTimeBox message={ui("Belum ada data waktu per format soal.")} />
           )}
         </CardContent>
       </Card>
@@ -127,7 +130,7 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Tren Waktu per Hari
+            <LocalizedText source={"Tren Waktu per Hari"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -164,7 +167,7 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyTimeBox message="Belum ada data tren waktu." />
+            <EmptyTimeBox message={ui("Belum ada data tren waktu.")} />
           )}
         </CardContent>
       </Card>

@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -74,6 +75,7 @@ function NavIcon({ name }: { name: string }) {
 }
 
 function NavLink({ item, isActive, collapsed }: { item: NavItem; isActive: boolean; collapsed: boolean }) {
+  const { ui } = useLocale();
   const tourAttr = item.to !== "/dashboard" ? { "data-tour": `nav-${item.to.replace("/", "")}` } : {};
   return (
     <Link
@@ -86,10 +88,10 @@ function NavLink({ item, isActive, collapsed }: { item: NavItem; isActive: boole
           ? "bg-[var(--matcha-300)] text-[var(--matcha-800)] font-semibold clay-shadow"
           : "text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)]"
       } ${collapsed ? "justify-center py-3 px-2" : "py-3 px-3"}`}
-      title={collapsed ? item.label : undefined}
+      title={collapsed ? ui(item.label) : undefined}
     >
       <NavIcon name={item.icon} />
-      {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
+      {!collapsed && <span className="text-sm font-medium">{ui(item.label)}</span>}
     </Link>
   );
 }
@@ -98,7 +100,7 @@ export function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { collapsed, toggle } = useSidebar();
-  const { locale, setLocale, t } = useLocale();
+  const { locale, setLocale, t, ui } = useLocale();
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session;
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
@@ -127,7 +129,7 @@ export function Sidebar() {
         <div className={`mb-8 ${collapsed ? "px-0 text-center" : "px-3"}`}>
           <img
             src={images.logo.src}
-            alt="Labas"
+            alt={ui("Labas")}
             width={64}
             height={64}
             className="mt-2 size-16 object-contain select-none"
@@ -135,7 +137,7 @@ export function Sidebar() {
           />
           {!collapsed && (
             <p className="text-xs text-[var(--warm-charcoal)] uppercase tracking-widest font-semibold mt-1">
-              外语考试练习
+              <LocalizedText source={"外语考试练习"} />
             </p>
           )}
         </div>
@@ -170,7 +172,7 @@ export function Sidebar() {
             <div className="space-y-1 pt-2 border-t border-[var(--matcha-400)]/30">
               {!collapsed && (
                 <p className="px-3 text-[10px] font-bold text-[var(--matcha-600)] uppercase tracking-wider">
-                  Admin
+                  <LocalizedText source={"Admin"} />
                 </p>
               )}
               {[{ to: "/admin", label: "Admin Panel", icon: "admin_panel_settings" }].map((item) => {
@@ -204,27 +206,27 @@ export function Sidebar() {
           {/* Help Tour Button */}
           <button
             onClick={triggerGlobalTour}
-            aria-label="Panduan"
+            aria-label={ui("Panduan")}
             className={`flex items-center gap-3 rounded-[var(--radius-lg)] transition-all clay-hover cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)] w-full ${
               collapsed ? "justify-center py-3 px-2" : "py-3 px-3 text-left"
             }`}
             title={collapsed ? "Panduan" : undefined}
           >
             <NavIcon name="help" />
-            {!collapsed && <span className="text-sm font-medium">Panduan</span>}
+            {!collapsed && <span className="text-sm font-medium"><LocalizedText source={"Panduan"} /></span>}
           </button>
 
           {isLoggedIn ? (
             <button
               onClick={handleSignOut}
-              aria-label="Keluar"
+              aria-label={ui("Keluar")}
               className={`flex items-center gap-3 rounded-[var(--radius-lg)] transition-all clay-hover cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)] w-full ${
                 collapsed ? "justify-center py-3 px-2" : "py-3 px-3 text-left"
               }`}
               title={collapsed ? "Keluar" : undefined}
             >
               <NavIcon name="logout" />
-              {!collapsed && <span className="text-sm font-medium">Keluar</span>}
+              {!collapsed && <span className="text-sm font-medium"><LocalizedText source={"Keluar"} /></span>}
             </button>
           ) : (
             <Link
@@ -235,7 +237,7 @@ export function Sidebar() {
               title={collapsed ? "Masuk" : undefined}
             >
               <NavIcon name="login" />
-              {!collapsed && <span className="text-sm font-medium">Masuk</span>}
+              {!collapsed && <span className="text-sm font-medium"><LocalizedText source={"Masuk"} /></span>}
             </Link>
           )}
         </div>
@@ -290,7 +292,7 @@ export function Sidebar() {
               }`}
             >
               <NavIcon name={item.icon} />
-              <span className="text-[10px] font-medium uppercase tracking-wider mt-1">{item.label}</span>
+              <span className="text-[10px] font-medium uppercase tracking-wider mt-1">{ui(item.label)}</span>
             </Link>
           );
         })}
@@ -343,14 +345,14 @@ export function Sidebar() {
             {/* Admin section */}
             {isAdmin && (
               <div className="space-y-1 pt-2 border-t border-[var(--matcha-400)]/30">
-                <p className="px-3 text-[10px] font-bold text-[var(--matcha-600)] uppercase tracking-wider">Admin</p>
+                <p className="px-3 text-[10px] font-bold text-[var(--matcha-600)] uppercase tracking-wider"><LocalizedText source={"Admin"} /></p>
                 <Link
                   to="/admin"
                   onClick={() => setMobileSheetOpen(false)}
                   className="flex items-center gap-3 rounded-[var(--radius-lg)] transition-all py-3 px-3 cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)]"
                 >
                   <NavIcon name="admin_panel_settings" />
-                  <span className="text-sm font-medium">Admin Panel</span>
+                  <span className="text-sm font-medium"><LocalizedText source={"Admin Panel"} /></span>
                 </Link>
               </div>
             )}

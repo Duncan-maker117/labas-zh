@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 interface PaginationProps {
   page: number;
   totalPages: number;
@@ -26,7 +27,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
         disabled={page <= 1}
         className={baseBtn}
       >
-        Previous
+        <LocalizedText source={"Previous"} />
       </button>
       {pages.map((p, i) =>
         p === "..." ? (
@@ -48,7 +49,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
         disabled={page >= totalPages}
         className={baseBtn}
       >
-        Next
+        <LocalizedText source={"Next"} />
       </button>
     </div>
   );

@@ -1,6 +1,8 @@
 /* Hallmark · redesign: leaderboard · genre: modern-minimal · macrostructure: Leaderboard
  * design-system: DESIGN.md · theme: Clay (warm-cream · oat · swatch palette)
  */
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { motion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link, useNavigate, useSearch } from "@tanstack/react-router";
@@ -62,7 +64,7 @@ function GapRow({ count }: { count: number }) {
     >
       <div className="flex-1 h-px bg-[var(--oat-border)]" />
       <span className="text-xs font-medium text-[var(--warm-silver)] whitespace-nowrap">
-        {count.toLocaleString()} peserta lainnya
+        {count.toLocaleString()} <LocalizedText source={"peserta lainnya"} />
       </span>
       <div className="flex-1 h-px bg-[var(--oat-border)]" />
     </motion.div>
@@ -70,6 +72,7 @@ function GapRow({ count }: { count: number }) {
 }
 
 function LeaderboardPage() {
+  const { ui } = useLocale();
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session;
   const navigate = useNavigate();
@@ -124,19 +127,19 @@ function LeaderboardPage() {
         <div className="pt-8 mb-6">
           <div className="flex items-center gap-2 text-sm text-[var(--warm-charcoal)] mb-4">
             <Link to="/dashboard" className="hover:text-[var(--clay-black)] transition-colors">
-              Beranda
+              <LocalizedText source={"Beranda"} />
             </Link>
             <MaterialIcon name="chevron_right" className="text-xs" />
-            <span className="text-[var(--clay-black)] font-medium">Klasemen</span>
+            <span className="text-[var(--clay-black)] font-medium"><LocalizedText source={"Klasemen"} /></span>
           </div>
 
           <div className="flex items-center justify-between gap-4">
             <div>
               <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-                Klasemen
+                <LocalizedText source={"Klasemen"} />
               </h1>
               <p className="text-base text-[var(--warm-charcoal)] mt-1">
-                Lihat peringkat berdasarkan total skor latihan.
+                <LocalizedText source={"Lihat peringkat berdasarkan total skor latihan."} />
               </p>
             </div>
           </div>
@@ -160,7 +163,7 @@ function LeaderboardPage() {
                   : "border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-[var(--clay-black)] hover:bg-[var(--oat-light)]"
               }`}
             >
-              {p.label}
+              {ui(p.label)}
             </Button>
           ))}
         </motion.div>
@@ -174,11 +177,11 @@ function LeaderboardPage() {
         >
           <Select value={examTypeId} onValueChange={(v) => handleExamTypeChange(v ?? "")}>
             <SelectTrigger className="w-[180px] rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]">
-              <SelectValue placeholder="Semua Ujian" />
+              <SelectValue placeholder={ui("Semua Ujian")} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="">Semua Ujian</SelectItem>
+                <SelectItem value=""><LocalizedText source={"Semua Ujian"} /></SelectItem>
                 {EXAM_TYPES.map((exam) => (
                   <SelectItem key={exam.id} value={exam.id}>
                     {exam.name}
@@ -208,15 +211,15 @@ function LeaderboardPage() {
             <CardContent className="p-12 text-center">
               <MaterialIcon name="leaderboard" className="text-5xl text-[var(--warm-silver)] mx-auto mb-4" />
               <p className="text-[var(--warm-charcoal)] font-semibold text-lg">
-                Belum ada data untuk periode ini
+                <LocalizedText source={"Belum ada data untuk periode ini"} />
               </p>
               <p className="text-sm text-[var(--warm-silver)] mt-2">
-                Mulai latihan dan selesaikan paket soal untuk masuk klasemen.
+                <LocalizedText source={"Mulai latihan dan selesaikan paket soal untuk masuk klasemen."} />
               </p>
               <Link to="/packages" className="inline-block mt-6">
                 <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)] clay-shadow clay-hover cursor-pointer">
                   <MaterialIcon name="folder" className="mr-2" />
-                  Mulai Latihan
+                  <LocalizedText source={"Mulai Latihan"} />
                 </Button>
               </Link>
             </CardContent>

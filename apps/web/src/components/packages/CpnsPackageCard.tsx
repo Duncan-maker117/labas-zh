@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent } from "@labas/ui/components/card";
@@ -31,19 +32,19 @@ export function CpnsPackageCard({ pkg }: CpnsPackageCardProps) {
             {pkg.estimatedDurationMin && (
               <span className="flex items-center gap-1">
                 <MaterialIcon name="timer" className="text-xs" />
-                {pkg.estimatedDurationMin}m
+                {pkg.estimatedDurationMin}<LocalizedText source={"m"} />
               </span>
             )}
           </div>
           <Link to="/package/$id/take" params={{ id: pkg.id }} className="shrink-0">
             <Button className="bg-[var(--matcha-600)] text-[var(--pure-white)] rounded-[var(--radius-lg)] h-8 text-xs">
-              Mulai
+              <LocalizedText source={"Mulai"} />
             </Button>
           </Link>
         </div>
         <div className="mt-2 pt-2 border-t border-[var(--oat-border)]">
           <Link to="/package/$id" params={{ id: pkg.id }} className="text-xs text-[var(--matcha-600)] font-semibold hover:underline">
-            Lihat Detail →
+            <LocalizedText source={"Lihat Detail →"} />
           </Link>
         </div>
       </CardContent>

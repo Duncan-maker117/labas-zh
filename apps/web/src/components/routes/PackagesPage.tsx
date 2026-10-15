@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -52,6 +54,7 @@ export const Route = createFileRoute("/packages")({
 type Tab = "all" | "mine";
 
 export function PackagesComponent() {
+  const { ui } = useLocale();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: session } = authClient.useSession();
@@ -131,15 +134,15 @@ export function PackagesComponent() {
         setSelectedIds(new Set());
         if (data.skipped > 0) {
           toast.success(
-            `${data.updated} paket dipublikasikan, ${data.skipped} dilewati`,
-            { description: "Beberapa paket bukan milikmu atau sudah tidak tersedia." },
+            uiMessage(`${data.updated} paket dipublikasikan, ${data.skipped} dilewati`),
+            { description: uiMessage("Beberapa paket bukan milikmu atau sudah tidak tersedia.") },
           );
         } else {
-          toast.success(`${data.updated} paket berhasil dipublikasikan`);
+          toast.success(uiMessage(`${data.updated} paket berhasil dipublikasikan`));
         }
       },
       onError: (err: unknown) => {
-        toast.error("Gagal mempublikasikan. Coba refresh dan pilih ulang paket.", { description: getErrorMessage(err) });
+        toast.error(uiMessage("Gagal mempublikasikan. Coba refresh dan pilih ulang paket."), { description: getErrorMessage(err) });
       },
     }),
   );
@@ -186,10 +189,10 @@ export function PackagesComponent() {
         privateCountQuery.refetch();
         setBulkMode(false);
         setSelectedIds(new Set());
-        toast.success(`${data.updated} paket berhasil dipublikasikan`);
+        toast.success(uiMessage(`${data.updated} paket berhasil dipublikasikan`));
       },
       onError: (err: unknown) => {
-        toast.error("Gagal mempublikasikan semua paket.", { description: getErrorMessage(err) });
+        toast.error(uiMessage("Gagal mempublikasikan semua paket."), { description: getErrorMessage(err) });
       },
     }),
   );
@@ -216,16 +219,16 @@ export function PackagesComponent() {
         <div data-tour="packages-header" className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-              Paket Soal
+              <LocalizedText source={"Paket Soal"} />
             </h1>
             <p className="text-lg text-[var(--warm-charcoal)] mt-2">
-              Kumpulan paket latihan dari komunitas.
+              <LocalizedText source={"Kumpulan paket latihan dari komunitas."} />
             </p>
           </div>
           <Link to="/bank">
             <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)] h-11">
               <MaterialIcon name="add" />
-              <span className="ml-2 hidden sm:inline">Buat Paket</span>
+              <span className="ml-2 hidden sm:inline"><LocalizedText source={"Buat Paket"} /></span>
             </Button>
           </Link>
         </div>
@@ -241,13 +244,13 @@ export function PackagesComponent() {
             value="all"
             className="px-4 py-2 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
           >
-            Semua Paket
+            <LocalizedText source={"Semua Paket"} />
           </TabsTrigger>
           <TabsTrigger
             value="mine"
             className="px-4 py-2 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
           >
-            Paket Saya
+            <LocalizedText source={"Paket Saya"} />
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -257,10 +260,10 @@ export function PackagesComponent() {
         <div className="relative flex-1 max-w-md">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)]" />
           <Input
-            placeholder="Cari paket..."
+            placeholder={ui("Cari paket...")}
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            aria-label="Cari paket"
+            aria-label={ui("Cari paket")}
             className="pl-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11"
           />
         </div>
@@ -269,11 +272,11 @@ export function PackagesComponent() {
           onValueChange={(v: string | null) => setExamType(v ?? "")}
         >
           <SelectTrigger className="w-36">
-            <SelectValue placeholder="Semua Ujian" />
+            <SelectValue placeholder={ui("Semua Ujian")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">Semua Ujian</SelectItem>
+              <SelectItem value=""><LocalizedText source={"Semua Ujian"} /></SelectItem>
               {EXAM_TYPES.map((t) => (
                 <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
               ))}
@@ -284,15 +287,15 @@ export function PackagesComponent() {
           <div className="flex gap-2">
             <VisChip active={visibilityFilter === "all"} onClick={() => setVisibility("all")}>
               <MaterialIcon name="visibility" className="text-xs" />
-              Semua
+              <LocalizedText source={"Semua"} />
             </VisChip>
             <VisChip active={visibilityFilter === "private"} onClick={() => setVisibility("private")}>
               <MaterialIcon name="lock" className="text-xs" />
-              Privat
+              <LocalizedText source={"Privat"} />
             </VisChip>
             <VisChip active={visibilityFilter === "public"} onClick={() => setVisibility("public")}>
               <MaterialIcon name="public" className="text-xs" />
-              Publik
+              <LocalizedText source={"Publik"} />
             </VisChip>
           </div>
         )}
@@ -309,14 +312,14 @@ export function PackagesComponent() {
                   className="text-xs font-semibold text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors flex items-center gap-1"
                 >
                   <MaterialIcon name="close" className="text-xs" />
-                  Batalkan ({selectedIds.size})
+                  <LocalizedText source={"Batalkan ("} />{selectedIds.size})
                 </button>
                 <button
                   onClick={selectAll}
                   className="text-xs font-semibold text-[var(--matcha-600)] hover:text-[var(--matcha-800)] transition-colors flex items-center gap-1"
                 >
                   <MaterialIcon name="select_all" className="text-xs" />
-                  Pilih Semua
+                  <LocalizedText source={"Pilih Semua"} />
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -333,7 +336,7 @@ export function PackagesComponent() {
                   onClick={() => { setBulkMode(false); setSelectedIds(new Set()); }}
                   className="text-xs font-semibold text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors"
                 >
-                  Selesai
+                  <LocalizedText source={"Selesai"} />
                 </button>
               </div>
             </>
@@ -343,7 +346,7 @@ export function PackagesComponent() {
               className="text-xs font-semibold text-[var(--matcha-600)] hover:text-[var(--matcha-800)] transition-colors flex items-center gap-1 ml-auto"
             >
               <MaterialIcon name="select_all" className="text-sm" />
-              Pilih Banyak
+              <LocalizedText source={"Pilih Banyak"} />
             </button>
           )}
         </div>
@@ -354,7 +357,7 @@ export function PackagesComponent() {
         <div className="mb-6">
           <CalloutCard
             privateCount={totalPrivateCount}
-            label="paket"
+            label={ui("paket")}
             onPublishAll={handlePublishAllPrivate}
             onDismiss={handleDismissCallout}
           />
@@ -371,23 +374,23 @@ export function PackagesComponent() {
       ) : packages.length === 0 ? (
         <div className="text-center py-16">
           <MaterialIcon name="folder_open" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-          <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Tidak ada paket ditemukan</p>
+          <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Tidak ada paket ditemukan"} /></p>
           <p className="text-sm text-[var(--warm-silver)] mt-1 mb-6">
-            {tab === "mine"
+            <LocalizedValue value={tab === "mine"
               ? "Belum ada paket yang Anda buat. Buat paket dari Bank Soal."
-              : "Belum ada paket publik. Buat paket soal pertama Anda"}
+              : "Belum ada paket publik. Buat paket soal pertama Anda"} />
           </p>
           <div className="flex items-center justify-center gap-3">
             <Link to="/generate">
               <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)]">
                 <MaterialIcon name="auto_awesome" className="mr-2" />
-                Generate Soal
+                <LocalizedText source={"Generate Soal"} />
               </Button>
             </Link>
             <Link to="/bank">
               <Button variant="outline" className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)]">
                 <MaterialIcon name="add" className="mr-2" />
-                Buat Paket
+                <LocalizedText source={"Buat Paket"} />
               </Button>
             </Link>
           </div>

@@ -1,3 +1,5 @@
+import { uiMessage } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -62,9 +64,9 @@ function PackageDetailComponent() {
       <div className="min-h-screen pt-8 pb-32 px-6 md:px-12 lg:px-16 max-w-4xl mx-auto bg-[var(--warm-cream)]">
         <div className="text-center py-20">
           <MaterialIcon name="error_outline" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-          <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Paket tidak ditemukan</p>
+          <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Paket tidak ditemukan"} /></p>
           <Link to={bankLink} className="text-[var(--matcha-600)] font-semibold mt-4 inline-block">
-            Kembali ke Bank Soal
+            <LocalizedText source={"Kembali ke Bank Soal"} />
           </Link>
         </div>
       </div>
@@ -81,7 +83,7 @@ function PackageDetailComponent() {
         <div className="px-6 md:px-12 lg:px-16 max-w-4xl mx-auto pt-4 pb-4">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs text-[var(--warm-charcoal)] mb-3">
-            <Link to={bankLink} className="hover:text-[var(--clay-black)] transition-colors">Bank Soal</Link>
+            <Link to={bankLink} className="hover:text-[var(--clay-black)] transition-colors"><LocalizedText source={"Bank Soal"} /></Link>
             <MaterialIcon name="chevron_right" className="text-[10px]" />
             <span className="text-[var(--clay-black)] font-medium truncate max-w-[240px]">{pkg.title}</span>
           </div>
@@ -95,11 +97,11 @@ function PackageDetailComponent() {
                 </span>
                 {pkg.isPublic ? (
                   <span className="px-2.5 py-1 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] text-xs font-semibold">
-                    Publik
+                    <LocalizedText source={"Publik"} />
                   </span>
                 ) : (
                   <span className="px-2.5 py-1 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-semibold">
-                    Privat
+                    <LocalizedText source={"Privat"} />
                   </span>
                 )}
               </div>
@@ -116,7 +118,7 @@ function PackageDetailComponent() {
               <Link to="/package/$id/take" params={{ id }}>
                 <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)]">
                   <MaterialIcon name="play_arrow" />
-                  <span className="ml-1.5">Mulai Latihan</span>
+                  <span className="ml-1.5"><LocalizedText source={"Mulai Latihan"} /></span>
                 </Button>
               </Link>
               {pkg.isPublic && (
@@ -125,12 +127,12 @@ function PackageDetailComponent() {
                   onClick={() => {
                     const url = `${window.location.origin}/package/${id}`;
                     navigator.clipboard.writeText(url);
-                    toast.success("Link paket disalin ke clipboard!");
+                    toast.success(uiMessage("Link paket disalin ke clipboard!"));
                   }}
                   className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
                 >
                   <MaterialIcon name="share" />
-                  <span className="ml-1.5 hidden sm:inline">Bagikan</span>
+                  <span className="ml-1.5 hidden sm:inline"><LocalizedText source={"Bagikan"} /></span>
                 </Button>
               )}
               {isOwner && (
@@ -140,7 +142,7 @@ function PackageDetailComponent() {
                   className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
                 >
                   <MaterialIcon name="edit" />
-                  <span className="ml-1.5 hidden sm:inline">Edit Paket</span>
+                  <span className="ml-1.5 hidden sm:inline"><LocalizedText source={"Edit Paket"} /></span>
                 </Button>
               )}
             </div>
@@ -158,21 +160,21 @@ function PackageDetailComponent() {
             </Link>
             <span className="flex items-center gap-1">
               <MaterialIcon name="quiz" className="text-xs" />
-              {totalQuestions} soal
+              {totalQuestions} <LocalizedText source={"soal"} />
             </span>
             <span className="flex items-center gap-1">
               <MaterialIcon name="folder" className="text-xs" />
-              {pkg.totalSections} section
+              {pkg.totalSections} <LocalizedText source={"section"} />
             </span>
             {pkg.estimatedDurationMin && (
               <span className="flex items-center gap-1">
                 <MaterialIcon name="timer" className="text-xs" />
-                {pkg.estimatedDurationMin} menit
+                {pkg.estimatedDurationMin} <LocalizedText source={"menit"} />
               </span>
             )}
             <span className="flex items-center gap-1">
               <MaterialIcon name="trending_up" className="text-xs" />
-              {pkg.usageCount}x digunakan
+              {pkg.usageCount}<LocalizedText source={"x digunakan"} />
             </span>
           </div>
         </div>
@@ -194,7 +196,7 @@ function PackageDetailComponent() {
               </div>
 
               {section.questions.length === 0 ? (
-                <p className="text-sm text-[var(--warm-silver)] text-center py-4">Belum ada soal di section ini</p>
+                <p className="text-sm text-[var(--warm-silver)] text-center py-4"><LocalizedText source={"Belum ada soal di section ini"} /></p>
               ) : (
                 <div className="space-y-3">
                   {section.questions.map((q, idx: number) => (
@@ -215,7 +217,7 @@ function PackageDetailComponent() {
                               {formatLabel(q.format)}
                             </span>
                             <span className="px-2 py-0.5 rounded bg-[var(--pure-white)] text-[var(--warm-charcoal)] text-xs">
-                              Lv.{q.difficulty}
+                              <LocalizedText source={"Lv."} />{q.difficulty}
                             </span>
                           </div>
                         </div>

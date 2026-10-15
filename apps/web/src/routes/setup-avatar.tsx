@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useMemo, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -47,6 +49,7 @@ export const Route = createFileRoute("/setup-avatar")({
 });
 
 function SetupAvatarComponent() {
+  const { ui } = useLocale();
   const navigate = useNavigate();
   const { redirectTo } = Route.useSearch();
   const updateMutation = useMutation(trpc.profile.update.mutationOptions());
@@ -102,10 +105,10 @@ function SetupAvatarComponent() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-            Pilih Avatar
+            <LocalizedText source={"Pilih Avatar"} />
           </h1>
           <p className="text-[var(--warm-charcoal)] mt-1">
-            Atur tampilan avatar DiceBear Lorelei kamu
+            <LocalizedText source={"Atur tampilan avatar DiceBear Lorelei kamu"} />
           </p>
         </div>
 
@@ -120,7 +123,7 @@ function SetupAvatarComponent() {
                   <div className="flex flex-col items-center shrink-0">
                     <img
                       src={avatarUrl}
-                      alt="Avatar preview"
+                      alt={ui("Avatar preview")}
                       className="h-32 w-32 rounded-full border-4 border-[var(--pure-white)] clay-shadow bg-white"
                     />
                     <button
@@ -128,12 +131,12 @@ function SetupAvatarComponent() {
                       className="mt-3 bg-[var(--clay-black)] text-[var(--pure-white)] text-xs px-4 py-1.5 rounded-full hover:bg-[var(--warm-charcoal)] transition-colors flex items-center gap-1.5"
                     >
                       <MaterialIcon name="shuffle" className="text-xs" />
-                      Random
+                      <LocalizedText source={"Random"} />
                     </button>
                   </div>
                   <div className="flex-1 space-y-4">
                     <div>
-                      <p className="text-sm font-semibold text-[var(--clay-black)] mb-2">Background</p>
+                      <p className="text-sm font-semibold text-[var(--clay-black)] mb-2"><LocalizedText source={"Background"} /></p>
                       <div className="flex gap-2 flex-wrap">
                         {BACKGROUND_COLORS.map((c) => (
                           <button
@@ -146,13 +149,13 @@ function SetupAvatarComponent() {
                                 : "border-[var(--oat-border)] hover:border-[var(--warm-charcoal)]",
                             )}
                             style={{ backgroundColor: `#${c.value}` }}
-                            title={c.label}
+                            title={ui(c.label)}
                           />
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[var(--clay-black)] mb-2">Kulit</p>
+                      <p className="text-sm font-semibold text-[var(--clay-black)] mb-2"><LocalizedText source={"Kulit"} /></p>
                       <div className="flex gap-2 flex-wrap">
                         {SKIN_COLORS.map((c) => (
                           <button
@@ -165,13 +168,13 @@ function SetupAvatarComponent() {
                                 : "border-[var(--oat-border)] hover:border-[var(--warm-charcoal)]",
                             )}
                             style={{ backgroundColor: `#${c.value}` }}
-                            title={c.label}
+                            title={ui(c.label === "Light" ? "Light skin" : c.label === "Dark" ? "Dark skin" : c.label)}
                           />
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[var(--clay-black)] mb-2">Rambut</p>
+                      <p className="text-sm font-semibold text-[var(--clay-black)] mb-2"><LocalizedText source={"Rambut"} /></p>
                       <div className="flex gap-2 flex-wrap">
                         {HAIR_COLORS.map((c) => (
                           <button
@@ -184,7 +187,7 @@ function SetupAvatarComponent() {
                                 : "border-[var(--oat-border)] hover:border-[var(--warm-charcoal)]",
                             )}
                             style={{ backgroundColor: `#${c.value}` }}
-                            title={c.label}
+                            title={ui(c.label)}
                           />
                         ))}
                       </div>
@@ -199,7 +202,7 @@ function SetupAvatarComponent() {
               {/* Accessories */}
               <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
                 <CardContent className="p-5">
-                  <p className="text-sm font-semibold text-[var(--clay-black)] mb-3">Aksesori</p>
+                  <p className="text-sm font-semibold text-[var(--clay-black)] mb-3"><LocalizedText source={"Aksesori"} /></p>
                   <div className="flex gap-2 flex-wrap">
                     {(
                       [
@@ -238,12 +241,12 @@ function SetupAvatarComponent() {
               <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-semibold text-[var(--clay-black)]">Pilihan Cepat</p>
+                    <p className="text-sm font-semibold text-[var(--clay-black)]"><LocalizedText source={"Pilihan Cepat"} /></p>
                     <button
                       onClick={handleRegenerateAll}
                       className="text-xs text-[var(--matcha-600)] hover:underline font-semibold"
                     >
-                      Regenerate
+                      <LocalizedText source={"Regenerate"} />
                     </button>
                   </div>
                   <div className="grid grid-cols-4 gap-2">
@@ -272,18 +275,18 @@ function SetupAvatarComponent() {
             <div className="lg:sticky lg:top-8 lg:h-fit">
               <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)] p-6">
                 <div className="text-center mb-4">
-                  <p className="text-sm font-semibold text-[var(--clay-black)]">Avatar Kamu</p>
-                  <p className="text-xs text-[var(--warm-charcoal)] mt-1">Sudah siap?</p>
+                  <p className="text-sm font-semibold text-[var(--clay-black)]"><LocalizedText source={"Avatar Kamu"} /></p>
+                  <p className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Sudah siap?"} /></p>
                 </div>
                 <Button
                   onClick={handleSave}
                   disabled={updateMutation.isPending}
                   className="w-full bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)] h-14 text-lg font-semibold shadow-lg"
                 >
-                  {updateMutation.isPending ? "Menyimpan..." : "✓ Selesai"}
+                  <LocalizedValue value={updateMutation.isPending ? "Menyimpan..." : "✓ Selesai"} />
                 </Button>
                 <p className="text-xs text-center text-[var(--warm-silver)] mt-3">
-                  Bisa diganti nanti di profil
+                  <LocalizedText source={"Bisa diganti nanti di profil"} />
                 </p>
               </Card>
             </div>

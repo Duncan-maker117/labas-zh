@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { trpc } from "@/utils/trpc";
@@ -130,7 +131,7 @@ export function QuestionReviewCard({
           {/* Passage Text */}
           {q.passageText && !hidePassage && (
             <div className="bg-[var(--oat-light)] rounded-[var(--radius-lg)] p-3 text-sm text-[var(--warm-charcoal)] whitespace-pre-wrap leading-relaxed max-w-prose">
-              <span className="font-semibold text-[var(--clay-black)] block mb-1">Teks Bacaan:</span>
+              <span className="font-semibold text-[var(--clay-black)] block mb-1"><LocalizedText source={"Teks Bacaan:"} /></span>
               {q.passageText}
             </div>
           )}
@@ -150,10 +151,10 @@ export function QuestionReviewCard({
             <div className="space-y-3 bg-[var(--badge-blue-bg)] rounded-[var(--radius-lg)] p-4 border-2 border-[var(--badge-blue-bg)]">
               <p className="text-sm font-semibold text-[var(--badge-blue-text)] flex items-center gap-2">
                 <MaterialIcon name="edit_note" className="text-sm" />
-                Koreksi Soal
+                <LocalizedText source={"Koreksi Soal"} />
               </p>
               <div>
-                <label className="text-xs font-medium text-[var(--warm-charcoal)] mb-1 block">Teks Bacaan</label>
+                <label className="text-xs font-medium text-[var(--warm-charcoal)] mb-1 block"><LocalizedText source={"Teks Bacaan"} /></label>
                 <textarea
                   value={editPassage}
                   onChange={(e) => setEditPassage(e.target.value)}
@@ -161,7 +162,7 @@ export function QuestionReviewCard({
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-[var(--warm-charcoal)] mb-1 block">Jawaban Benar</label>
+                <label className="text-xs font-medium text-[var(--warm-charcoal)] mb-1 block"><LocalizedText source={"Jawaban Benar"} /></label>
                 <Input
                   value={editCorrectAnswer}
                   onChange={(e) => setEditCorrectAnswer(e.target.value)}
@@ -169,7 +170,7 @@ export function QuestionReviewCard({
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-[var(--warm-charcoal)] mb-1 block">Penjelasan</label>
+                <label className="text-xs font-medium text-[var(--warm-charcoal)] mb-1 block"><LocalizedText source={"Penjelasan"} /></label>
                 <textarea
                   value={editExplanation}
                   onChange={(e) => setEditExplanation(e.target.value)}
@@ -183,14 +184,14 @@ export function QuestionReviewCard({
                   className="h-9 text-sm bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)]"
                 >
                   <MaterialIcon name="save" className="text-sm mr-1" />
-                  Simpan
+                  <LocalizedText source={"Simpan"} />
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setIsEditing(false)}
                   className="h-9 text-sm rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)]"
                 >
-                  Batal
+                  <LocalizedText source={"Batal"} />
                 </Button>
               </div>
             </div>
@@ -199,7 +200,7 @@ export function QuestionReviewCard({
           {/* Answer Comparison */}
           <div className="flex flex-wrap gap-4 text-sm">
             <div>
-              <span className="text-[var(--warm-silver)]">Jawaban Anda:</span>{" "}
+              <span className="text-[var(--warm-silver)]"><LocalizedText source={"Jawaban Anda:"} /></span>{" "}
               <span
                 className={`font-semibold ${
                   isCorrect === true
@@ -214,7 +215,7 @@ export function QuestionReviewCard({
             </div>
             {ans?.partialScore != null && ans?.partialScore < 100 && (
               <div>
-                <span className="text-[var(--warm-silver)]">Skor Parsial:</span>{" "}
+                <span className="text-[var(--warm-silver)]"><LocalizedText source={"Skor Parsial:"} /></span>{" "}
                 <span className="font-semibold text-[var(--lemon-700)]">
                   {ans.partialScore}%
                 </span>
@@ -222,7 +223,7 @@ export function QuestionReviewCard({
             )}
             {(isCorrect === false || isCorrect === null) && (
               <div>
-                <span className="text-[var(--warm-silver)]">Jawaban Benar:</span>{" "}
+                <span className="text-[var(--warm-silver)]"><LocalizedText source={"Jawaban Benar:"} /></span>{" "}
                 <span className="font-semibold text-[var(--matcha-700)]">
                   {q.correctAnswer}
                 </span>
@@ -239,7 +240,7 @@ export function QuestionReviewCard({
           {/* Explanation */}
           {q.explanation && !isEditing && (
             <div className="bg-[var(--oat-light)] rounded-[var(--radius-lg)] p-3 text-sm text-[var(--warm-charcoal)] max-w-prose">
-              <span className="font-semibold text-[var(--clay-black)]">Penjelasan:</span>{" "}
+              <span className="font-semibold text-[var(--clay-black)]"><LocalizedText source={"Penjelasan:"} /></span>{" "}
               {q.explanation}
             </div>
           )}
@@ -274,7 +275,7 @@ export function QuestionReviewCard({
                 className="ml-auto flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--oat-light)] text-[var(--warm-charcoal)] hover:bg-[var(--badge-blue-bg)] hover:text-[var(--badge-blue-text)] transition-all"
               >
                 <MaterialIcon name="edit" className="text-sm" />
-                Koreksi
+                <LocalizedText source={"Koreksi"} />
               </button>
             )}
           </div>

@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { Input } from "@labas/ui/components/input";
 import { Button } from "@labas/ui/components/button";
@@ -24,6 +26,7 @@ export function CreatePackageModal({
   examTypeName: string;
   lowCount: boolean;
 }) {
+  const { ui } = useLocale();
   const [title, setTitle] = useState(`${examTypeName} Bundle — ${selectedCount} Soal`);
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
@@ -33,7 +36,7 @@ export function CreatePackageModal({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline font-bold text-[var(--clay-black)]">
-            Buat Paket Soal
+            <LocalizedText source={"Buat Paket Soal"} />
           </DialogTitle>
         </DialogHeader>
 
@@ -42,7 +45,7 @@ export function CreatePackageModal({
             {examTypeName}
           </span>
           <span className="text-sm text-[var(--warm-charcoal)]">
-            {selectedCount} soal
+            {selectedCount} <LocalizedText source={"soal"} />
           </span>
         </div>
 
@@ -50,7 +53,7 @@ export function CreatePackageModal({
           <div className="mb-4 p-3 rounded-[var(--radius-md)] bg-[var(--lemon-400)]/20 border-2 border-[var(--lemon-500)]/30 text-sm text-[var(--lemon-800)] flex items-start gap-2">
             <MaterialIcon name="info" className="text-sm mt-0.5 shrink-0" />
             <span>
-              Soal yang tersedia sedikit ({selectedCount} soal). Paket tetap bisa dibuat, tapi disarankan untuk menambah soal.
+              <LocalizedText source={"Soal yang tersedia sedikit ("} />{selectedCount} <LocalizedText source={"soal). Paket tetap bisa dibuat, tapi disarankan untuk menambah soal."} />
             </span>
           </div>
         )}
@@ -58,24 +61,24 @@ export function CreatePackageModal({
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Judul Paket
+              <LocalizedText source={"Judul Paket"} />
             </label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. IELTS Reading Bundle"
+              placeholder={ui("e.g. IELTS Reading Bundle")}
               className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
             />
           </div>
 
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Deskripsi
+              <LocalizedText source={"Deskripsi"} />
             </label>
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Deskripsi singkat..."
+              placeholder={ui("Deskripsi singkat...")}
               className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
             />
           </div>
@@ -88,7 +91,7 @@ export function CreatePackageModal({
               className="w-4 h-4 rounded border-[var(--oat-border)]"
             />
             <span className="text-sm text-[var(--warm-charcoal)]">
-              Publikasikan ke Bank Soal
+              <LocalizedText source={"Publikasikan ke Bank Soal"} />
             </span>
           </label>
         </div>
@@ -99,14 +102,14 @@ export function CreatePackageModal({
             onClick={onClose}
             className="flex-1 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
           >
-            Batal
+            <LocalizedText source={"Batal"} />
           </Button>
           <Button
             onClick={() => onCreate({ title, description, isPublic })}
             disabled={!title || isPending}
             className="flex-1 bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)]"
           >
-            {isPending ? "Membuat..." : "Buat Paket"}
+            <LocalizedValue value={isPending ? "Membuat..." : "Buat Paket"} />
           </Button>
         </div>
       </DialogContent>

@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -77,6 +79,7 @@ type PackageRow = {
 const PAGE_SIZE = 30;
 
 function QuestionsView() {
+  const { ui } = useLocale();
   const s = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const page = s.q_page;
@@ -115,9 +118,9 @@ function QuestionsView() {
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listLatestQuestions.queryKey() });
         setSelectedIds(new Set());
-        toast.success(data.isPublic ? "Made public" : "Made private");
+        toast.success(uiMessage(data.isPublic ? "Made public" : "Made private"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -126,9 +129,9 @@ function QuestionsView() {
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listLatestQuestions.queryKey() });
         setSelectedIds(new Set());
-        toast.success(`Updated ${data.updated} questions`);
+        toast.success(uiMessage(`Updated ${data.updated} questions`));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -160,7 +163,7 @@ function QuestionsView() {
     },
     {
       id: "visibility", header: "Visibility", size: "w-[10%]",
-      cell: ({ row }) => (<span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.isPublic ? "bg-[var(--matcha-300)] text-[var(--matcha-800)]" : "bg-[var(--oat-border)] text-[var(--warm-charcoal)]"}`}>{row.isPublic ? "Public" : "Private"}</span>),
+      cell: ({ row }) => (<span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.isPublic ? "bg-[var(--matcha-300)] text-[var(--matcha-800)]" : "bg-[var(--oat-border)] text-[var(--warm-charcoal)]"}`}><LocalizedValue value={row.isPublic ? "Public" : "Private"} /></span>),
     },
     { id: "created", header: "Created", size: "w-[12%]", cell: ({ row }) => <span className="text-xs text-[var(--warm-charcoal)]">{new Date(row.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}</span> },
   ];
@@ -170,47 +173,47 @@ function QuestionsView() {
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)] text-sm" />
-          <Input placeholder="Search questions..." value={rawSearch} onChange={(e) => setRawSearch(e.target.value)} aria-label="Search questions" className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm" />
+          <Input placeholder={ui("Search questions...")} value={rawSearch} onChange={(e) => setRawSearch(e.target.value)} aria-label={ui("Search questions")} className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm" />
         </div>
         <Select value={examFilter} onValueChange={(v: string | null) => qNav({ q_exam: v || undefined })}>
-          <SelectTrigger className="w-[160px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label="Filter by exam type">
-            <SelectValue placeholder="All Exams" />
+          <SelectTrigger className="w-[160px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label={ui("Filter by exam type")}>
+            <SelectValue placeholder={ui("All Exams")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">All Exams</SelectItem>
+              <SelectItem value=""><LocalizedText source={"All Exams"} /></SelectItem>
               {EXAM_TYPES.map((et) => <SelectItem key={et.id} value={et.id}>{et.name}</SelectItem>)}
             </SelectGroup>
           </SelectContent>
         </Select>
         <Select value={visFilter} onValueChange={(v: string | null) => qNav({ q_vis: v || undefined })}>
-          <SelectTrigger className="w-[150px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label="Filter by visibility">
-            <SelectValue placeholder="All Visibility" />
+          <SelectTrigger className="w-[150px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label={ui("Filter by visibility")}>
+            <SelectValue placeholder={ui("All Visibility")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">All Visibility</SelectItem>
-              <SelectItem value="public">Public</SelectItem>
-              <SelectItem value="private">Private</SelectItem>
+              <SelectItem value=""><LocalizedText source={"All Visibility"} /></SelectItem>
+              <SelectItem value="public"><LocalizedText source={"Public"} /></SelectItem>
+              <SelectItem value="private"><LocalizedText source={"Private"} /></SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} questions</span>
+        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} <LocalizedText source={"questions"} /></span>
       </div>
 
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 mb-4 px-4 py-3 bg-[var(--matcha-300)]/15 border border-[var(--matcha-500)] rounded-[var(--radius-lg)]">
-          <span className="text-sm font-medium text-[var(--matcha-800)]">{selectedIds.size} question{selectedIds.size > 1 ? "s" : ""} selected</span>
+          <span className="text-sm font-medium text-[var(--matcha-800)]">{selectedIds.size} <LocalizedText source={"question"} />{selectedIds.size > 1 ? "s" : ""} <LocalizedText source={"selected"} /></span>
           <div className="flex items-center gap-2 ml-auto">
-            <Button size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ questionIds: Array.from(selectedIds), isPublic: true })} disabled={bulkMutation.isPending}>Make Public</Button>
-            <Button variant="outline" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ questionIds: Array.from(selectedIds), isPublic: false })} disabled={bulkMutation.isPending}>Make Private</Button>
-            <Button variant="ghost" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs text-[var(--warm-charcoal)]" onClick={() => setSelectedIds(new Set())}>Clear</Button>
+            <Button size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ questionIds: Array.from(selectedIds), isPublic: true })} disabled={bulkMutation.isPending}><LocalizedText source={"Make Public"} /></Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ questionIds: Array.from(selectedIds), isPublic: false })} disabled={bulkMutation.isPending}><LocalizedText source={"Make Private"} /></Button>
+            <Button variant="ghost" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs text-[var(--warm-charcoal)]" onClick={() => setSelectedIds(new Set())}><LocalizedText source={"Clear"} /></Button>
           </div>
         </div>
       )}
 
-      <DataTable data={questionData} columns={columns} isLoading={questions.isLoading} isFetching={questions.isFetching} emptyMessage="No questions found." keyExtractor={(q) => q.id} selectable selectedIds={selectedIds} onSelectionChange={setSelectedIds} onRowClick={(q) => setDetailQuestion(q)} actions={(q) => (
-        <Button variant="outline" className="h-9 rounded-[var(--radius-lg)] text-xs" onClick={(e) => { e.stopPropagation(); toggleVisibility(q); }} disabled={toggleMutation.isPending}>{q.isPublic ? "Make Private" : "Make Public"}</Button>
+      <DataTable data={questionData} columns={columns} isLoading={questions.isLoading} isFetching={questions.isFetching} emptyMessage={ui("No questions found.")} keyExtractor={(q) => q.id} selectable selectedIds={selectedIds} onSelectionChange={setSelectedIds} onRowClick={(q) => setDetailQuestion(q)} actions={(q) => (
+        <Button variant="outline" className="h-9 rounded-[var(--radius-lg)] text-xs" onClick={(e) => { e.stopPropagation(); toggleVisibility(q); }} disabled={toggleMutation.isPending}><LocalizedValue value={q.isPublic ? "Make Private" : "Make Public"} /></Button>
       )} />
       <Pagination page={page} totalPages={totalPages} onChange={(p) => navigate({ search: (prev) => ({ ...prev, q_page: p }), replace: true })} />
 
@@ -220,6 +223,7 @@ function QuestionsView() {
 }
 
 function PackagesView() {
+  const { ui } = useLocale();
   const s = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const page = s.p_page;
@@ -257,9 +261,9 @@ function PackagesView() {
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listLatestPackages.queryKey() });
         setSelectedIds(new Set());
-        toast.success(data.isPublic ? "Made public" : "Made private");
+        toast.success(uiMessage(data.isPublic ? "Made public" : "Made private"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -268,9 +272,9 @@ function PackagesView() {
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listLatestPackages.queryKey() });
         setSelectedIds(new Set());
-        toast.success(`Updated ${data.updated} packages`);
+        toast.success(uiMessage(`Updated ${data.updated} packages`));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -282,13 +286,13 @@ function PackagesView() {
       cell: ({ row }) => (
         <div className="max-w-xs">
           <p className="font-medium text-[var(--clay-black)] truncate">{row.title}</p>
-          {row.creatorName && <p className="text-xs text-[var(--warm-charcoal)] truncate mt-0.5">by {row.creatorName}</p>}
+          {row.creatorName && <p className="text-xs text-[var(--warm-charcoal)] truncate mt-0.5"><LocalizedText source={"by"} /> {row.creatorName}</p>}
         </div>
       ),
     },
     { id: "exam", header: "Exam", size: "w-[10%]", cell: ({ row }) => <span className="text-xs">{row.examTypeId}</span> },
     { id: "questions", header: "Qs", size: "w-[8%]", cell: ({ row }) => <span className="text-xs">{row.totalQuestions}</span> },
-    { id: "visibility", header: "Visibility", size: "w-[12%]", cell: ({ row }) => (<span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.isPublic ? "bg-[var(--matcha-300)] text-[var(--matcha-800)]" : "bg-[var(--oat-border)] text-[var(--warm-charcoal)]"}`}>{row.isPublic ? "Public" : "Private"}</span>) },
+    { id: "visibility", header: "Visibility", size: "w-[12%]", cell: ({ row }) => (<span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.isPublic ? "bg-[var(--matcha-300)] text-[var(--matcha-800)]" : "bg-[var(--oat-border)] text-[var(--warm-charcoal)]"}`}><LocalizedValue value={row.isPublic ? "Public" : "Private"} /></span>) },
     { id: "created", header: "Created", size: "w-[12%]", cell: ({ row }) => <span className="text-xs text-[var(--warm-charcoal)]">{new Date(row.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}</span> },
   ];
 
@@ -297,47 +301,47 @@ function PackagesView() {
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)] text-sm" />
-          <Input placeholder="Search packages..." value={rawSearch} onChange={(e) => setRawSearch(e.target.value)} aria-label="Search packages" className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm" />
+          <Input placeholder={ui("Search packages...")} value={rawSearch} onChange={(e) => setRawSearch(e.target.value)} aria-label={ui("Search packages")} className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm" />
         </div>
         <Select value={examFilter} onValueChange={(v: string | null) => pNav({ p_exam: v || undefined })}>
-          <SelectTrigger className="w-[160px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label="Filter by exam type">
-            <SelectValue placeholder="All Exams" />
+          <SelectTrigger className="w-[160px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label={ui("Filter by exam type")}>
+            <SelectValue placeholder={ui("All Exams")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">All Exams</SelectItem>
+              <SelectItem value=""><LocalizedText source={"All Exams"} /></SelectItem>
               {EXAM_TYPES.map((et) => <SelectItem key={et.id} value={et.id}>{et.name}</SelectItem>)}
             </SelectGroup>
           </SelectContent>
         </Select>
         <Select value={visFilter} onValueChange={(v: string | null) => pNav({ p_vis: v || undefined })}>
-          <SelectTrigger className="w-[150px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label="Filter by visibility">
-            <SelectValue placeholder="All Visibility" />
+          <SelectTrigger className="w-[150px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label={ui("Filter by visibility")}>
+            <SelectValue placeholder={ui("All Visibility")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">All Visibility</SelectItem>
-              <SelectItem value="public">Public</SelectItem>
-              <SelectItem value="private">Private</SelectItem>
+              <SelectItem value=""><LocalizedText source={"All Visibility"} /></SelectItem>
+              <SelectItem value="public"><LocalizedText source={"Public"} /></SelectItem>
+              <SelectItem value="private"><LocalizedText source={"Private"} /></SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} packages</span>
+        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} <LocalizedText source={"packages"} /></span>
       </div>
 
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 mb-4 px-4 py-3 bg-[var(--matcha-300)]/15 border border-[var(--matcha-500)] rounded-[var(--radius-lg)]">
-          <span className="text-sm font-medium text-[var(--matcha-800)]">{selectedIds.size} package{selectedIds.size > 1 ? "s" : ""} selected</span>
+          <span className="text-sm font-medium text-[var(--matcha-800)]">{selectedIds.size} <LocalizedText source={"package"} />{selectedIds.size > 1 ? "s" : ""} <LocalizedText source={"selected"} /></span>
           <div className="flex items-center gap-2 ml-auto">
-            <Button size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ packageIds: Array.from(selectedIds), isPublic: true })} disabled={bulkMutation.isPending}>Make Public</Button>
-            <Button variant="outline" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ packageIds: Array.from(selectedIds), isPublic: false })} disabled={bulkMutation.isPending}>Make Private</Button>
-            <Button variant="ghost" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs text-[var(--warm-charcoal)]" onClick={() => setSelectedIds(new Set())}>Clear</Button>
+            <Button size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ packageIds: Array.from(selectedIds), isPublic: true })} disabled={bulkMutation.isPending}><LocalizedText source={"Make Public"} /></Button>
+            <Button variant="outline" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs" onClick={() => bulkMutation.mutate({ packageIds: Array.from(selectedIds), isPublic: false })} disabled={bulkMutation.isPending}><LocalizedText source={"Make Private"} /></Button>
+            <Button variant="ghost" size="sm" className="h-8 rounded-[var(--radius-lg)] text-xs text-[var(--warm-charcoal)]" onClick={() => setSelectedIds(new Set())}><LocalizedText source={"Clear"} /></Button>
           </div>
         </div>
       )}
 
-      <DataTable data={packageData} columns={columns} isLoading={packages.isLoading} isFetching={packages.isFetching} emptyMessage="No packages found." keyExtractor={(p) => p.id} selectable selectedIds={selectedIds} onSelectionChange={setSelectedIds} actionsHeader="" actions={(p) => (
-        <Button variant="outline" className="h-9 rounded-[var(--radius-lg)] text-xs" onClick={(e) => { e.stopPropagation(); toggleVisibility(p); }} disabled={toggleMutation.isPending}>{p.isPublic ? "Make Private" : "Make Public"}</Button>
+      <DataTable data={packageData} columns={columns} isLoading={packages.isLoading} isFetching={packages.isFetching} emptyMessage={ui("No packages found.")} keyExtractor={(p) => p.id} selectable selectedIds={selectedIds} onSelectionChange={setSelectedIds} actionsHeader="" actions={(p) => (
+        <Button variant="outline" className="h-9 rounded-[var(--radius-lg)] text-xs" onClick={(e) => { e.stopPropagation(); toggleVisibility(p); }} disabled={toggleMutation.isPending}><LocalizedValue value={p.isPublic ? "Make Private" : "Make Public"} /></Button>
       )} />
       <Pagination page={page} totalPages={totalPages} onChange={(p) => navigate({ search: (prev) => ({ ...prev, p_page: p }), replace: true })} />
     </div>
@@ -352,17 +356,17 @@ function AdminModeration() {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)]">Content Moderation</h1>
+        <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Content Moderation"} /></h1>
       </div>
-      <p className="text-[var(--warm-charcoal)] mb-6">Review questions and packages, manage visibility across the platform.</p>
+      <p className="text-[var(--warm-charcoal)] mb-6"><LocalizedText source={"Review questions and packages, manage visibility across the platform."} /></p>
 
       <Tabs value={tab} onValueChange={(v) => navigate({ search: { tab: v, q_page: 1, p_page: 1 } }) } className="mb-6">
         <TabsList variant="line" className="h-10 bg-transparent border-b border-[var(--oat-border)]">
           <TabsTrigger value="questions" className="px-4 py-2.5 text-sm font-medium rounded-t-[var(--radius-lg)] data-[active=true]:bg-[var(--pure-white)] data-[active=true]:text-[var(--clay-black)] data-[active=true]:border data-[active=true]:border-[var(--oat-border)] data-[active=true]:border-b-[var(--pure-white)] data-[active=true]:-mb-[1px] text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors">
-            Questions
+            <LocalizedText source={"Questions"} />
           </TabsTrigger>
           <TabsTrigger value="packages" className="px-4 py-2.5 text-sm font-medium rounded-t-[var(--radius-lg)] data-[active=true]:bg-[var(--pure-white)] data-[active=true]:text-[var(--clay-black)] data-[active=true]:border data-[active=true]:border-[var(--oat-border)] data-[active=true]:border-b-[var(--pure-white)] data-[active=true]:-mb-[1px] text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors">
-            Packages
+            <LocalizedText source={"Packages"} />
           </TabsTrigger>
         </TabsList>
         <TabsContent value="questions" className="mt-6">

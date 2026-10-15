@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useQuery } from "@tanstack/react-query";
 import { useSearch, useNavigate, Link } from "@tanstack/react-router";
 import { trpc } from "@/utils/trpc";
@@ -10,6 +12,7 @@ import { useDebouncedSearch, useDebouncedNavigate } from "@/hooks/use-debounced-
 const LIMIT = 15;
 
 export function CpnsHistoryComponent() {
+  const { ui } = useLocale();
   const search = useSearch({ strict: false }) as Record<string, string>;
   const navigate = useNavigate();
 
@@ -41,18 +44,18 @@ export function CpnsHistoryComponent() {
 
   return (
     <div>
-      <CpnsPageHeader icon="history" title="Riwayat Latihan CPNS" subtitle="Lihat hasil dan progres latihan CPNS kamu" />
+      <CpnsPageHeader icon="history" title={ui("Riwayat Latihan CPNS")} subtitle={ui("Lihat hasil dan progres latihan CPNS kamu")} />
 
       <div className="mb-4">
         <div className="relative max-w-md">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-silver)] text-sm" />
           <input
-            type="text" placeholder="Cari paket..." value={localSearch}
+            type="text" placeholder={ui("Cari paket...")} value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm text-[var(--clay-black)] placeholder:text-[var(--warm-silver)] focus:outline-none focus:border-[var(--matcha-500)]"
           />
         </div>
-        <p className="text-xs text-[var(--warm-silver)] mt-2">{total} latihan ditemukan</p>
+        <p className="text-xs text-[var(--warm-silver)] mt-2">{total} <LocalizedText source={"latihan ditemukan"} /></p>
       </div>
 
       <div className="space-y-3">
@@ -60,15 +63,15 @@ export function CpnsHistoryComponent() {
           <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
             <CardContent className="p-8 text-center">
               <div className="animate-spin inline-block mb-2 text-lg">⟳</div>
-              <p className="text-sm text-[var(--warm-charcoal)]">Memuat riwayat...</p>
+              <p className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Memuat riwayat..."} /></p>
             </CardContent>
           </Card>
         )}
         {!isLoading && rows.length === 0 && (
           <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
             <CardContent className="p-8 text-center">
-              <p className="text-sm font-semibold text-[var(--clay-black)] mb-1">Belum ada latihan</p>
-              <p className="text-xs text-[var(--warm-charcoal)]">Mulai latihan CPNS dan hasilnya akan muncul di sini</p>
+              <p className="text-sm font-semibold text-[var(--clay-black)] mb-1"><LocalizedText source={"Belum ada latihan"} /></p>
+              <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Mulai latihan CPNS dan hasilnya akan muncul di sini"} /></p>
             </CardContent>
           </Card>
         )}
@@ -103,12 +106,12 @@ export function CpnsHistoryComponent() {
                     )}
                     {a.status === "completed" && (
                       <Link to="/attempt/$id" params={{ id: a.id }}>
-                        <button className="px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all">Hasil</button>
+                        <button className="px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"><LocalizedText source={"Hasil"} /></button>
                       </Link>
                     )}
                     {a.status === "in_progress" && a.packageId && (
                       <Link to="/package/$id/attempt/$attemptId" params={{ id: a.packageId, attemptId: a.id }}>
-                        <button className="px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--matcha-600)] text-[var(--pure-white)] hover:bg-[var(--matcha-800)] transition-all">Lanjutkan</button>
+                        <button className="px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--matcha-600)] text-[var(--pure-white)] hover:bg-[var(--matcha-800)] transition-all"><LocalizedText source={"Lanjutkan"} /></button>
                       </Link>
                     )}
                   </div>

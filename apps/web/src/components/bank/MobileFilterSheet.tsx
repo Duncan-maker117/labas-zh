@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import {
   Sheet,
   SheetContent,
@@ -49,6 +51,7 @@ export function MobileFilterSheet({
   onSetDifficulty,
   onClearFilters,
 }: MobileFilterSheetProps) {
+  const { ui } = useLocale();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -57,21 +60,21 @@ export function MobileFilterSheet({
         showCloseButton
       >
         <SheetHeader>
-          <SheetTitle className="text-base font-bold text-[var(--clay-black)]">Filter Lanjutan</SheetTitle>
+          <SheetTitle className="text-base font-bold text-[var(--clay-black)]"><LocalizedText source={"Filter Lanjutan"} /></SheetTitle>
           <SheetDescription className="text-xs text-[var(--warm-charcoal)]">
-            Sesuaikan pencarian soal Anda
+            <LocalizedText source={"Sesuaikan pencarian soal Anda"} />
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-4 py-4 overflow-y-auto">
           <div>
-            <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase">Section</label>
+            <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase"><LocalizedText source={"Section"} /></label>
             <Select value={section} onValueChange={(v: string | null) => onSetSection(v ?? "")}>
               <SelectTrigger className="w-full rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-                <SelectValue placeholder="Pilih section" />
+                <SelectValue placeholder={ui("Pilih section")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="">Semua Section</SelectItem>
+                  <SelectItem value=""><LocalizedText source={"Semua Section"} /></SelectItem>
                   {SECTIONS.map((s) => (
                     <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                   ))}
@@ -80,14 +83,14 @@ export function MobileFilterSheet({
             </Select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase">Format</label>
+            <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase"><LocalizedText source={"Format"} /></label>
             <Select value={format} onValueChange={(v: string | null) => onSetFormat(v ?? "")}>
               <SelectTrigger className="w-full rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-                <SelectValue placeholder="Pilih format" />
+                <SelectValue placeholder={ui("Pilih format")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="">Semua Format</SelectItem>
+                  <SelectItem value=""><LocalizedText source={"Semua Format"} /></SelectItem>
                   {FORMATS.map((f) => (
                     <SelectItem key={f} value={f}>{formatLabel(f)}</SelectItem>
                   ))}
@@ -96,17 +99,17 @@ export function MobileFilterSheet({
             </Select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase">Level</label>
+            <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase"><LocalizedText source={"Level"} /></label>
             <Select
               value={difficulty !== undefined ? String(difficulty) : ""}
               onValueChange={(v: string | null) => onSetDifficulty(v ? Number(v) : undefined)}
             >
               <SelectTrigger className="w-full rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-                <SelectValue placeholder="Pilih level" />
+                <SelectValue placeholder={ui("Pilih level")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="">Semua Level</SelectItem>
+                  <SelectItem value=""><LocalizedText source={"Semua Level"} /></SelectItem>
                   {DIFFICULTIES.map((d) => (
                     <SelectItem key={d.value} value={String(d.value)}>{d.label}</SelectItem>
                   ))}
@@ -134,7 +137,7 @@ export function MobileFilterSheet({
             onClick={() => onOpenChange(false)}
             className="flex-1 rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] font-bold text-sm h-11 cursor-pointer"
           >
-            Terapkan
+            <LocalizedText source={"Terapkan"} />
           </Button>
           <Button
             variant="outline"
@@ -144,7 +147,7 @@ export function MobileFilterSheet({
             }}
             className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] h-11 cursor-pointer"
           >
-            Reset
+            <LocalizedText source={"Reset"} />
           </Button>
         </div>
       </SheetContent>

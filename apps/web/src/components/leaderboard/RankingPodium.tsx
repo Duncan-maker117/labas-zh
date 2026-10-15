@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { motion } from "motion/react";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { Avatar } from "@/components/ui/Avatar";
@@ -36,7 +37,7 @@ function PodiumCard({
         <p className="text-sm font-headline font-bold text-[var(--clay-black)] truncate max-w-[120px]">
           {user.name}
         </p>
-        <p className="text-xs text-[var(--warm-charcoal)]">{user.totalScore} pts</p>
+        <p className="text-xs text-[var(--warm-charcoal)]">{user.totalScore} <LocalizedText source={"pts"} /></p>
       </div>
       <Card className={`relative w-full clay-shadow bg-[var(--pure-white)] border-2 rounded-[var(--radius-xl)] overflow-visible ${medalColor} ${height}`}>
         <CardContent className="p-4 flex flex-col items-center justify-center h-full">

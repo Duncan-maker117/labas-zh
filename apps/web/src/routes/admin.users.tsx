@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -46,6 +48,7 @@ type UserRow = {
 };
 
 function AdminUsers() {
+  const { ui } = useLocale();
   const s = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const queryClient = useQueryClient();
@@ -86,9 +89,9 @@ function AdminUsers() {
     trpc.admin.suspendUser.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listUsers.queryKey() });
-        toast.success(data.suspended ? "User suspended" : "User unsuspended");
+        toast.success(uiMessage(data.suspended ? "User suspended" : "User unsuspended"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -96,20 +99,20 @@ function AdminUsers() {
     trpc.admin.setUserRole.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listUsers.queryKey() });
-        toast.success(`Role changed to ${data.role}`);
+        toast.success(uiMessage(`Role changed to ${data.role}`));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
   function handleSuspend(u: UserRow) {
-    if (!confirm(u.suspended ? `Unsuspend ${u.name}?` : `Suspend ${u.name}? This will prevent them from using the platform.`)) return;
+    if (!confirm(uiMessage(u.suspended ? `Unsuspend ${u.name}?` : `Suspend ${u.name}? This will prevent them from using the platform.`))) return;
     suspendMutation.mutate({ userId: u.id, suspended: !u.suspended });
   }
 
   function handleRoleChange(u: UserRow) {
     const newRole = u.role === "admin" ? "user" : "admin";
-    if (!confirm(`Change ${u.name}'s role to "${newRole}"?`)) return;
+    if (!confirm(uiMessage(`Change ${u.name}'s role to "${newRole}"?`))) return;
     roleMutation.mutate({ userId: u.id, role: newRole });
   }
 
@@ -133,7 +136,7 @@ function AdminUsers() {
       cell: ({ row }) => (
         <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${row.emailVerified ? "bg-[var(--matcha-300)] text-[var(--matcha-800)]" : "bg-[var(--sunbeam-300)] text-[var(--sunbeam-800)]"}`}>
           <MaterialIcon name={row.emailVerified ? "check_circle" : "cancel"} className="text-xs" />
-          {row.emailVerified ? "Verified" : "Unverified"}
+          <LocalizedValue value={row.emailVerified ? "Verified" : "Unverified"} />
         </span>
       ),
     },
@@ -153,7 +156,7 @@ function AdminUsers() {
       size: "w-[10%]",
       cell: ({ row }) => (
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.suspended ? "bg-[var(--clay-red)]/10 text-[var(--clay-red)]" : "bg-[var(--matcha-300)] text-[var(--matcha-800)]"}`}>
-          {row.suspended ? "Suspended" : "Active"}
+          <LocalizedValue value={row.suspended ? "Suspended" : "Active"} />
         </span>
       ),
     },
@@ -162,54 +165,54 @@ function AdminUsers() {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)]">Users</h1>
-        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} total</span>
+        <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Users"} /></h1>
+        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} <LocalizedText source={"total"} /></span>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)] text-sm" />
           <Input
-            placeholder="Search by name or email..."
+            placeholder={ui("Search by name or email...")}
             value={rawSearch}
             onChange={(e) => { setRawSearch(e.target.value); }}
-            aria-label="Search users"
+            aria-label={ui("Search users")}
             className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm"
           />
         </div>
         <Select value={roleFilter} onValueChange={(v: string | null) => nav({ role: v || undefined })}>
-          <SelectTrigger className="w-[120px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label="Filter by role">
-            <SelectValue placeholder="All Roles" />
+          <SelectTrigger className="w-[120px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label={ui("Filter by role")}>
+            <SelectValue placeholder={ui("All Roles")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">All Roles</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="user">User</SelectItem>
+              <SelectItem value=""><LocalizedText source={"All Roles"} /></SelectItem>
+              <SelectItem value="admin"><LocalizedText source={"Admin"} /></SelectItem>
+              <SelectItem value="user"><LocalizedText source={"User"} /></SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v: string | null) => nav({ status: v || undefined })}>
-          <SelectTrigger className="w-[130px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label="Filter by status">
-            <SelectValue placeholder="All Status" />
+          <SelectTrigger className="w-[130px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label={ui("Filter by status")}>
+            <SelectValue placeholder={ui("All Status")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="suspended">Suspended</SelectItem>
+              <SelectItem value=""><LocalizedText source={"All Status"} /></SelectItem>
+              <SelectItem value="active"><LocalizedText source={"Active"} /></SelectItem>
+              <SelectItem value="suspended"><LocalizedText source={"Suspended"} /></SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
         <Select value={verifFilter} onValueChange={(v: string | null) => nav({ verified: v || undefined })}>
-          <SelectTrigger className="w-[140px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label="Filter by verification">
-            <SelectValue placeholder="All Verified" />
+          <SelectTrigger className="w-[140px] h-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm cursor-pointer" aria-label={ui("Filter by verification")}>
+            <SelectValue placeholder={ui("All Verified")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="">All Verified</SelectItem>
-              <SelectItem value="verified">Verified</SelectItem>
-              <SelectItem value="unverified">Unverified</SelectItem>
+              <SelectItem value=""><LocalizedText source={"All Verified"} /></SelectItem>
+              <SelectItem value="verified"><LocalizedText source={"Verified"} /></SelectItem>
+              <SelectItem value="unverified"><LocalizedText source={"Unverified"} /></SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -220,7 +223,7 @@ function AdminUsers() {
         columns={columns}
         isLoading={usersQuery.isLoading}
         isFetching={usersQuery.isFetching}
-        emptyMessage="No users found."
+        emptyMessage={ui("No users found.")}
         keyExtractor={(u) => u.id}
         page={page}
         totalPages={totalPages}
@@ -229,10 +232,10 @@ function AdminUsers() {
         actions={(u) => (
           <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
             <Button variant="outline" onClick={() => handleSuspend(u)} disabled={suspendMutation.isPending} className="h-9 rounded-[var(--radius-lg)] text-xs">
-              {u.suspended ? "Unsuspend" : "Suspend"}
+              <LocalizedValue value={u.suspended ? "Unsuspend" : "Suspend"} />
             </Button>
             <Button variant="outline" onClick={() => handleRoleChange(u)} disabled={roleMutation.isPending} className="h-9 rounded-[var(--radius-lg)] text-xs">
-              {u.role === "admin" ? "Demote" : "Promote"}
+              <LocalizedValue value={u.role === "admin" ? "Demote" : "Promote"} />
             </Button>
           </div>
         )}

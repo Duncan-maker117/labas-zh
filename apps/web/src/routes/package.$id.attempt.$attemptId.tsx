@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -96,9 +97,9 @@ function ContinueAttemptComponent() {
       <div className="min-h-screen pt-8 pb-32 px-6 md:px-12 lg:px-16 max-w-4xl mx-auto bg-[var(--warm-cream)]">
         <div className="text-center py-20">
           <MaterialIcon name="error_outline" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-          <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Paket tidak ditemukan</p>
+          <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Paket tidak ditemukan"} /></p>
           <Link to={packagesLink} className="text-[var(--matcha-600)] font-semibold mt-4 inline-block">
-            Kembali ke Paket
+            <LocalizedText source={"Kembali ke Paket"} />
           </Link>
         </div>
       </div>
@@ -111,9 +112,9 @@ function ContinueAttemptComponent() {
       <div className="min-h-screen pt-8 pb-32 px-6 md:px-12 lg:px-16 max-w-4xl mx-auto bg-[var(--warm-cream)]">
         <div className="text-center py-20">
           <MaterialIcon name="check_circle" className="text-6xl text-[var(--matcha-600)] mx-auto mb-4" />
-          <p className="text-xl font-headline font-bold text-[var(--clay-black)]">Semua section selesai!</p>
+          <p className="text-xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Semua section selesai!"} /></p>
           <Button onClick={handleFinishWithTracking} className="mt-6 bg-[var(--clay-black)] text-[var(--pure-white)] clay-hover rounded-[var(--radius-lg)]">
-            Selesaikan & Lihat Hasil
+            <LocalizedText source={"Selesaikan & Lihat Hasil"} />
           </Button>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useSearch, useNavigate, Link } from "@tanstack/react-router";
@@ -23,6 +25,7 @@ function pickRandom<T>(items: T[]): T | null {
 }
 
 export function CpnsPackagesComponent() {
+  const { ui } = useLocale();
   const search = useSearch({ strict: false }) as Record<string, string>;
   const navigate = useNavigate();
 
@@ -106,16 +109,16 @@ export function CpnsPackagesComponent() {
         }),
       );
       const result = await comboMutation.mutateAsync({ title, description: desc, isPublic: true, sections });
-      toast.success("Full Test SKD siap!");
+      toast.success(uiMessage("Full Test SKD siap!"));
       navigate({ to: "/package/$id", params: { id: result.packageId } });
     } catch (err: unknown) {
-      toast.error("Gagal membuat paket SKD", { description: getErrorMessage(err) });
+      toast.error(uiMessage("Gagal membuat paket SKD"), { description: getErrorMessage(err) });
     }
   };
 
   return (
     <div>
-      <CpnsPageHeader icon="folder" title="Paket Soal CPNS" subtitle="Latihan soal dari paket yang sudah dibuat" />
+      <CpnsPageHeader icon="folder" title={ui("Paket Soal CPNS")} subtitle={ui("Latihan soal dari paket yang sudah dibuat")} />
 
       {/* Auto Random Pick — Full Test SKD */}
       <Card className="mb-6 bg-gradient-to-br from-[var(--blueberry-800)]/5 to-[var(--ube-800)]/5 border-2 border-[var(--blueberry-800)]/20 rounded-[var(--radius-xl)]">
@@ -125,8 +128,8 @@ export function CpnsPackagesComponent() {
               <MaterialIcon name="workspace_premium" className="text-lg text-[var(--pure-white)]" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-[var(--clay-black)]">Full Test SKD — Auto Bundle</p>
-              <p className="text-xs text-[var(--warm-charcoal)]">Acak & gabung paket TIU, TWK, TKP jadi satu latihan</p>
+              <p className="text-sm font-bold text-[var(--clay-black)]"><LocalizedText source={"Full Test SKD — Auto Bundle"} /></p>
+              <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Acak & gabung paket TIU, TWK, TKP jadi satu latihan"} /></p>
             </div>
           </div>
 
@@ -143,23 +146,23 @@ export function CpnsPackagesComponent() {
                       className={`text-sm ${pick ? "text-[var(--matcha-600)]" : "text-[var(--pomegranate-400)]"}`}
                     />
                     <p className="text-xs font-semibold text-[var(--clay-black)]">{sec}</p>
-                    <span className="text-[10px] text-[var(--warm-silver)]">{cfg.questionCount} soal</span>
+                    <span className="text-[10px] text-[var(--warm-silver)]">{cfg.questionCount} <LocalizedText source={"soal"} /></span>
                   </div>
                   {pick ? (
                     <>
                       <p className="text-[11px] text-[var(--warm-charcoal)] truncate">{pick.title}</p>
-                      <p className="text-[10px] text-[var(--warm-silver)]">{pick.totalQuestions} soal · {cfg.durationMin}m</p>
+                      <p className="text-[10px] text-[var(--warm-silver)]">{pick.totalQuestions} <LocalizedText source={"soal ·"} /> {cfg.durationMin}<LocalizedText source={"m"} /></p>
                     </>
                   ) : (
                     <p className="text-[11px] text-[var(--pomegranate-400)]">
-                      Belum ada paket {sec}
+                      <LocalizedText source={"Belum ada paket"} /> {sec}
                       {sec === "TIU" && " — Generate TIU dulu"}
                       {sec === "TWK" && " — Generate TWK dulu"}
                       {sec === "TKP" && " — Generate TKP dulu"}
                     </p>
                   )}
                   {count > 0 && (
-                    <p className="text-[10px] text-[var(--warm-silver)] mt-1">{count} paket tersedia</p>
+                    <p className="text-[10px] text-[var(--warm-silver)] mt-1">{count} <LocalizedText source={"paket tersedia"} /></p>
                   )}
                 </div>
               );
@@ -180,13 +183,13 @@ export function CpnsPackagesComponent() {
                   className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] text-sm"
                 >
                   <MaterialIcon name="shuffle" className="text-sm mr-1" />
-                  Acak Ulang
+                  <LocalizedText source={"Acak Ulang"} />
                 </Button>
               )}
               {!allAvailable && (
                 <Link to="/cpns/generate">
                   <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] rounded-[var(--radius-lg)] text-sm">
-                    Generate Soal
+                    <LocalizedText source={"Generate Soal"} />
                   </Button>
                 </Link>
               )}
@@ -195,7 +198,7 @@ export function CpnsPackagesComponent() {
                 disabled={!allAvailable || comboMutation.isPending}
                 className="bg-[var(--clay-black)] text-[var(--pure-white)] rounded-[var(--radius-lg)] text-sm"
               >
-                {comboMutation.isPending ? "Menggabungkan..." : "Buat & Mulai Latihan SKD"}
+                <LocalizedValue value={comboMutation.isPending ? "Menggabungkan..." : "Buat & Mulai Latihan SKD"} />
               </Button>
             </div>
           </div>
@@ -207,12 +210,12 @@ export function CpnsPackagesComponent() {
         <div className="relative max-w-md">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-silver)] text-sm" />
           <input
-            type="text" placeholder="Cari paket..." value={localSearch}
+            type="text" placeholder={ui("Cari paket...")} value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm text-[var(--clay-black)] placeholder:text-[var(--warm-silver)] focus:outline-none focus:border-[var(--matcha-500)]"
           />
         </div>
-        <p className="text-xs text-[var(--warm-silver)] mt-2">{total} paket ditemukan</p>
+        <p className="text-xs text-[var(--warm-silver)] mt-2">{total} <LocalizedText source={"paket ditemukan"} /></p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -220,17 +223,17 @@ export function CpnsPackagesComponent() {
           <Card className="md:col-span-2 bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
             <CardContent className="p-8 text-center">
               <div className="animate-spin inline-block mb-2 text-lg">⟳</div>
-              <p className="text-sm text-[var(--warm-charcoal)]">Memuat paket...</p>
+              <p className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Memuat paket..."} /></p>
             </CardContent>
           </Card>
         )}
         {!isLoading && rows.length === 0 && (
           <Card className="md:col-span-2 bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
             <CardContent className="p-8 text-center">
-              <p className="text-sm font-semibold text-[var(--clay-black)] mb-1">Belum ada paket</p>
-              <p className="text-xs text-[var(--warm-charcoal)] mb-4">Generate soal CPNS untuk membuat paket latihan</p>
+              <p className="text-sm font-semibold text-[var(--clay-black)] mb-1"><LocalizedText source={"Belum ada paket"} /></p>
+              <p className="text-xs text-[var(--warm-charcoal)] mb-4"><LocalizedText source={"Generate soal CPNS untuk membuat paket latihan"} /></p>
               <Link to="/cpns/generate">
-                <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] rounded-[var(--radius-lg)]">Generate Soal</Button>
+                <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] rounded-[var(--radius-lg)]"><LocalizedText source={"Generate Soal"} /></Button>
               </Link>
             </CardContent>
           </Card>

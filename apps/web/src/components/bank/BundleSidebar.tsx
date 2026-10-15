@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import { Input } from "@labas/ui/components/input";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
@@ -49,6 +51,7 @@ export function BundleSidebar({
   onCreateFromSections,
   onOpenAutoBundle,
 }: BundleSidebarProps) {
+  const { ui } = useLocale();
   const activeBundle = mode === "soal" ? bundleQuestions : bundleSections;
   const bundleCount = activeBundle.length;
 
@@ -58,12 +61,12 @@ export function BundleSidebar({
         {/* Header */}
         <div className="p-5 bg-[var(--clay-black)] text-[var(--pure-white)]">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-bold font-headline">Paket Saat Ini</h3>
-            <span className="text-xs font-medium bg-[var(--matcha-600)]/30 px-2 py-1 rounded">DRAFT</span>
+            <h3 className="text-lg font-bold font-headline"><LocalizedText source={"Paket Saat Ini"} /></h3>
+            <span className="text-xs font-medium bg-[var(--matcha-600)]/30 px-2 py-1 rounded"><LocalizedText source={"DRAFT"} /></span>
           </div>
           <div className="flex items-center gap-2">
             <p className="text-sm text-[var(--warm-silver)]">
-              {bundleCount} {mode === "soal" ? "soal" : "section"} dipilih
+              {bundleCount} <LocalizedValue value={mode === "soal" ? "soal" : "section"} /> <LocalizedText source={"dipilih"} />
             </p>
             {lockedExamType && (
               <span className="text-[10px] font-medium bg-[var(--matcha-600)]/40 text-[var(--matcha-300)] px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -79,7 +82,7 @@ export function BundleSidebar({
           {bundleCount === 0 ? (
             <div className="text-center py-8 text-sm text-[var(--warm-silver)]">
               <MaterialIcon name="inventory_2" className="text-3xl mx-auto mb-2" />
-              Belum ada yang dipilih
+              <LocalizedText source={"Belum ada yang dipilih"} />
             </div>
           ) : (
             activeBundle.map((item, idx: number) => {
@@ -123,8 +126,8 @@ export function BundleSidebar({
                 <MaterialIcon name="auto_awesome" className="text-lg text-[var(--matcha-600)]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[var(--clay-black)]">Auto Bundle</p>
-                <p className="text-xs text-[var(--warm-charcoal)]">AI pilihkan soal otomatis</p>
+                <p className="text-sm font-bold text-[var(--clay-black)]"><LocalizedText source={"Auto Bundle"} /></p>
+                <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"AI pilihkan soal otomatis"} /></p>
               </div>
               <Button
                 size="sm"
@@ -133,7 +136,7 @@ export function BundleSidebar({
                 className="bg-[var(--matcha-600)] text-[var(--pure-white)] hover:bg-[var(--matcha-800)] rounded-[var(--radius-lg)] text-xs px-3 py-1.5 h-auto shrink-0 cursor-pointer"
               >
                 <MaterialIcon name="auto_fix_high" className="mr-1 text-xs" />
-                Buat
+                <LocalizedText source={"Buat"} />
               </Button>
             </div>
           </div>
@@ -144,36 +147,36 @@ export function BundleSidebar({
           <div className="space-y-4 mb-5">
             <div>
               <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase">
-                Judul Paket
+                <LocalizedText source={"Judul Paket"} />
               </label>
               <Input
                 value={bundleTitle}
                 onChange={(e) => onSetTitle(e.target.value)}
-                placeholder="Judul paket..."
+                placeholder={ui("Judul paket...")}
                 className="w-full bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-lg)] text-sm"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase">
-                Deskripsi
+                <LocalizedText source={"Deskripsi"} />
               </label>
               <Input
                 value={bundleDescription}
                 onChange={(e) => onSetDescription(e.target.value)}
-                placeholder="Deskripsi singkat..."
+                placeholder={ui("Deskripsi singkat...")}
                 className="w-full bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-lg)] text-sm"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase">
-                Visibilitas
+                <LocalizedText source={"Visibilitas"} />
               </label>
               <div className="flex gap-2">
                 <VisButton active={bundleIsPublic} onClick={() => onSetIsPublic(true)}>
-                  Publik
+                  <LocalizedText source={"Publik"} />
                 </VisButton>
                 <VisButton active={!bundleIsPublic} onClick={() => onSetIsPublic(false)}>
-                  Privat
+                  <LocalizedText source={"Privat"} />
                 </VisButton>
               </div>
             </div>
@@ -185,11 +188,11 @@ export function BundleSidebar({
           >
             <MaterialIcon name={mode === "soal" ? "folder" : "construction"} />
             <span className="ml-2">
-              {isCreating
+              <LocalizedValue value={isCreating
                 ? "Membuat..."
                 : mode === "soal"
                   ? "Buat Paket"
-                  : "Buat Combo Paket"}
+                  : "Buat Combo Paket"} />
             </span>
           </Button>
         </div>

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import uiTranslations from "./ui-translations.json";
 
 export type Locale = "zh-CN" | "en-US" | "id-ID";
 
@@ -17,7 +18,7 @@ const messages = {
 
 type MessageKey = keyof typeof messages["zh-CN"];
 type LocaleContextValue = { locale: Locale; setLocale: (locale: Locale) => void; t: (key: MessageKey) => string; ui: (source: string) => string };
-const LocaleContext = createContext<LocaleContextValue>({ locale: "zh-CN", setLocale: () => {}, t: (key) => messages["zh-CN"][key], ui: (source) => interfaceText["zh-CN"][source] ?? source });
+const LocaleContext = createContext<LocaleContextValue>({ locale: "zh-CN", setLocale: () => {}, t: (key) => messages["zh-CN"][key], ui: (source) => interfaceText["zh-CN"][source] ?? (uiTranslations["zh-CN"] as Record<string, string>)[source] ?? source });
 
 // Source strings are kept as keys so existing Indonesian copy remains available
 // while page content follows the same preference as the navigation.
@@ -50,11 +51,46 @@ const interfaceText: Record<Locale, Record<string, string>> = {
   "id-ID": {},
 };
 
+function savedLocale(): Locale {
+  if (typeof window === "undefined") return "zh-CN";
+  const saved = window.localStorage.getItem("labas-locale");
+  return saved === "en-US" || saved === "id-ID" ? saved : "zh-CN";
+}
+
+export function uiMessage<T>(value: T): T {
+  if (typeof value !== "string") return value;
+  const locale = savedLocale();
+  const fixed = interfaceText[locale][value] ?? (uiTranslations[locale] as Record<string, string>)[value];
+  if (fixed) return fixed as T;
+  const templates: Array<[RegExp, [string, string, string]]> = [
+    [/^(\d+) (soal|paket) berhasil dipublikasikan$/, ["已公开 $1 个$2", "$1 $2 published", "$1 $2 berhasil dipublikasikan"]],
+    [/^(\d+) (soal|paket) dipublikasikan, (\d+) dilewati$/, ["已公开 $1 个$2，跳过 $3 个", "$1 $2 published, $3 skipped", "$1 $2 dipublikasikan, $3 dilewati"]],
+    [/^(\d+) stale attempt\(s\) abandoned\.$/, ["已结束 $1 条超时练习。", "$1 stale attempts abandoned.", "$1 percobaan lama ditinggalkan."]],
+    [/^Updated (\d+) (questions|packages)$/, ["已更新 $1 个$2", "Updated $1 $2", "$1 $2 diperbarui"]],
+    [/^Role changed to (.+)$/, ["角色已改为 $1", "Role changed to $1", "Peran diubah menjadi $1"]],
+    [/^Hanya bisa memilih soal dari (.+)$/, ["只能选择 $1 的题目", "You can only select $1 questions", "Hanya bisa memilih soal dari $1"]],
+    [/^(Added|Deducted) ([\d,.]+) tokens\. New balance: ([\d,.]+)$/, ["$1 $2 Token，当前余额：$3", "$1 $2 tokens. New balance: $3", "$1 $2 token. Saldo baru: $3"]],
+    [/^Unsuspend (.+)\?$/, ["恢复 $1 的账号？", "Unsuspend $1?", "Aktifkan kembali $1?"]],
+    [/^Suspend (.+)\? This will prevent them from using the platform\.$/, ["停用 $1 的账号？停用后该用户将无法使用平台。", "Suspend $1? This will prevent them from using the platform.", "Tangguhkan $1? Pengguna tidak dapat memakai platform."]],
+    [/^Change (.+)'s role to "(.+)"\?$/, ["将 $1 的角色改为“$2”？", "Change $1's role to $2?", "Ubah peran $1 menjadi $2?"]],
+  ];
+  const localeIndex = locale === "zh-CN" ? 0 : locale === "en-US" ? 1 : 2;
+  for (const [pattern, variants] of templates) {
+    const match = value.match(pattern);
+    if (!match) continue;
+    let result = variants[localeIndex];
+    match.slice(1).forEach((part, index) => {
+      const translated = locale === "zh-CN" ? ({ soal: "题目", paket: "套题", questions: "题目", packages: "套题", Added: "增加", Deducted: "扣除" } as Record<string, string>)[part] ?? part : part;
+      result = result.replace(`$${index + 1}`, translated);
+    });
+    return result as T;
+  }
+  return value;
+}
+
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
-    if (typeof window === "undefined") return "zh-CN";
-    const saved = window.localStorage.getItem("labas-locale");
-    return saved === "en-US" || saved === "id-ID" ? saved : "zh-CN";
+    return savedLocale();
   });
   const setLocale = useCallback((next: Locale) => {
     window.localStorage.setItem("labas-locale", next);
@@ -62,7 +98,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
   const t = useCallback((key: MessageKey) => messages[locale][key], [locale]);
-  const ui = useCallback((source: string) => interfaceText[locale][source] ?? source, [locale]);
+  const ui = useCallback((source: string) => interfaceText[locale][source] ?? (uiTranslations[locale] as Record<string, string>)[source] ?? source, [locale]);
   return <LocaleContext.Provider value={{ locale, setLocale, t, ui }}>{children}</LocaleContext.Provider>;
 }
 

@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useRef, useEffect } from "react";
 import { Card } from "@labas/ui/components/card";
 import { Button } from "@labas/ui/components/button";
@@ -131,13 +132,13 @@ export function SoalBrowser({
     return (
       <div className="text-center py-20">
         <MaterialIcon name="search_off" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-        <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Tidak ada soal ditemukan</p>
+        <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Tidak ada soal ditemukan"} /></p>
         {hasFilters && (
           <button
             onClick={onClearFilters}
             className="mt-3 text-sm text-[var(--pomegranate-400)] font-medium hover:underline cursor-pointer"
           >
-            Hapus filter
+            <LocalizedText source={"Hapus filter"} />
           </button>
         )}
       </div>
@@ -154,7 +155,7 @@ export function SoalBrowser({
           className="text-xs font-semibold text-[var(--matcha-600)] hover:text-[var(--matcha-800)] transition-colors cursor-pointer flex items-center gap-1 mb-2"
         >
           <MaterialIcon name="select_all" className="text-sm" />
-          Pilih Banyak
+          <LocalizedText source={"Pilih Banyak"} />
         </button>
       );
     }
@@ -165,13 +166,13 @@ export function SoalBrowser({
             onClick={clearSelection}
             className="text-xs font-semibold text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors cursor-pointer"
           >
-            Batalkan ({selectedIds.size})
+            <LocalizedText source={"Batalkan ("} />{selectedIds.size})
           </button>
           <button
             onClick={selectAll}
             className="text-xs font-semibold text-[var(--matcha-600)] hover:text-[var(--matcha-800)] transition-colors cursor-pointer"
           >
-            Pilih Semua
+            <LocalizedText source={"Pilih Semua"} />
           </button>
         </div>
         <div className="flex items-center gap-2">
@@ -182,13 +183,13 @@ export function SoalBrowser({
             className="rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] text-xs cursor-pointer"
           >
             <MaterialIcon name="public" className="text-xs mr-1" />
-            Jadikan Publik ({selectedIds.size})
+            <LocalizedText source={"Jadikan Publik ("} />{selectedIds.size})
           </Button>
           <button
             onClick={() => { setBulkMode(false); setSelectedIds(new Set()); }}
             className="text-xs text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors cursor-pointer font-semibold ml-2"
           >
-            Selesai
+            <LocalizedText source={"Selesai"} />
           </button>
         </div>
       </div>
@@ -256,7 +257,7 @@ export function SoalBrowser({
 
       {!hasMore && questions.length > 0 && (
         <p className="text-center text-sm text-[var(--warm-silver)] mt-8">
-          Semua soal telah dimuat ({questions.length} soal)
+          <LocalizedText source={"Semua soal telah dimuat ("} />{questions.length} <LocalizedText source={"soal)"} />
         </p>
       )}
     </>

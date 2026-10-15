@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useSearch, useNavigate } from "@tanstack/react-router";
@@ -21,6 +23,7 @@ import type { Question } from "@/lib/types";
 const LIMIT = 12;
 
 export function CpnsBankComponent() {
+  const { ui } = useLocale();
   const search = useSearch({ strict: false }) as Record<string, string>;
   const navigate = useNavigate();
 
@@ -106,10 +109,10 @@ export function CpnsBankComponent() {
       setBundleQuestions([]);
       setBundleTitle("");
       setBundleDescription("");
-      toast.success("Paket berhasil dibuat!");
+      toast.success(uiMessage("Paket berhasil dibuat!"));
       navigate({ to: "/cpns/packages" });
     } catch (err: unknown) {
-      toast.error("Gagal membuat paket", { description: getErrorMessage(err) });
+      toast.error(uiMessage("Gagal membuat paket"), { description: getErrorMessage(err) });
     }
   };
 
@@ -141,14 +144,14 @@ export function CpnsBankComponent() {
         />
       )}
 
-      <CpnsPageHeader icon="database" title="Bank Soal CPNS" subtitle="Pilih soal untuk dibuat paket latihan" />
+      <CpnsPageHeader icon="database" title={ui("Bank Soal CPNS")} subtitle={ui("Pilih soal untuk dibuat paket latihan")} />
 
       {/* Search + Section filter */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="flex-1 relative">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-silver)] text-sm" />
           <input
-            type="text" placeholder="Cari soal..." value={localSearch}
+            type="text" placeholder={ui("Cari soal...")} value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] text-sm text-[var(--clay-black)] placeholder:text-[var(--warm-silver)] focus:outline-none focus:border-[var(--matcha-500)]"
           />
@@ -171,10 +174,10 @@ export function CpnsBankComponent() {
 
       {/* Results count + bundle badge */}
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-[var(--warm-silver)]">{total} soal ditemukan</p>
+        <p className="text-xs text-[var(--warm-silver)]">{total} <LocalizedText source={"soal ditemukan"} /></p>
         {bundleQuestions.length > 0 && (
           <span className="px-3 py-1 rounded-full bg-[var(--blueberry-800)]/10 text-[var(--blueberry-800)] text-xs font-semibold">
-            {bundleQuestions.length} soal dipilih
+            {bundleQuestions.length} <LocalizedText source={"soal dipilih"} />
           </span>
         )}
       </div>
@@ -187,17 +190,17 @@ export function CpnsBankComponent() {
               <Card className="md:col-span-2 bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
                 <CardContent className="p-8 text-center">
                   <div className="animate-spin inline-block mb-2 text-lg">⟳</div>
-                  <p className="text-sm text-[var(--warm-charcoal)]">Memuat soal...</p>
+                  <p className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Memuat soal..."} /></p>
                 </CardContent>
               </Card>
             )}
             {!isLoading && rows.length === 0 && (
               <Card className="md:col-span-2 bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
                 <CardContent className="p-8 text-center">
-                  <p className="text-sm font-semibold text-[var(--clay-black)] mb-1">Belum ada soal</p>
-                  <p className="text-xs text-[var(--warm-charcoal)] mb-4">Generate soal CPNS terlebih dahulu</p>
+                  <p className="text-sm font-semibold text-[var(--clay-black)] mb-1"><LocalizedText source={"Belum ada soal"} /></p>
+                  <p className="text-xs text-[var(--warm-charcoal)] mb-4"><LocalizedText source={"Generate soal CPNS terlebih dahulu"} /></p>
                   <Button onClick={() => navigate({ to: "/cpns/generate" })} className="bg-[var(--clay-black)] text-[var(--pure-white)] rounded-[var(--radius-lg)]">
-                    Generate Soal
+                    <LocalizedText source={"Generate Soal"} />
                   </Button>
                 </CardContent>
               </Card>

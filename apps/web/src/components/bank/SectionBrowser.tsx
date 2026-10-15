@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { Button } from "@labas/ui/components/button";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
@@ -30,7 +31,7 @@ export function SectionBrowser({
     return (
       <div className="text-center py-20">
         <MaterialIcon name="folder_open" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-        <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Tidak ada section ditemukan</p>
+        <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Tidak ada section ditemukan"} /></p>
       </div>
     );
   }
@@ -76,7 +77,7 @@ export function SectionBrowser({
                             : "bg-[var(--matcha-300)] text-[var(--matcha-800)] hover:bg-[var(--matcha-400)]"
                         }`}
                       >
-                        {inBundle ? "Hapus" : "Tambah"}
+                        <LocalizedValue value={inBundle ? "Hapus" : "Tambah"} />
                       </Button>
                     </div>
                   </div>

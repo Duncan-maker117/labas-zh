@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { Input } from "@labas/ui/components/input";
 import { Button } from "@labas/ui/components/button";
@@ -27,6 +29,7 @@ export function EditPackageModal({
   }) => void;
   isPending: boolean;
 }) {
+  const { ui } = useLocale();
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription ?? "");
   const [isPublic, setIsPublic] = useState(initialIsPublic);
@@ -36,31 +39,31 @@ export function EditPackageModal({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline font-bold text-[var(--clay-black)]">
-            Edit Paket
+            <LocalizedText source={"Edit Paket"} />
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Judul Paket
+              <LocalizedText source={"Judul Paket"} />
             </label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Judul paket..."
+              placeholder={ui("Judul paket...")}
               className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
             />
           </div>
 
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Deskripsi
+              <LocalizedText source={"Deskripsi"} />
             </label>
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Deskripsi singkat..."
+              placeholder={ui("Deskripsi singkat...")}
               className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
             />
           </div>
@@ -73,7 +76,7 @@ export function EditPackageModal({
               className="w-4 h-4 rounded border-[var(--oat-border)]"
             />
             <span className="text-sm text-[var(--warm-charcoal)]">
-              Publikasikan ke Bank Soal
+              <LocalizedText source={"Publikasikan ke Bank Soal"} />
             </span>
           </label>
         </div>
@@ -84,14 +87,14 @@ export function EditPackageModal({
             onClick={onClose}
             className="flex-1 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
           >
-            Batal
+            <LocalizedText source={"Batal"} />
           </Button>
           <Button
             onClick={() => onSave({ title, description, isPublic })}
             disabled={!title || isPending}
             className="flex-1 bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)]"
           >
-            {isPending ? "Menyimpan..." : "Simpan"}
+            <LocalizedValue value={isPending ? "Menyimpan..." : "Simpan"} />
           </Button>
         </div>
       </DialogContent>

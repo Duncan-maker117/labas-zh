@@ -101,7 +101,7 @@ interface PageTourProps {
 }
 
 export function PageTourImpl({ storageKey, steps, autoDelay }: PageTourProps) {
-  const { locale } = useLocale();
+  const { locale, ui } = useLocale();
   const [run, setRun] = useState(false);
 
   useEffect(() => {
@@ -124,7 +124,11 @@ export function PageTourImpl({ storageKey, steps, autoDelay }: PageTourProps) {
   };
 
   return (
-    <Joyride steps={steps} run={run} continuous
+    <Joyride steps={steps.map((step) => ({
+      ...step,
+      title: typeof step.title === "string" ? ui(step.title) : step.title,
+      content: typeof step.content === "string" ? ui(step.content) : step.content,
+    }))} run={run} continuous
       options={{ ...joyrideOptions, showProgress: true, buttons: ["back", "primary", "skip"] }}
       locale={joyrideLocales[locale]} styles={joyrideStyles} onEvent={handleEvent}
     />

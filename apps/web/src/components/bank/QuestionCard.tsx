@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { formatLabel } from "@/lib/format";
@@ -30,6 +32,7 @@ export function QuestionCard({
   onTogglePublic,
   onDelete,
 }: QuestionCardProps) {
+  const { ui } = useLocale();
   const isPrivate = isOwner && !q.isPublic;
 
   return (
@@ -57,7 +60,7 @@ export function QuestionCard({
                   : "bg-[var(--oat-light)] text-[var(--warm-charcoal)]"
               }`}>
                 <MaterialIcon name={selected ? "check_circle" : "radio_button_unchecked"} className="text-xs" />
-                {selected ? "Terpilih" : "Pilih"}
+                <LocalizedValue value={selected ? "Terpilih" : "Pilih"} />
               </span>
             )}
             <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[var(--matcha-300)] text-[var(--matcha-800)] text-xs font-semibold leading-none whitespace-nowrap">
@@ -69,7 +72,7 @@ export function QuestionCard({
             {disabled && (
               <span className="px-2 py-1 rounded-full bg-[var(--warm-silver)]/30 text-[var(--warm-charcoal)] text-[10px] font-semibold flex items-center gap-1">
                 <MaterialIcon name="lock" className="text-[10px]" />
-                Terkunci
+                <LocalizedText source={"Terkunci"} />
               </span>
             )}
           </div>
@@ -103,10 +106,10 @@ export function QuestionCard({
               {formatLabel(q.format ?? "")}
             </span>
             <span className="px-2 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-medium">
-              Lv.{q.difficulty}
+              <LocalizedText source={"Lv."} />{q.difficulty}
             </span>
             <span className="px-2 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-medium">
-              {q.usageCount}x digunakan
+              {q.usageCount}<LocalizedText source={"x digunakan"} />
             </span>
           </div>
         </div>
@@ -136,16 +139,16 @@ export function QuestionCard({
                 />
                 {/* Default label */}
                 <span className="group-hover:hidden">
-                  {q.isPublic ? "Publik" : "Privat"}
+                  <LocalizedValue value={q.isPublic ? "Publik" : "Privat"} />
                 </span>
                 {/* Hover label (shows what will happen) */}
                 <span className="hidden group-hover:inline">
-                  {q.isPublic ? "Jadikan Privat" : "Jadikan Publik"}
+                  <LocalizedValue value={q.isPublic ? "Jadikan Privat" : "Jadikan Publik"} />
                 </span>
               </button>
               <button
                 onClick={onDelete}
-                aria-label="Hapus soal"
+                aria-label={ui("Hapus soal")}
                 className="text-[var(--pomegranate-400)] hover:bg-[var(--pomegranate-400)]/10 px-2 py-1 rounded-full transition-colors cursor-pointer"
               >
                 <MaterialIcon name="delete" className="text-sm" />
@@ -168,7 +171,7 @@ export function QuestionCard({
                   : "bg-[var(--matcha-300)] text-[var(--matcha-800)] hover:bg-[var(--matcha-400)] cursor-pointer"
             }`}
           >
-            {disabled ? "Tidak Tersedia" : isInBundle ? "Hapus dari Paket" : "Tambah ke Paket"}
+            <LocalizedValue value={disabled ? "Tidak Tersedia" : isInBundle ? "Hapus dari Paket" : "Tambah ke Paket"} />
           </Button>
           )}
         </div>

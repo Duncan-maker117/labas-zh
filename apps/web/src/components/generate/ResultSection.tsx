@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent, CardHeader } from "@labas/ui/components/card";
@@ -43,7 +44,7 @@ export function ResultSection({ result, generatedPackageId, onClear, bankLink = 
       </div>
 
       <div className="text-sm text-[var(--warm-charcoal)] mb-4 font-mono">
-        {locale === "zh-CN" ? "模型" : "Model"}: {result.meta.model} · Token: {result.meta.tokensUsed ?? "?"} · {locale === "zh-CN" ? "耗时" : locale === "en-US" ? "Time" : "Waktu"}: {result.meta.durationMs}ms · {result.questions.length} {ui("soal")}
+        {locale === "zh-CN" ? "模型" : "Model"}: {result.meta.model} <LocalizedText source={"· Token:"} /> {result.meta.tokensUsed ?? "?"} · {locale === "zh-CN" ? "耗时" : locale === "en-US" ? "Time" : "Waktu"}: {result.meta.durationMs}<LocalizedText source={"ms ·"} /> {result.questions.length} {ui("soal")}
       </div>
 
       {result.questions.map((q, idx) => (

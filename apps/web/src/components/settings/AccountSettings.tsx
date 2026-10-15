@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { Input } from "@labas/ui/components/input";
@@ -16,6 +18,7 @@ type AccountInfo = {
 };
 
 export function AccountSettings() {
+  const { ui } = useLocale();
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
@@ -49,11 +52,11 @@ export function AccountSettings() {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(newPassword)) {
-      toast.error("Password minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka");
+      toast.error(uiMessage("Password minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("Password baru tidak cocok");
+      toast.error(uiMessage("Password baru tidak cocok"));
       return;
     }
     setIsChangingPassword(true);
@@ -63,12 +66,12 @@ export function AccountSettings() {
         newPassword,
         revokeOtherSessions: true,
       });
-      toast.success("Password berhasil diubah");
+      toast.success(uiMessage("Password berhasil diubah"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || "Gagal mengubah password");
+      toast.error(uiMessage(getErrorMessage(err) || "Gagal mengubah password"));
     } finally {
       setIsChangingPassword(false);
     }
@@ -80,10 +83,10 @@ export function AccountSettings() {
     setIsChangingEmail(true);
     try {
       await authClient.changeEmail({ newEmail });
-      toast.success("Email berhasil diubah. Cek email baru Anda untuk verifikasi.");
+      toast.success(uiMessage("Email berhasil diubah. Cek email baru Anda untuk verifikasi."));
       setNewEmail("");
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || "Gagal mengubah email");
+      toast.error(uiMessage(getErrorMessage(err) || "Gagal mengubah email"));
     } finally {
       setIsChangingEmail(false);
     }
@@ -97,7 +100,7 @@ export function AccountSettings() {
         callbackURL: `${env.VITE_SITE_URL}/settings?tab=account`,
       });
     } catch {
-      toast.error("Gagal menghubungkan Google");
+      toast.error(uiMessage("Gagal menghubungkan Google"));
     } finally {
       setLinking(false);
     }
@@ -109,10 +112,10 @@ export function AccountSettings() {
       await authClient.unlinkAccount({
         providerId: "google",
       });
-      toast.success("Akun Google berhasil diputuskan");
+      toast.success(uiMessage("Akun Google berhasil diputuskan"));
       setAccounts((prev) => prev.filter((a) => a.providerId !== "google"));
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || "Gagal memutuskan akun Google");
+      toast.error(uiMessage(getErrorMessage(err) || "Gagal memutuskan akun Google"));
     } finally {
       setUnlinking(false);
     }
@@ -122,18 +125,18 @@ export function AccountSettings() {
     <div className="space-y-6">
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
-          <CardTitle className="font-headline text-[var(--clay-black)]">Informasi Akun</CardTitle>
+          <CardTitle className="font-headline text-[var(--clay-black)]"><LocalizedText source={"Informasi Akun"} /></CardTitle>
           <CardDescription className="text-[var(--warm-charcoal)]">
-            Detail akun Anda saat ini
+            <LocalizedText source={"Detail akun Anda saat ini"} />
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
-            <Label className="text-sm text-[var(--warm-charcoal)]">Nama</Label>
+            <Label className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Nama"} /></Label>
             <p className="font-medium text-[var(--clay-black)]">{user?.name}</p>
           </div>
           <div>
-            <Label className="text-sm text-[var(--warm-charcoal)]">Email</Label>
+            <Label className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Email"} /></Label>
             <p className="font-medium text-[var(--clay-black)]">{user?.email}</p>
           </div>
         </CardContent>
@@ -141,14 +144,14 @@ export function AccountSettings() {
 
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
-          <CardTitle className="font-headline text-[var(--clay-black)]">Akun Terhubung</CardTitle>
+          <CardTitle className="font-headline text-[var(--clay-black)]"><LocalizedText source={"Akun Terhubung"} /></CardTitle>
           <CardDescription className="text-[var(--warm-charcoal)]">
-            Kelola metode masuk ke akun Anda
+            <LocalizedText source={"Kelola metode masuk ke akun Anda"} />
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {loadingAccounts ? (
-            <p className="text-sm text-[var(--warm-charcoal)]">Memuat...</p>
+            <p className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Memuat..."} /></p>
           ) : (
             <>
               <div className="flex items-center justify-between rounded-lg border p-3">
@@ -160,9 +163,9 @@ export function AccountSettings() {
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                   </svg>
                   <div>
-                    <p className="text-sm font-medium">Google</p>
+                    <p className="text-sm font-medium"><LocalizedText source={"Google"} /></p>
                     <p className="text-xs text-[var(--warm-charcoal)]">
-                      {hasGoogleAccount ? "Terhubung" : "Belum terhubung"}
+                      <LocalizedValue value={hasGoogleAccount ? "Terhubung" : "Belum terhubung"} />
                     </p>
                   </div>
                 </div>
@@ -174,7 +177,7 @@ export function AccountSettings() {
                     disabled={unlinking || !canDisconnectGoogle}
                     title={!canDisconnectGoogle ? "Tidak bisa putuskan — hanya Google satu-satunya metode masuk" : "Putuskan Google"}
                   >
-                    {unlinking ? "Memutuskan..." : "Putuskan"}
+                    <LocalizedValue value={unlinking ? "Memutuskan..." : "Putuskan"} />
                   </Button>
                 ) : (
                   <Button
@@ -183,13 +186,13 @@ export function AccountSettings() {
                     onClick={handleConnectGoogle}
                     disabled={linking}
                   >
-                    {linking ? "Menghubungkan..." : "Hubungkan"}
+                    <LocalizedValue value={linking ? "Menghubungkan..." : "Hubungkan"} />
                   </Button>
                 )}
               </div>
               {hasGoogleAccount && !canDisconnectGoogle && (
                 <p className="text-xs text-[var(--warm-charcoal)]">
-                  Minimal harus ada satu metode masuk. Tambahkan email/password sebelum memutuskan Google.
+                  <LocalizedText source={"Minimal harus ada satu metode masuk. Tambahkan email/password sebelum memutuskan Google."} />
                 </p>
               )}
             </>
@@ -201,41 +204,41 @@ export function AccountSettings() {
         <>
           <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
             <CardHeader>
-              <CardTitle className="font-headline text-[var(--clay-black)]">Ubah Password</CardTitle>
+              <CardTitle className="font-headline text-[var(--clay-black)]"><LocalizedText source={"Ubah Password"} /></CardTitle>
               <CardDescription className="text-[var(--warm-charcoal)]">
-                Gunakan password yang kuat dan unik
+                <LocalizedText source={"Gunakan password yang kuat dan unik"} />
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Password Saat Ini</Label>
+                  <Label htmlFor="currentPassword"><LocalizedText source={"Password Saat Ini"} /></Label>
                   <Input
                     id="currentPassword"
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Masukkan password saat ini"
+                    placeholder={ui("Masukkan password saat ini")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Password Baru</Label>
+                  <Label htmlFor="newPassword"><LocalizedText source={"Password Baru"} /></Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Minimal 8 karakter"
+                    placeholder={ui("Minimal 8 karakter")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+                  <Label htmlFor="confirmPassword"><LocalizedText source={"Konfirmasi Password Baru"} /></Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Ulangi password baru"
+                    placeholder={ui("Ulangi password baru")}
                   />
                 </div>
                 <Button
@@ -243,7 +246,7 @@ export function AccountSettings() {
                   className="rounded-[var(--radius-lg)]"
                   disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
                 >
-                  {isChangingPassword ? "Menyimpan..." : "Ubah Password"}
+                  <LocalizedValue value={isChangingPassword ? "Menyimpan..." : "Ubah Password"} />
                 </Button>
               </form>
             </CardContent>
@@ -251,25 +254,25 @@ export function AccountSettings() {
 
           <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
             <CardHeader>
-              <CardTitle className="font-headline text-[var(--clay-black)]">Ubah Email</CardTitle>
+              <CardTitle className="font-headline text-[var(--clay-black)]"><LocalizedText source={"Ubah Email"} /></CardTitle>
               <CardDescription className="text-[var(--warm-charcoal)]">
-                Masukkan alamat email baru Anda
+                <LocalizedText source={"Masukkan alamat email baru Anda"} />
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleChangeEmail} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newEmail">Email Baru</Label>
+                  <Label htmlFor="newEmail"><LocalizedText source={"Email Baru"} /></Label>
                   <Input
                     id="newEmail"
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder="nama@email.com"
+                    placeholder={ui("nama@email.com")}
                   />
                 </div>
                 <Button type="submit" className="rounded-[var(--radius-lg)]" disabled={isChangingEmail || !newEmail}>
-                  {isChangingEmail ? "Menyimpan..." : "Ubah Email"}
+                  <LocalizedValue value={isChangingEmail ? "Menyimpan..." : "Ubah Email"} />
                 </Button>
               </form>
             </CardContent>

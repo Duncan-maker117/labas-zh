@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent } from "@labas/ui/components/card";
@@ -40,27 +41,28 @@ function FaqItem({ question, answer, isDark }: { question: string; answer: strin
 }
 
 export function LandingPage() {
+  const { ui } = useLocale();
   const { locale, setLocale } = useLocale();
   return (
     <div className="min-h-screen bg-[var(--warm-cream)] flex flex-col font-sans selection:bg-[var(--matcha-300)] selection:text-[var(--clay-black)]">
       {/* Navbar */}
       <nav className="w-full px-6 py-4 md:px-12 lg:px-16 flex items-center justify-between max-w-7xl mx-auto z-50 sticky top-0 bg-[var(--warm-cream)] border-b-2 border-[var(--oat-border)]">
         <div className="flex items-center gap-3">
-          <img src={images.logo.src} alt="Labas Logo" className="h-10 w-auto object-contain" />
-          <span className="font-headline font-semibold text-2xl tracking-[-0.64px] text-[var(--clay-black)] hidden sm:block">Labas</span>
+          <img src={images.logo.src} alt={ui("Labas Logo")} className="h-10 w-auto object-contain" />
+          <span className="font-headline font-semibold text-2xl tracking-[-0.64px] text-[var(--clay-black)] hidden sm:block"><LocalizedText source={"Labas"} /></span>
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
-          <label className="sr-only" htmlFor="landing-locale">界面语言</label>
+          <label className="sr-only" htmlFor="landing-locale"><LocalizedText source={"界面语言"} /></label>
           <select id="landing-locale" value={locale} onChange={(event) => setLocale(event.target.value as "zh-CN" | "en-US" | "id-ID")} className="rounded border border-[var(--oat-border)] bg-transparent px-2 py-2 text-sm text-[var(--clay-black)]"><option value="zh-CN">简体中文</option><option value="en-US">English</option><option value="id-ID">Bahasa Indonesia</option></select>
           <div className="w-px h-6 bg-[var(--oat-border)] hidden sm:block mx-2"></div>
           <Link to="/login">
             <Button variant="ghost" className="text-[var(--clay-black)] font-semibold hover:bg-[var(--oat-light)] rounded-[12px] text-lg px-4 sm:px-6 h-12">
-              登录
+              <LocalizedText source={"登录"} />
             </Button>
           </Link>
           <Link to="/login">
             <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--dark-charcoal)] rounded-[24px] h-12 px-6 sm:px-8 font-semibold text-lg clay-hover clay-shadow">
-              免费开始
+              <LocalizedText source={"免费开始"} />
             </Button>
           </Link>
         </div>
@@ -72,21 +74,21 @@ export function LandingPage() {
           <div className="flex-1 text-center xl:text-left space-y-8 z-10 w-full max-w-[800px] xl:max-w-none">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--matcha-300)] border-2 border-[var(--matcha-800)] text-[var(--clay-black)] uppercase-label shadow-sm mx-auto xl:mx-0 transform -rotate-2">
               <MaterialIcon name="auto_awesome" className="text-sm" />
-              <span>AI 驱动的语言考试练习</span>
+              <span><LocalizedText source={"AI 驱动的语言考试练习"} /></span>
             </div>
 
             <h1 className="text-[50px] md:text-[70px] lg:text-[85px] font-headline font-semibold text-[var(--clay-black)] tracking-[-2.4px] lg:tracking-[-3.2px] leading-[1.0] lg:leading-[0.95] drop-shadow-sm">
-              面向中文学习者的外语考试练习平台
+              <LocalizedText source={"面向中文学习者的外语考试练习平台"} />
             </h1>
 
             <p className="text-xl md:text-2xl text-[var(--warm-charcoal)] max-w-2xl mx-auto xl:mx-0 leading-relaxed">
-              通过交互式题库、真实考试模拟和 AI 出题，高效准备 TOEFL、IELTS、JLPT、TOPIK 等语言考试。
+              <LocalizedText source={"通过交互式题库、真实考试模拟和 AI 出题，高效准备 TOEFL、IELTS、JLPT、TOPIK 等语言考试。"} />
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center xl:justify-start pt-6">
               <Link to="/login" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto bg-[var(--pure-white)] text-[var(--clay-black)] rounded-[24px] h-[64px] px-8 text-xl font-semibold border-2 border-[var(--oat-border)] clay-shadow clay-hover">
-                  立即开始练习
+                  <LocalizedText source={"立即开始练习"} />
                 </Button>
               </Link>
             </div>
@@ -99,7 +101,7 @@ export function LandingPage() {
                 src={images.hero.src}
                 srcset={images.hero.srcset}
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw"
-                alt="Labas Dashboard Preview"
+                alt={ui("Labas Dashboard Preview")}
                 priority
                 className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-105 group-hover:-rotate-1 drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-10"
               />
@@ -127,10 +129,10 @@ export function LandingPage() {
             <div className="text-center max-w-3xl mx-auto mb-24 space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--ube-300)]/30 border-2 border-[var(--ube-300)] text-[var(--ube-800)] uppercase-label shadow-sm">
                 <MaterialIcon name="play_circle" className="text-sm" />
-                <span>功能演示</span>
+                <span><LocalizedText source={"功能演示"} /></span>
               </div>
               <h2 className="text-[50px] md:text-[60px] font-headline font-semibold text-[var(--clay-black)] tracking-[-2.4px] leading-tight drop-shadow-sm">
-                从题库练习到成绩分析，规划你的备考
+                <LocalizedText source={"从题库练习到成绩分析，规划你的备考"} />
               </h2>
             </div>
 
@@ -138,12 +140,12 @@ export function LandingPage() {
               {/* Feature 1: Hero Showcase - Generate AI */}
               <div className="flex flex-col items-center text-center pb-8 pt-4">
                 <div className="max-w-3xl space-y-5 mb-10">
-                  <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--ube-300)]/20 border-2 border-[var(--ube-300)]/50 text-[var(--ube-800)] text-sm font-bold tracking-wide uppercase-label mb-2">✨ 核心功能</div>
+                  <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--ube-300)]/20 border-2 border-[var(--ube-300)]/50 text-[var(--ube-800)] text-sm font-bold tracking-wide uppercase-label mb-2"><LocalizedText source={"✨ 核心功能"} /></div>
                   <h3 className="text-[36px] md:text-[45px] lg:text-[55px] font-headline font-semibold text-[var(--clay-black)] leading-[1.1] tracking-[-1.5px]">
-                    生成练习题 <br className="hidden sm:block md:hidden" /> <span className="text-[var(--ube-800)]">Agentic AI</span>
+                    <LocalizedText source={"生成练习题"} /> <br className="hidden sm:block md:hidden" /> <span className="text-[var(--ube-800)]"><LocalizedText source={"Agentic AI"} /></span>
                   </h3>
                   <p className="text-lg md:text-xl text-[var(--warm-charcoal)] leading-relaxed max-w-2xl mx-auto">
-                    输入外语阅读材料，系统会生成练习题并进行内容检查。
+                    <LocalizedText source={"输入外语阅读材料，系统会生成练习题并进行内容检查。"} />
                   </p>
                 </div>
 
@@ -159,7 +161,7 @@ export function LandingPage() {
                       playsInline
                     >
                       <source src="/generate%20soal.mp4" type="video/mp4" />
-                      当前浏览器暂不支持播放此视频。
+                      <LocalizedText source={"当前浏览器暂不支持播放此视频。"} />
                     </video>
                   </div>
 
@@ -169,8 +171,8 @@ export function LandingPage() {
                       <MaterialIcon name="smart_toy" className="text-2xl md:text-3xl text-[var(--ube-800)]" />
                     </div>
                     <div className="text-left">
-                      <p className="text-base md:text-lg font-bold text-[var(--clay-black)] leading-tight">Agentic Pipeline</p>
-                      <p className="text-xs md:text-sm text-[var(--warm-charcoal)]">Generasi & Self-Check</p>
+                      <p className="text-base md:text-lg font-bold text-[var(--clay-black)] leading-tight"><LocalizedText source={"Agentic Pipeline"} /></p>
+                      <p className="text-xs md:text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Generasi & Self-Check"} /></p>
                     </div>
                   </div>
 
@@ -180,8 +182,8 @@ export function LandingPage() {
                       <MaterialIcon name="verified" className="text-2xl text-[var(--lemon-800)]" />
                     </div>
                     <div className="text-left">
-                      <p className="font-bold text-[var(--clay-black)] leading-tight">Kualitas Tinggi</p>
-                      <p className="text-xs text-[var(--warm-charcoal)]">Evaluasi Otomatis</p>
+                      <p className="font-bold text-[var(--clay-black)] leading-tight"><LocalizedText source={"Kualitas Tinggi"} /></p>
+                      <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Evaluasi Otomatis"} /></p>
                     </div>
                   </div>
                 </div>
@@ -200,7 +202,7 @@ export function LandingPage() {
                       playsInline
                     >
                       <source src="/paket%20soal.mp4" type="video/mp4" />
-                      当前浏览器暂不支持播放此视频。
+                      <LocalizedText source={"当前浏览器暂不支持播放此视频。"} />
                     </video>
                   </div>
 
@@ -210,31 +212,31 @@ export function LandingPage() {
                       <MaterialIcon name="source" className="text-2xl text-[var(--matcha-800)]" />
                     </div>
                     <div>
-                      <p className="font-bold text-[var(--clay-black)] leading-tight">题库</p>
-                      <p className="text-xs text-[var(--warm-charcoal)]">Koleksi Lengkap</p>
+                      <p className="font-bold text-[var(--clay-black)] leading-tight"><LocalizedText source={"题库"} /></p>
+                      <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Koleksi Lengkap"} /></p>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex-1 w-full lg:w-1/2 space-y-6">
                   <h3 className="text-[40px] lg:text-[50px] font-headline font-semibold text-[var(--clay-black)] leading-[1.1] tracking-[-1.5px]">
-                    Kustomisasi <br/> <span className="text-[var(--matcha-600)]">Paket Belajar</span>
+                    <LocalizedText source={"Kustomisasi"} /> <br/> <span className="text-[var(--matcha-600)]"><LocalizedText source={"Paket Belajar"} /></span>
                   </h3>
                   <p className="text-xl text-[var(--warm-charcoal)] leading-relaxed">
-                    Eksplorasi 题库 untuk merakit paket latihan Anda sendiri. Publikasikan paket soal buatan Anda, atau gunakan paket pilihan dari daftar Editor's Pick.
+                    <LocalizedText source={"Eksplorasi 题库 untuk merakit paket latihan Anda sendiri. Publikasikan paket soal buatan Anda, atau gunakan paket pilihan dari daftar Editor's Pick."} />
                   </p>
                   <ul className="space-y-4 pt-4">
                     <li className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[var(--matcha-300)]/50 flex items-center justify-center">
                         <MaterialIcon name="check" className="text-[var(--matcha-800)]" />
                       </div>
-                      <span className="text-lg font-medium text-[var(--clay-black)]">题库 Terintegrasi</span>
+                      <span className="text-lg font-medium text-[var(--clay-black)]"><LocalizedText source={"题库 Terintegrasi"} /></span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[var(--matcha-300)]/50 flex items-center justify-center">
                         <MaterialIcon name="check" className="text-[var(--matcha-800)]" />
                       </div>
-                      <span className="text-lg font-medium text-[var(--clay-black)]">Sistem Publikasi Paket</span>
+                      <span className="text-lg font-medium text-[var(--clay-black)]"><LocalizedText source={"Sistem Publikasi Paket"} /></span>
                     </li>
                   </ul>
                 </div>
@@ -253,7 +255,7 @@ export function LandingPage() {
                       playsInline
                     >
                       <source src="/attempt%20exam.mp4" type="video/mp4" />
-                      当前浏览器暂不支持播放此视频。
+                      <LocalizedText source={"当前浏览器暂不支持播放此视频。"} />
                     </video>
                   </div>
 
@@ -263,31 +265,31 @@ export function LandingPage() {
                       <MaterialIcon name="timer" className="text-2xl text-[var(--clay-black)]" />
                     </div>
                     <div>
-                      <p className="font-bold text-[var(--clay-black)] leading-tight">Anti-Curang</p>
-                      <p className="text-xs text-[var(--warm-charcoal)]">Validasi Waktu</p>
+                      <p className="font-bold text-[var(--clay-black)] leading-tight"><LocalizedText source={"Anti-Curang"} /></p>
+                      <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Validasi Waktu"} /></p>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex-1 w-full lg:w-1/2 space-y-6">
                   <h3 className="text-[40px] lg:text-[50px] font-headline font-semibold text-[var(--clay-black)] leading-[1.1] tracking-[-1.5px]">
-                    模拟考试 <br/> <span className="text-[var(--slushie-600)]">Fokus Penuh</span>
+                    <LocalizedText source={"模拟考试"} /> <br/> <span className="text-[var(--slushie-600)]"><LocalizedText source={"Fokus Penuh"} /></span>
                   </h3>
                   <p className="text-xl text-[var(--warm-charcoal)] leading-relaxed">
-                    Kerjakan latihan dengan antarmuka ujian sesungguhnya. Selesaikan tes dengan sistem timer yang tervalidasi secara akurat, dan dapatkan kalkulasi skor serta akurasi secara instan.
+                    <LocalizedText source={"Kerjakan latihan dengan antarmuka ujian sesungguhnya. Selesaikan tes dengan sistem timer yang tervalidasi secara akurat, dan dapatkan kalkulasi skor serta akurasi secara instan."} />
                   </p>
                   <ul className="space-y-4 pt-4">
                     <li className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[var(--slushie-500)]/30 flex items-center justify-center">
                         <MaterialIcon name="check" className="text-[var(--clay-black)]" />
                       </div>
-                      <span className="text-lg font-medium text-[var(--clay-black)]">Sistem Timer Tervalidasi</span>
+                      <span className="text-lg font-medium text-[var(--clay-black)]"><LocalizedText source={"Sistem Timer Tervalidasi"} /></span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[var(--slushie-500)]/30 flex items-center justify-center">
                         <MaterialIcon name="check" className="text-[var(--clay-black)]" />
                       </div>
-                      <span className="text-lg font-medium text-[var(--clay-black)]">自动计算成绩</span>
+                      <span className="text-lg font-medium text-[var(--clay-black)]"><LocalizedText source={"自动计算成绩"} /></span>
                     </li>
                   </ul>
                 </div>
@@ -301,10 +303,10 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
             <div className="text-center max-w-4xl mx-auto mb-24 space-y-6">
               <h2 className="text-[50px] md:text-[60px] font-headline font-semibold text-[var(--clay-black)] tracking-[-2.4px] leading-tight">
-                核心功能
+                <LocalizedText source={"核心功能"} />
               </h2>
               <p className="text-2xl text-[var(--warm-charcoal)]">
-                从题目练习到成绩分析，帮助你把备考过程安排得更清晰。
+                <LocalizedText source={"从题目练习到成绩分析，帮助你把备考过程安排得更清晰。"} />
               </p>
             </div>
 
@@ -312,14 +314,14 @@ export function LandingPage() {
               {/* Feature 1 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src={images.generateAi.src} alt="AI Generator" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.generateAi.src} alt={ui("AI Generator")} loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    AI Generator
+                    <LocalizedText source={"AI Generator"} />
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    使用 AI 按主题、难度和题型生成语言考试练习题。
+                    <LocalizedText source={"使用 AI 按主题、难度和题型生成语言考试练习题。"} />
                   </p>
                 </CardContent>
               </Card>
@@ -327,14 +329,14 @@ export function LandingPage() {
               {/* Feature 2 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src={images.latihanSoal.src} alt="Latihan Soal" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.latihanSoal.src} alt={ui("Latihan Soal")} loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    专项练习
+                    <LocalizedText source={"专项练习"} />
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    从题库挑选题目并创建练习套题，针对薄弱环节进行训练。
+                    <LocalizedText source={"从题库挑选题目并创建练习套题，针对薄弱环节进行训练。"} />
                   </p>
                 </CardContent>
               </Card>
@@ -342,14 +344,14 @@ export function LandingPage() {
               {/* Feature 3 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src={images.mocktest.src} alt="Mock Test" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.mocktest.src} alt={ui("Mock Test")} loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    模拟考试
+                    <LocalizedText source={"模拟考试"} />
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    在限时环境中完成模拟考试，并查看练习结果。
+                    <LocalizedText source={"在限时环境中完成模拟考试，并查看练习结果。"} />
                   </p>
                 </CardContent>
               </Card>
@@ -357,14 +359,14 @@ export function LandingPage() {
               {/* Feature 4 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src={images.progress.src} alt="Progress Tracking" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.progress.src} alt={ui("Progress Tracking")} loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    学习分析
+                    <LocalizedText source={"学习分析"} />
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    查看练习历史和各考试部分的成绩变化。
+                    <LocalizedText source={"查看练习历史和各考试部分的成绩变化。"} />
                   </p>
                 </CardContent>
               </Card>
@@ -372,14 +374,14 @@ export function LandingPage() {
               {/* Feature 5 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src={images.vocabulary.src} alt="Vocabulary" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.vocabulary.src} alt={ui("Vocabulary")} loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    词汇训练
+                    <LocalizedText source={"词汇训练"} />
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    Perkaya kosakata Anda dengan metode cerdas dan pengulangan berkala yang dioptimalkan.
+                    <LocalizedText source={"Perkaya kosakata Anda dengan metode cerdas dan pengulangan berkala yang dioptimalkan."} />
                   </p>
                 </CardContent>
               </Card>
@@ -387,14 +389,14 @@ export function LandingPage() {
               {/* Feature 6 */}
               <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[24px] overflow-hidden group p-4">
                 <div className="h-56 w-full flex items-center justify-center p-2">
-                  <img src={images.diskusi.src} alt="Diskusi" loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
+                  <img src={images.diskusi.src} alt={ui("Diskusi")} loading="lazy" className="h-full w-auto object-contain transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 drop-shadow-lg" />
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    讨论与答疑
+                    <LocalizedText source={"讨论与答疑"} />
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    围绕难题交流思路，并查看题目解析。
+                    <LocalizedText source={"围绕难题交流思路，并查看题目解析。"} />
                   </p>
                 </CardContent>
               </Card>
@@ -409,33 +411,33 @@ export function LandingPage() {
           <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-16">
             <div className="text-center mb-16">
               <h2 className="text-[50px] md:text-[60px] font-headline font-semibold text-[var(--pure-white)] tracking-[-2.4px] mb-6 leading-tight drop-shadow-sm">
-                常见问题
+                <LocalizedText source={"常见问题"} />
               </h2>
               <p className="text-[var(--ube-300)] text-2xl max-w-2xl mx-auto">
-                关于平台功能的常见问题。
+                <LocalizedText source={"关于平台功能的常见问题。"} />
               </p>
             </div>
 
             <div className="bg-[var(--ube-900)]/40 backdrop-blur-sm border-2 border-[var(--ube-300)]/30 rounded-[32px] p-8 md:p-12 shadow-2xl">
               <FaqItem
                 isDark
-                question="Labas 是什么？"
-                answer="Labas 是一个外语考试练习平台，提供模拟考试、交互式题库和学习分析。"
+                question={ui("Labas 是什么？")}
+                answer={ui("Labas 是一个外语考试练习平台，提供模拟考试、交互式题库和学习分析。")}
               />
               <FaqItem
                 isDark
-                question="AI 出题如何使用？"
-                answer="选择考试、主题和题型后，可以生成新的练习题。具体可用能力取决于当前配置的 AI 服务。"
+                question={ui("AI 出题如何使用？")}
+                answer={ui("选择考试、主题和题型后，可以生成新的练习题。具体可用能力取决于当前配置的 AI 服务。")}
               />
               <FaqItem
                 isDark
-                question="Labas 完全免费吗？"
-                answer="基础功能与 AI 生成功能的可用范围以实际部署配置为准。使用 AI 功能前，请先在设置中配置兼容的服务密钥。"
+                question={ui("Labas 完全免费吗？")}
+                answer={ui("基础功能与 AI 生成功能的可用范围以实际部署配置为准。使用 AI 功能前，请先在设置中配置兼容的服务密钥。")}
               />
               <FaqItem
                 isDark
-                question="支持哪些语言考试？"
-                answer="题库覆盖 TOEFL、IELTS、TOEIC、JLPT、TOPIK、HSK 等多类语言考试，具体题目以题库内容为准。"
+                question={ui("支持哪些语言考试？")}
+                answer={ui("题库覆盖 TOEFL、IELTS、TOEIC、JLPT、TOPIK、HSK 等多类语言考试，具体题目以题库内容为准。")}
               />
             </div>
           </div>
@@ -445,15 +447,15 @@ export function LandingPage() {
         <section className="w-full bg-[var(--matcha-800)] py-40 px-6 rounded-t-[40px] mt-[-40px] z-20 relative shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t-2 border-[var(--matcha-600)]">
           <div className="max-w-4xl mx-auto text-center space-y-12">
             <h2 className="text-[60px] md:text-[80px] font-headline font-semibold text-[var(--pure-white)] tracking-[-3.2px] leading-[0.95] drop-shadow-md">
-              准备好开始练习了吗？
+              <LocalizedText source={"准备好开始练习了吗？"} />
             </h2>
             <p className="text-2xl text-[var(--matcha-300)] max-w-2xl mx-auto">
-              注册后开始练习，逐步了解自己的备考进度。
+              <LocalizedText source={"注册后开始练习，逐步了解自己的备考进度。"} />
             </p>
             <div className="pt-8">
               <Link to="/login" className="inline-block">
                 <Button className="bg-[var(--pure-white)] text-[var(--clay-black)] hover:bg-[var(--oat-light)] rounded-[24px] h-[80px] px-14 text-2xl font-bold clay-shadow clay-hover">
-                  立即开始
+                  <LocalizedText source={"立即开始"} />
                 </Button>
               </Link>
             </div>
@@ -464,7 +466,7 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="w-full bg-[var(--pure-white)] py-12 border-t-2 border-[var(--oat-border)] text-center relative z-30">
         <p className="text-[var(--warm-charcoal)] font-semibold text-lg">
-          &copy; {new Date().getFullYear()} Labas · 外语考试练习
+          &copy; {new Date().getFullYear()} <LocalizedText source={"Labas · 外语考试练习"} />
         </p>
       </footer>
     </div>

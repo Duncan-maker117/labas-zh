@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -56,6 +58,7 @@ function formatDate(dateStr: string | Date | null) {
 }
 
 function AdminJobs() {
+  const { ui } = useLocale();
   const s = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const page = s.page;
@@ -91,9 +94,9 @@ function AdminJobs() {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listAllJobs.queryKey() });
         setDetailJob(null);
-        toast.success("Job cancelled");
+        toast.success(uiMessage("Job cancelled"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
       onSettled: () => setCancellingId(null),
     }),
   );
@@ -150,7 +153,7 @@ function AdminJobs() {
       size: "w-[13%]",
       cell: ({ row }) => (
         <div className="flex flex-col gap-0.5">
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block w-fit ${statusColor(row.status)}`}>{row.status}</span>
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block w-fit ${statusColor(row.status)}`}>{ui(row.status)}</span>
           {row.status === "failed" && row.errorMessage && (
             <span className="text-[10px] text-[var(--clay-red)] truncate max-w-[140px]" title={row.errorMessage}>{row.errorMessage}</span>
           )}
@@ -184,18 +187,18 @@ function AdminJobs() {
 
   return (
     <div>
-      <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)] mb-2">Generation Jobs</h1>
-      <p className="text-[var(--warm-charcoal)] mb-6">Monitor AI generation jobs across the platform.</p>
+      <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)] mb-2"><LocalizedText source={"Generation Jobs"} /></h1>
+      <p className="text-[var(--warm-charcoal)] mb-6"><LocalizedText source={"Monitor AI generation jobs across the platform."} /></p>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)] text-sm" />
           <Input
-            placeholder="Search by user name or email..."
+            placeholder={ui("Search by user name or email...")}
             value={rawSearch}
             onChange={(e) => { setRawSearch(e.target.value); }}
-            aria-label="Search jobs by user"
+            aria-label={ui("Search jobs by user")}
             className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm"
           />
         </div>
@@ -215,7 +218,7 @@ function AdminJobs() {
             </button>
           ))}
         </div>
-        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} jobs</span>
+        <span className="text-sm text-[var(--warm-charcoal)]">{total.toLocaleString()} <LocalizedText source={"jobs"} /></span>
       </div>
 
       <DataTable
@@ -223,7 +226,7 @@ function AdminJobs() {
         columns={columns}
         isLoading={jobsQuery.isLoading}
         isFetching={jobsQuery.isFetching}
-        emptyMessage="No jobs found."
+        emptyMessage={ui("No jobs found.")}
         keyExtractor={(j) => j.id}
         page={page}
         totalPages={totalPages}
@@ -238,7 +241,7 @@ function AdminJobs() {
               onClick={(e) => { e.stopPropagation(); handleCancel(j.id); }}
               disabled={cancellingId === j.id}
             >
-              {cancellingId === j.id ? "..." : "Cancel"}
+              <LocalizedValue value={cancellingId === j.id ? "..." : "Cancel"} />
             </Button>
           ) : null
         )}
@@ -252,14 +255,14 @@ function AdminJobs() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-xl font-headline font-bold text-[var(--clay-black)]">
-                  Job Detail
+                  <LocalizedText source={"Job Detail"} />
                 </DialogTitle>
               </DialogHeader>
 
               <div className="space-y-4">
                 {/* User */}
                 <div className="bg-[var(--oat-light)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                  <p className="text-xs text-[var(--warm-charcoal)] mb-1">User</p>
+                  <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"User"} /></p>
                   <p className="font-medium text-[var(--clay-black)]">{detailJob.userName ?? "Unknown"}</p>
                   {detailJob.userEmail && <p className="text-sm text-[var(--warm-charcoal)]">{detailJob.userEmail}</p>}
                 </div>
@@ -267,27 +270,27 @@ function AdminJobs() {
                 {/* Info grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Job ID</p>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Job ID"} /></p>
                     <p className="text-xs font-mono text-[var(--clay-black)] break-all">{detailJob.id}</p>
                   </div>
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Status</p>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColor(detailJob.status)}`}>{detailJob.status}</span>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Status"} /></p>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColor(detailJob.status)}`}>{ui(detailJob.status)}</span>
                   </div>
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Exam</p>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Exam"} /></p>
                     <p className="text-sm font-medium text-[var(--clay-black)]">{detailJob.examTypeId ?? "-"}</p>
                   </div>
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Mode</p>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Mode"} /></p>
                     <p className="text-sm font-medium text-[var(--clay-black)]">{detailJob.mode ?? "-"}</p>
                   </div>
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Section</p>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Section"} /></p>
                     <p className="text-sm font-medium text-[var(--clay-black)]">{detailJob.sectionTypeId ?? "-"}</p>
                   </div>
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Questions</p>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Questions"} /></p>
                     <p className="text-sm font-medium text-[var(--clay-black)]">{detailJob.questionCount ?? "-"}</p>
                   </div>
                 </div>
@@ -295,7 +298,7 @@ function AdminJobs() {
                 {/* Progress */}
                 <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs text-[var(--warm-charcoal)]">Progress</p>
+                    <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Progress"} /></p>
                     <span className="text-xs text-[var(--warm-charcoal)]">{detailJob.progress ?? 0}%</span>
                   </div>
                   <div className="h-2 bg-[var(--oat-border)] rounded-full overflow-hidden">
@@ -309,11 +312,11 @@ function AdminJobs() {
                 {/* Tokens */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Tokens Used</p>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Tokens Used"} /></p>
                     <p className="text-lg font-bold text-[var(--clay-black)]">{detailJob.tokensUsed?.toLocaleString() ?? "-"}</p>
                   </div>
                   <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-                    <p className="text-xs text-[var(--warm-charcoal)] mb-1">Created</p>
+                    <p className="text-xs text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Created"} /></p>
                     <p className="text-sm text-[var(--clay-black)]">{formatDate(detailJob.createdAt)}</p>
                   </div>
                 </div>
@@ -323,7 +326,7 @@ function AdminJobs() {
                   <div className="bg-[var(--clay-red)]/5 rounded-[var(--radius-xl)] p-4 border border-[var(--clay-red)]/30">
                     <p className="text-xs font-semibold text-[var(--clay-red)] mb-1 flex items-center gap-1">
                       <MaterialIcon name="error" className="text-sm" />
-                      Error
+                      <LocalizedText source={"Error"} />
                     </p>
                     <p className="text-sm text-[var(--clay-red)] whitespace-pre-wrap">{detailJob.errorMessage}</p>
                   </div>
@@ -337,7 +340,7 @@ function AdminJobs() {
                   onClick={() => setDetailJob(null)}
                   className="rounded-[var(--radius-lg)]"
                 >
-                  Close
+                  <LocalizedText source={"Close"} />
                 </Button>
                 {(detailJob.status === "pending" || detailJob.status === "running") && (
                   <Button
@@ -346,7 +349,7 @@ function AdminJobs() {
                     onClick={() => handleCancel(detailJob.id)}
                     disabled={cancellingId === detailJob.id}
                   >
-                    {cancellingId === detailJob.id ? "Cancelling..." : "Cancel Job"}
+                    <LocalizedValue value={cancellingId === detailJob.id ? "Cancelling..." : "Cancel Job"} />
                   </Button>
                 )}
               </div>

@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import {
   Dialog,
@@ -24,12 +25,12 @@ export function AbandonDialog({ open, onClose, onConfirm }: AbandonDialogProps) 
               <MaterialIcon name="warning" className="text-[var(--pomegranate-400)]" />
             </div>
             <DialogTitle className="text-xl font-headline font-bold text-[var(--clay-black)]">
-              Keluar dari Latihan?
+              <LocalizedText source={"Keluar dari Latihan?"} />
             </DialogTitle>
           </div>
         </DialogHeader>
         <DialogDescription className="text-sm text-[var(--warm-charcoal)]">
-          Apakah Anda yakin ingin meninggalkan sesi latihan ini? Progress pengerjaan Anda mungkin tidak tersimpan dan akan ditandai sebagai gagal atau dibatalkan.
+          <LocalizedText source={"Apakah Anda yakin ingin meninggalkan sesi latihan ini? Progress pengerjaan Anda mungkin tidak tersimpan dan akan ditandai sebagai gagal atau dibatalkan."} />
         </DialogDescription>
         <div className="flex gap-3 mt-2">
           <Button
@@ -37,13 +38,13 @@ export function AbandonDialog({ open, onClose, onConfirm }: AbandonDialogProps) 
             onClick={onClose}
             className="flex-1 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)]"
           >
-            Batal
+            <LocalizedText source={"Batal"} />
           </Button>
           <Button
             onClick={onConfirm}
             className="flex-1 bg-[var(--pomegranate-400)] text-[var(--pure-white)] hover:bg-[var(--pomegranate-600)] rounded-[var(--radius-lg)]"
           >
-            Keluar
+            <LocalizedText source={"Keluar"} />
           </Button>
         </div>
       </DialogContent>

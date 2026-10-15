@@ -1,3 +1,5 @@
+import { uiMessage } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
@@ -181,15 +183,15 @@ export function BankComponent() {
         privateCountQuery.refetch();
         if (data.skipped > 0) {
           toast.success(
-            `${data.updated} soal dipublikasikan, ${data.skipped} dilewati`,
-            { description: "Beberapa soal bukan milikmu atau sudah tidak tersedia." },
+            uiMessage(`${data.updated} soal dipublikasikan, ${data.skipped} dilewati`),
+            { description: uiMessage("Beberapa soal bukan milikmu atau sudah tidak tersedia.") },
           );
         } else {
-          toast.success(`${data.updated} soal berhasil dipublikasikan`);
+          toast.success(uiMessage(`${data.updated} soal berhasil dipublikasikan`));
         }
       },
       onError: (err) => {
-        toast.error("Gagal mempublikasikan. Coba refresh dan pilih ulang soal.", { description: getErrorMessage(err) });
+        toast.error(uiMessage("Gagal mempublikasikan. Coba refresh dan pilih ulang soal."), { description: getErrorMessage(err) });
       },
     }),
   );
@@ -204,10 +206,10 @@ export function BankComponent() {
           questionQuery.refetch();
         }
         privateCountQuery.refetch();
-        toast.success(`${data.updated} soal berhasil dipublikasikan`);
+        toast.success(uiMessage(`${data.updated} soal berhasil dipublikasikan`));
       },
       onError: (err) => {
-        toast.error("Gagal mempublikasikan semua soal.", { description: getErrorMessage(err) });
+        toast.error(uiMessage("Gagal mempublikasikan semua soal."), { description: getErrorMessage(err) });
       },
     }),
   );
@@ -300,7 +302,7 @@ export function BankComponent() {
 
   const toggleQuestion = (q: Question) => {
     if (lockedExamType && q.examTypeId !== lockedExamType) {
-      toast.error(`Hanya bisa memilih soal dari ${EXAM_TYPES.find((t) => t.id === lockedExamType)?.name ?? lockedExamType}`);
+      toast.error(uiMessage(`Hanya bisa memilih soal dari ${EXAM_TYPES.find((t) => t.id === lockedExamType)?.name ?? lockedExamType}`));
       return;
     }
     setBundleQuestions((prev) => {
@@ -355,7 +357,7 @@ export function BankComponent() {
       setBundleTitle("");
       setBundleDescription("");
     } catch (err: unknown) {
-      toast.error("Gagal membuat paket", { description: getErrorMessage(err) });
+      toast.error(uiMessage("Gagal membuat paket"), { description: getErrorMessage(err) });
     }
   };
 
@@ -375,9 +377,9 @@ export function BankComponent() {
       setBundleSections([]);
       setBundleTitle("");
       setBundleDescription("");
-      toast.success("Combo paket berhasil dibuat!");
+      toast.success(uiMessage("Combo paket berhasil dibuat!"));
     } catch (err: unknown) {
-      toast.error("Gagal membuat combo", { description: getErrorMessage(err) });
+      toast.error(uiMessage("Gagal membuat combo"), { description: getErrorMessage(err) });
     }
   };
 
@@ -477,19 +479,19 @@ export function BankComponent() {
       <div className="px-6 md:px-12 lg:px-16 max-w-7xl mx-auto pt-6">
         <section className="mb-8">
           <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-            Buat Paket
+            <LocalizedText source={"Buat Paket"} />
           </h1>
           <p className="text-lg text-[var(--warm-charcoal)] mt-2">
-            Pilih soal atau section untuk dibuatkan paket latihan.
+            <LocalizedText source={"Pilih soal atau section untuk dibuatkan paket latihan."} />
           </p>
           <div className="mt-3 flex flex-wrap gap-3 text-sm text-[var(--warm-charcoal)]">
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--matcha-300)]/30 text-[var(--matcha-800)] font-medium">
               <MaterialIcon name="auto_awesome" className="text-sm" />
-              Auto Bundle — biarkan AI pilihkan soal otomatis
+              <LocalizedText source={"Auto Bundle — biarkan AI pilihkan soal otomatis"} />
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] font-medium">
               <MaterialIcon name="touch_app" className="text-sm" />
-              Manual — pilih sendiri soal satu per satu
+              <LocalizedText source={"Manual — pilih sendiri soal satu per satu"} />
             </span>
           </div>
         </section>

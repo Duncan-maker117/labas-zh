@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useEffect, useCallback, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -86,6 +88,7 @@ function statusBadge(status: string, isOvertime?: boolean) {
 }
 
 function AdminActivity() {
+  const { ui, locale } = useLocale();
   const s = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const queryClient = useQueryClient();
@@ -112,9 +115,9 @@ function AdminActivity() {
     trpc.admin.abandonStaleAttempts.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listAttempts.queryKey() });
-        toast.success(`${data.abandoned} stale attempt(s) abandoned.`);
+        toast.success(uiMessage(`${data.abandoned} stale attempt(s) abandoned.`));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -202,7 +205,7 @@ function AdminActivity() {
           <>
             <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${badge.className}`}>
               <MaterialIcon name={badge.icon} className="text-xs" />
-              {badge.label}
+              {ui(badge.label)}
             </span>
             {isStaleAttempt && (
               <p className="text-[10px] text-[var(--warm-silver)] mt-0.5">
@@ -254,8 +257,8 @@ function AdminActivity() {
     <div>
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)]">Activity</h1>
-          <p className="text-[var(--warm-charcoal)] mt-1">Lihat semua aktivitas latihan user.</p>
+          <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Activity"} /></h1>
+          <p className="text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Lihat semua aktivitas latihan user."} /></p>
         </div>
         <Button
           variant="outline"
@@ -265,7 +268,7 @@ function AdminActivity() {
           className="border-[var(--pomegranate-600)]/30 text-[var(--pomegranate-600)] hover:bg-[var(--pomegranate-600)]/5 rounded-[var(--radius-lg)] text-xs"
         >
           <MaterialIcon name="timer_off" className="text-sm mr-1" />
-          Abandon Stale
+          <LocalizedText source={"Abandon Stale"} />
         </Button>
       </div>
 
@@ -273,10 +276,10 @@ function AdminActivity() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)] text-sm" />
           <Input
-            placeholder="Cari user, email, atau paket..."
+            placeholder={ui("Cari user, email, atau paket...")}
             value={rawSearch}
             onChange={(e) => setRawSearch(e.target.value)}
-            aria-label="Search attempts"
+            aria-label={ui("Search attempts")}
             className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm"
           />
         </div>
@@ -305,13 +308,13 @@ function AdminActivity() {
                 }`}
               >
                 <MaterialIcon name={badge.icon} className="text-xs" />
-                {badge.label}
+                {ui(badge.label)}
               </button>
             );
           })}
         </div>
 
-        <span className="text-sm text-[var(--warm-charcoal)] ml-auto">{total.toLocaleString("id-ID")} attempt</span>
+        <span className="text-sm text-[var(--warm-charcoal)] ml-auto">{total.toLocaleString(locale)} <LocalizedText source={"attempt"} /></span>
       </div>
 
       <DataTable
@@ -338,10 +341,10 @@ function AdminActivity() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="font-headline font-bold text-[var(--clay-black)]">
-              Abandon Stale Attempts
+              <LocalizedText source={"Abandon Stale Attempts"} />
             </DialogTitle>
             <DialogDescription className="text-[var(--warm-charcoal)] text-sm mt-2">
-              Tandai semua attempt <strong>in_progress</strong> yang sudah lebih dari 24 jam sebagai abandoned. Tindakan ini tidak bisa dibatalkan.
+              <LocalizedText source={"Tandai semua attempt"} /> <strong><LocalizedText source={"in_progress"} /></strong> <LocalizedText source={"yang sudah lebih dari 24 jam sebagai abandoned. Tindakan ini tidak bisa dibatalkan."} />
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-3 pt-2">
@@ -350,7 +353,7 @@ function AdminActivity() {
               onClick={() => setShowAbandonDialog(false)}
               className="rounded-[var(--radius-lg)]"
             >
-              Batal
+              <LocalizedText source={"Batal"} />
             </Button>
             <Button
               onClick={() => {
@@ -360,7 +363,7 @@ function AdminActivity() {
               disabled={abandonMutation.isPending}
               className="bg-[var(--pomegranate-600)] text-[var(--pure-white)] hover:bg-[var(--pomegranate-600)]/80 rounded-[var(--radius-lg)]"
             >
-              {abandonMutation.isPending ? "Processing..." : "Abandon"}
+              <LocalizedValue value={abandonMutation.isPending ? "Processing..." : "Abandon"} />
             </Button>
           </div>
         </DialogContent>

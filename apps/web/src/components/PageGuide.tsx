@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
+import { useLocale } from "@/lib/locale";
 
 interface GuideItem {
   icon: string;
@@ -14,6 +15,7 @@ interface PageGuideProps {
 }
 
 export function PageGuide({ items, title = "Petunjuk" }: PageGuideProps) {
+  const { locale, ui } = useLocale();
   const [open, setOpen] = useState(false);
 
   return (
@@ -27,9 +29,9 @@ export function PageGuide({ items, title = "Petunjuk" }: PageGuideProps) {
             <MaterialIcon name="help" className="text-lg text-[var(--slushie-800)]" />
           </div>
           <div className="text-left">
-            <h3 className="font-headline font-bold text-[var(--clay-black)]">{title}</h3>
+            <h3 className="font-headline font-bold text-[var(--clay-black)]">{ui(title)}</h3>
             <p className="text-xs text-[var(--warm-charcoal)]">
-              {open ? "Tutup petunjuk" : `Klik untuk lihat ${items.length} panduan`}
+              {open ? ui("Tutup petunjuk") : locale === "zh-CN" ? `查看 ${items.length} 条指南` : locale === "en-US" ? `View ${items.length} tips` : `Klik untuk lihat ${items.length} panduan`}
             </p>
           </div>
         </div>
@@ -47,8 +49,8 @@ export function PageGuide({ items, title = "Petunjuk" }: PageGuideProps) {
                 <MaterialIcon name={item.icon} className="text-sm text-[var(--matcha-600)]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[var(--clay-black)]">{item.title}</p>
-                <p className="text-xs text-[var(--warm-charcoal)] mt-0.5 leading-relaxed">{item.desc}</p>
+                <p className="text-sm font-bold text-[var(--clay-black)]">{ui(item.title)}</p>
+                <p className="text-xs text-[var(--warm-charcoal)] mt-0.5 leading-relaxed">{ui(item.desc)}</p>
               </div>
             </div>
           ))}

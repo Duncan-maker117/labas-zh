@@ -1,3 +1,4 @@
+import { uiMessage } from "@/lib/locale";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { trpc } from "@/utils/trpc";
@@ -53,7 +54,7 @@ export function usePackageBuilder() {
 
       navigate({ to: "/package/$id", params: { id: pkg.id } });
     } catch (err: unknown) {
-      toast.error("Gagal membuat paket", { description: getErrorMessage(err) });
+      toast.error(uiMessage("Gagal membuat paket"), { description: getErrorMessage(err) });
     }
   };
 
@@ -78,7 +79,7 @@ export function usePackageBuilder() {
     picked = picked.slice(0, params.count);
 
     if (picked.length === 0) {
-      toast.error("Tidak ada soal tersedia untuk ujian ini.");
+      toast.error(uiMessage("Tidak ada soal tersedia untuk ujian ini."));
       return;
     }
 
@@ -108,7 +109,7 @@ export function usePackageBuilder() {
 
       navigate({ to: "/package/$id", params: { id: pkg.id } });
     } catch (err: unknown) {
-      toast.error("Gagal membuat paket", { description: getErrorMessage(err) });
+      toast.error(uiMessage("Gagal membuat paket"), { description: getErrorMessage(err) });
     }
   };
 

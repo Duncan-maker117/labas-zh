@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import {
   COMMUNITY_PLATFORM_META,
@@ -34,11 +35,11 @@ function ChannelRow({
           <span className="flex items-center gap-2 flex-wrap">
             <span className="block font-bold">{channel.name}</span>
             <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)]">
-              Segera hadir
+              <LocalizedText source={"Segera hadir"} />
             </span>
           </span>
           <span className="block text-sm font-normal text-[var(--warm-charcoal)] mt-0.5">
-            {channel.description}
+            <LocalizedValue value={channel.description} />
           </span>
         </span>
       </div>
@@ -60,7 +61,7 @@ function ChannelRow({
         <span
           className={`block font-normal text-[var(--warm-charcoal)] mt-0.5 ${variant === "card" ? "text-xs" : "text-sm"}`}
         >
-          {channel.description}
+          <LocalizedValue value={channel.description} />
         </span>
       </span>
     </a>

@@ -1,3 +1,5 @@
+import { LocalizedValue } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import { Button } from "@labas/ui/components/button";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { formatTime } from "@/lib/time";
@@ -27,6 +29,7 @@ export function AttemptHeader({
   onAbandon,
   onFinish,
 }: AttemptHeaderProps) {
+  const { ui } = useLocale();
   const remaining = timeLimitSec !== null ? timeLimitSec - timeElapsed : null;
   const displaySec = remaining !== null ? Math.max(0, remaining) : timeElapsed;
   const isWarning = remaining !== null && remaining <= 300;
@@ -38,7 +41,7 @@ export function AttemptHeader({
       <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         <button
           onClick={onAbandon}
-          aria-label="Keluar dari latihan"
+          aria-label={ui("Keluar dari latihan")}
           className="text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors flex items-center shrink-0"
         >
           <MaterialIcon name="close" />
@@ -73,7 +76,7 @@ export function AttemptHeader({
           {timeLimitSec !== null ? formatTime(displaySec) : formatTime(timeElapsed)}
         </span>
         <span className="hidden sm:inline text-[10px] leading-none uppercase font-bold text-[var(--warm-silver)] tracking-tighter ml-1">
-          {timeLimitSec !== null ? "Sisa" : "Waktu"}
+          <LocalizedValue value={timeLimitSec !== null ? "Sisa" : "Waktu"} />
         </span>
       </div>
 
@@ -97,8 +100,8 @@ export function AttemptHeader({
         size="sm"
         className="bg-[var(--matcha-600)] text-[var(--pure-white)] hover:bg-[var(--matcha-800)] px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-opacity shrink-0"
       >
-        <span className="hidden sm:inline">{isTimeUp ? "Waktu Habis" : "Selesai Test"}</span>
-        <span className="sm:hidden">{isTimeUp ? "Habis" : "Selesai"}</span>
+        <span className="hidden sm:inline"><LocalizedValue value={isTimeUp ? "Waktu Habis" : "Selesai Test"} /></span>
+        <span className="sm:hidden"><LocalizedValue value={isTimeUp ? "Habis" : "Selesai"} /></span>
       </Button>
     </header>
   );

@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -50,6 +52,7 @@ type SortBy = "" | "balance" | "usage" | "recent";
 type SortDir = "asc" | "desc";
 
 function AdminCredits() {
+  const { ui } = useLocale();
   const s = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const page = s.page;
@@ -101,10 +104,10 @@ function AdminCredits() {
         setCustomAmount("");
         setCustomNote("");
         toast.success(
-          `${vars.amount >= 0 ? "Added" : "Deducted"} ${Math.abs(vars.amount).toLocaleString()} tokens. New balance: ${data.newBalance.toLocaleString()}`,
+          uiMessage(`${vars.amount >= 0 ? "Added" : "Deducted"} ${Math.abs(vars.amount).toLocaleString()} tokens. New balance: ${data.newBalance.toLocaleString()}`),
         );
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -209,23 +212,23 @@ function AdminCredits() {
 
   return (
     <div>
-      <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)] mb-2">Credit Management</h1>
-      <p className="text-[var(--warm-charcoal)] mb-6">Manage token credits across all users.</p>
+      <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)] mb-2"><LocalizedText source={"Credit Management"} /></h1>
+      <p className="text-[var(--warm-charcoal)] mb-6"><LocalizedText source={"Manage token credits across all users."} /></p>
 
       {/* Search + sort controls */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)] text-sm" />
           <Input
-            placeholder="Search by name or email..."
+            placeholder={ui("Search by name or email...")}
             value={rawSearch}
             onChange={(e) => setRawSearch(e.target.value)}
-            aria-label="Search users"
+            aria-label={ui("Search users")}
             className="pl-8 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-10 text-sm"
           />
         </div>
         <div className="flex items-center gap-1 text-sm">
-          <span className="text-[var(--warm-charcoal)] mr-1">Sort:</span>
+          <span className="text-[var(--warm-charcoal)] mr-1"><LocalizedText source={"Sort:"} /></span>
           {(["usage", "balance", "recent"] as const).map((key) => (
             <button
               key={key}
@@ -237,12 +240,12 @@ function AdminCredits() {
               }`}
               aria-pressed={sortBy === key}
             >
-              {key === "usage" ? "Usage" : key === "balance" ? "Balance" : "Recent"}
+              <LocalizedValue value={key === "usage" ? "Usage" : key === "balance" ? "Balance" : "Recent"} />
               {sortBy === key && (sortDir === "asc" ? " ↑" : " ↓")}
             </button>
           ))}
         </div>
-        <span className="text-sm text-[var(--warm-charcoal)] ml-auto">{total.toLocaleString()} users</span>
+        <span className="text-sm text-[var(--warm-charcoal)] ml-auto">{total.toLocaleString()} <LocalizedText source={"users"} /></span>
       </div>
 
       <DataTable
@@ -250,7 +253,7 @@ function AdminCredits() {
         columns={columns}
         isLoading={usersQuery.isLoading}
         isFetching={usersQuery.isFetching}
-        emptyMessage="No users found."
+        emptyMessage={ui("No users found.")}
         keyExtractor={(u) => u.id}
         page={page}
         totalPages={totalPages}
@@ -264,7 +267,7 @@ function AdminCredits() {
         onSort={toggleSort}
         sortColumn={sortBy || undefined}
         sortDirection={sortDir}
-        actionsHeader="Top up"
+        actionsHeader={ui("Top up")}
         actions={(u) => {
           const pct = usagePercent(u);
           const isLow = u.tokenBalance <= REFILL_AMOUNT * 0.2;
@@ -306,9 +309,9 @@ function AdminCredits() {
               {/* Progress */}
               <div className="bg-[var(--oat-light)] rounded-[var(--radius-xl)] p-5 border border-[var(--oat-border)]">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-[var(--clay-black)]">Credit Usage</span>
+                  <span className="text-sm font-medium text-[var(--clay-black)]"><LocalizedText source={"Credit Usage"} /></span>
                   <span className="text-xs text-[var(--warm-charcoal)]">
-                    Balance: <span className="font-mono font-semibold text-[var(--clay-black)]">{detailUser.tokenBalance.toLocaleString()}</span>
+                    <LocalizedText source={"Balance:"} /> <span className="font-mono font-semibold text-[var(--clay-black)]">{detailUser.tokenBalance.toLocaleString()}</span>
                   </span>
                 </div>
                 <div className="h-3 bg-[var(--pure-white)] rounded-full border border-[var(--oat-border)] overflow-hidden mb-2">
@@ -322,15 +325,15 @@ function AdminCredits() {
                   />
                 </div>
                 <div className="flex items-center justify-between text-xs text-[var(--warm-charcoal)]">
-                  <span>Used: <span className="font-mono">{detailUser.lifetimeTokensUsed.toLocaleString()}</span></span>
-                  <span>{usagePercent(detailUser)}% used</span>
-                  <span>Total: <span className="font-mono">{(detailUser.tokenBalance + detailUser.lifetimeTokensUsed).toLocaleString()}</span></span>
+                  <span><LocalizedText source={"Used:"} /> <span className="font-mono">{detailUser.lifetimeTokensUsed.toLocaleString()}</span></span>
+                  <span>{usagePercent(detailUser)}<LocalizedText source={"% used"} /></span>
+                  <span><LocalizedText source={"Total:"} /> <span className="font-mono">{(detailUser.tokenBalance + detailUser.lifetimeTokensUsed).toLocaleString()}</span></span>
                 </div>
               </div>
 
               {/* Quick Top-up */}
               <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-5 border border-[var(--oat-border)]">
-                <h3 className="font-headline font-bold text-[var(--clay-black)] mb-3 text-sm">Quick Top-up</h3>
+                <h3 className="font-headline font-bold text-[var(--clay-black)] mb-3 text-sm"><LocalizedText source={"Quick Top-up"} /></h3>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {[10000, 25000, 50000, 100000].map((amount) => (
                     <Button
@@ -346,26 +349,26 @@ function AdminCredits() {
                   ))}
                 </div>
                 <div className="border-t border-[var(--oat-border)] pt-4">
-                  <h4 className="text-xs font-medium text-[var(--warm-charcoal)] mb-3">Custom Adjustment</h4>
+                  <h4 className="text-xs font-medium text-[var(--warm-charcoal)] mb-3"><LocalizedText source={"Custom Adjustment"} /></h4>
                   <div className="flex flex-wrap items-end gap-3">
                     <div>
-                      <label className="text-xs text-[var(--warm-charcoal)] block mb-1">Amount (+ add, - deduct)</label>
+                      <label className="text-xs text-[var(--warm-charcoal)] block mb-1"><LocalizedText source={"Amount (+ add, - deduct)"} /></label>
                       <Input
                         type="number"
                         value={customAmount}
                         onChange={(e) => setCustomAmount(e.target.value)}
-                        placeholder="e.g. 50000"
-                        aria-label="Adjustment amount"
+                        placeholder={ui("e.g. 50000")}
+                        aria-label={ui("Adjustment amount")}
                         className="w-36 h-9 text-sm"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-[var(--warm-charcoal)] block mb-1">Note</label>
+                      <label className="text-xs text-[var(--warm-charcoal)] block mb-1"><LocalizedText source={"Note"} /></label>
                       <Input
                         value={customNote}
                         onChange={(e) => setCustomNote(e.target.value)}
-                        placeholder="Reason"
-                        aria-label="Adjustment note"
+                        placeholder={ui("Reason")}
+                        aria-label={ui("Adjustment note")}
                         className="w-44 h-9 text-sm"
                       />
                     </div>
@@ -375,14 +378,14 @@ function AdminCredits() {
                       onClick={() => {
                         const val = parseInt(customAmount, 10);
                         if (isNaN(val) || val === 0) {
-                          toast.error("Enter a valid amount");
+                          toast.error(uiMessage("Enter a valid amount"));
                           return;
                         }
                         handleAdjust(val);
                       }}
                       disabled={adjustMutation.isPending || !customAmount}
                     >
-                      Apply
+                      <LocalizedText source={"Apply"} />
                     </Button>
                   </div>
                 </div>
@@ -391,22 +394,22 @@ function AdminCredits() {
               {/* Transaction History */}
               <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] border border-[var(--oat-border)] overflow-hidden">
                 <div className="px-5 pt-4 pb-2 border-b border-[var(--oat-border)]">
-                  <h3 className="font-headline font-bold text-[var(--clay-black)] text-sm">Recent Transactions</h3>
+                  <h3 className="font-headline font-bold text-[var(--clay-black)] text-sm"><LocalizedText source={"Recent Transactions"} /></h3>
                 </div>
                 {historyQuery.isLoading ? (
-                  <div className="text-center py-8 text-sm text-[var(--warm-charcoal)]">Loading...</div>
+                  <div className="text-center py-8 text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Loading..."} /></div>
                 ) : (historyQuery.data?.transactions ?? []).length === 0 ? (
-                  <div className="text-center py-8 text-sm text-[var(--warm-charcoal)]">No transactions yet.</div>
+                  <div className="text-center py-8 text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"No transactions yet."} /></div>
                 ) : (
                   <div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-[var(--oat-light)] text-[var(--warm-charcoal)]">
-                            <th className="text-left px-4 py-2.5 font-medium text-xs">Type</th>
-                            <th className="text-right px-4 py-2.5 font-medium text-xs">Amount</th>
-                            <th className="text-left px-4 py-2.5 font-medium text-xs">Description</th>
-                            <th className="text-right px-4 py-2.5 font-medium text-xs">Date</th>
+                            <th className="text-left px-4 py-2.5 font-medium text-xs"><LocalizedText source={"Type"} /></th>
+                            <th className="text-right px-4 py-2.5 font-medium text-xs"><LocalizedText source={"Amount"} /></th>
+                            <th className="text-left px-4 py-2.5 font-medium text-xs"><LocalizedText source={"Description"} /></th>
+                            <th className="text-right px-4 py-2.5 font-medium text-xs"><LocalizedText source={"Date"} /></th>
                           </tr>
                         </thead>
                         <tbody>

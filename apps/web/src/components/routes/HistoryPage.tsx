@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -53,27 +55,28 @@ function getStatusBadge(status: string) {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--matcha-300)] text-[var(--matcha-800)] text-xs font-semibold">
           <MaterialIcon name="check_circle" className="text-xs" />
-          Selesai
+          <LocalizedText source={"Selesai"} />
         </span>
       );
     case "abandoned":
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-semibold">
           <MaterialIcon name="cancel" className="text-xs" />
-          Ditinggalkan
+          <LocalizedText source={"Ditinggalkan"} />
         </span>
       );
     default:
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] text-xs font-semibold">
           <MaterialIcon name="hourglass_top" className="text-xs" />
-          Berlangsung
+          <LocalizedText source={"Berlangsung"} />
         </span>
       );
   }
 }
 
 export function HistoryComponent() {
+  const { ui } = useLocale();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const page = search.page ?? 1;
@@ -125,19 +128,19 @@ export function HistoryComponent() {
       <div className="mb-8">
         <div className="flex items-center gap-2 text-sm text-[var(--warm-charcoal)] mb-4">
           <Link to="/dashboard" className="hover:text-[var(--clay-black)] transition-colors">
-            Beranda
+            <LocalizedText source={"Beranda"} />
           </Link>
           <MaterialIcon name="chevron_right" className="text-xs" />
-          <span className="text-[var(--clay-black)] font-medium">Riwayat Latihan</span>
+          <span className="text-[var(--clay-black)] font-medium"><LocalizedText source={"Riwayat Latihan"} /></span>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-              Riwayat Latihan
+              <LocalizedText source={"Riwayat Latihan"} />
             </h1>
             <p className="text-lg text-[var(--warm-charcoal)] mt-2">
-              Semua attempt latihan Anda.
+              <LocalizedText source={"Semua attempt latihan Anda."} />
             </p>
           </div>
         </div>
@@ -147,20 +150,20 @@ export function HistoryComponent() {
           <div className="relative flex-1 max-w-md">
             <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)]" />
             <Input
-              placeholder="Cari paket..."
+              placeholder={ui("Cari paket...")}
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
-              aria-label="Cari paket"
+              aria-label={ui("Cari paket")}
               className="pl-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11"
             />
           </div>
           <Select value={examTypeId} onValueChange={(v) => setExamTypeFilter(v ?? "")}>
             <SelectTrigger className="w-36">
-              <SelectValue placeholder="Semua Ujian" />
+              <SelectValue placeholder={ui("Semua Ujian")} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="">Semua Ujian</SelectItem>
+                <SelectItem value=""><LocalizedText source={"Semua Ujian"} /></SelectItem>
                 {EXAM_TYPES.map((t) => (
                   <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                 ))}
@@ -180,14 +183,14 @@ export function HistoryComponent() {
       ) : attempts.length === 0 ? (
         <div className="text-center py-20">
           <MaterialIcon name="history" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-          <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Belum ada riwayat latihan</p>
+          <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Belum ada riwayat latihan"} /></p>
           <p className="text-sm text-[var(--warm-silver)] mt-1">
-            Mulai latihan dari paket soal untuk melihat riwayat di sini.
+            <LocalizedText source={"Mulai latihan dari paket soal untuk melihat riwayat di sini."} />
           </p>
           <Link to="/packages" className="inline-block mt-6">
             <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)]">
               <MaterialIcon name="folder" className="mr-2" />
-              Lihat Paket Soal
+              <LocalizedText source={"Lihat Paket Soal"} />
             </Button>
           </Link>
         </div>
@@ -255,7 +258,7 @@ export function HistoryComponent() {
                                 className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover text-sm"
                               >
                                 <MaterialIcon name="visibility" className="mr-1" />
-                                Hasil
+                                <LocalizedText source={"Hasil"} />
                               </Button>
                             </Link>
                           )}
@@ -266,7 +269,7 @@ export function HistoryComponent() {
                                 className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover text-sm"
                               >
                                 <MaterialIcon name="folder" className="mr-1" />
-                                Paket
+                                <LocalizedText source={"Paket"} />
                               </Button>
                             </Link>
                           )}

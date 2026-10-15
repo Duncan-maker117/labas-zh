@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 
@@ -20,7 +21,7 @@ export function TopPackagesTable({ data, isLoading }: TopPackagesTableProps) {
       <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Paket Terpopuler
+            <LocalizedText source={"Paket Terpopuler"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -42,7 +43,7 @@ export function TopPackagesTable({ data, isLoading }: TopPackagesTableProps) {
         <div className="flex items-center gap-2">
           <MaterialIcon name="star" className="text-xl text-[var(--chart-4)]" />
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Paket Terpopuler (30 Hari)
+            <LocalizedText source={"Paket Terpopuler (30 Hari)"} />
           </CardTitle>
         </div>
       </CardHeader>
@@ -50,7 +51,7 @@ export function TopPackagesTable({ data, isLoading }: TopPackagesTableProps) {
         {rows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 text-[var(--warm-charcoal)]">
             <MaterialIcon name="library_books" className="text-3xl text-[var(--warm-silver)] mb-2" />
-            <p className="text-sm">Belum ada paket yang dikerjakan</p>
+            <p className="text-sm"><LocalizedText source={"Belum ada paket yang dikerjakan"} /></p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -58,9 +59,9 @@ export function TopPackagesTable({ data, isLoading }: TopPackagesTableProps) {
               <thead>
                 <tr className="text-xs text-[var(--warm-charcoal)] border-b border-[var(--oat-border)]">
                   <th className="text-left py-2 font-medium w-8">#</th>
-                  <th className="text-left py-2 font-medium">Paket</th>
-                  <th className="text-right py-2 font-medium">Dikerjakan</th>
-                  <th className="text-right py-2 font-medium">Rata-rata</th>
+                  <th className="text-left py-2 font-medium"><LocalizedText source={"Paket"} /></th>
+                  <th className="text-right py-2 font-medium"><LocalizedText source={"Dikerjakan"} /></th>
+                  <th className="text-right py-2 font-medium"><LocalizedText source={"Rata-rata"} /></th>
                 </tr>
               </thead>
               <tbody>

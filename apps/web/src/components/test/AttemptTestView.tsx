@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@labas/ui/components/button";
@@ -114,7 +116,7 @@ const QuestionCard = memo(function QuestionCard({
         {isSubmitting && (
           <div className="text-xs text-[var(--matcha-600)] mb-2 flex items-center gap-1">
             <MaterialIcon name="sync" className="text-xs animate-spin" />
-            Menyimpan...
+            <LocalizedText source={"Menyimpan..."} />
           </div>
         )}
         <QuestionInput
@@ -159,6 +161,7 @@ export function AttemptTestView({
   setActiveQuestionId,
   startQuestionTimer,
 }: AttemptTestViewProps) {
+  const { ui } = useLocale();
   const [showFinishDialog, setShowFinishDialog] = useState(false);
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
   const questionPanelRef = useRef<HTMLDivElement>(null);
@@ -196,7 +199,7 @@ export function AttemptTestView({
   if (!currentSection) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--warm-cream)]">
-        <p className="text-[var(--warm-charcoal)]">Section tidak ditemukan.</p>
+        <p className="text-[var(--warm-charcoal)]"><LocalizedText source={"Section tidak ditemukan."} /></p>
       </div>
     );
   }
@@ -327,7 +330,7 @@ export function AttemptTestView({
                       {currentSection.title}
                     </h1>
                     <div className="flex gap-4 text-sm text-[var(--warm-silver)] italic">
-                      <span>Section {currentSectionIdx + 1} dari {pkg.sections.length}</span>
+                      <span><LocalizedText source={"Section"} /> {currentSectionIdx + 1} <LocalizedText source={"dari"} /> {pkg.sections.length}</span>
                     </div>
                   </header>
                   <div className="space-y-6 text-lg leading-relaxed text-[var(--warm-charcoal)] font-body whitespace-pre-wrap" dir={isRtl ? "rtl" : undefined}>
@@ -341,7 +344,7 @@ export function AttemptTestView({
                 <div className="max-w-2xl mx-auto pb-32">
 
               {/* Nav bar with counter + prev/next */}
-              <nav className="flex items-center justify-between mb-6" aria-label="Navigasi soal">
+              <nav className="flex items-center justify-between mb-6" aria-label={ui("Navigasi soal")}>
                 <Button
                   variant="ghost"
                   onClick={goToPrevQuestion}
@@ -349,17 +352,17 @@ export function AttemptTestView({
                   className="flex items-center gap-2 text-[var(--clay-black)] font-bold px-4 sm:px-6 py-3 rounded-xl hover:bg-[var(--clay-black)]/5 transition-all disabled:opacity-50"
                 >
                   <MaterialIcon name="arrow_back" />
-                  <span className="hidden sm:inline">Sebelumnya</span>
+                  <span className="hidden sm:inline"><LocalizedText source={"Sebelumnya"} /></span>
                 </Button>
 
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-bold text-[var(--warm-charcoal)] bg-[var(--oat-light)] px-3 py-1.5 rounded-lg tabular-nums">
-                    Soal {activeGlobalIdx} / {totalQuestions}
+                    <LocalizedText source={"Soal"} /> {activeGlobalIdx} / {totalQuestions}
                   </span>
                   {markedQuestions.has(activeQuestionId ?? "") && (
                     <span className="flex items-center gap-1 text-xs font-semibold text-[var(--pomegranate-400)] bg-[var(--pomegranate-400)]/10 px-2 py-1 rounded-full">
                       <MaterialIcon name="bookmark" className="text-xs" />
-                      Ditandai
+                      <LocalizedText source={"Ditandai"} />
                     </span>
                   )}
                 </div>
@@ -369,7 +372,7 @@ export function AttemptTestView({
                   disabled={isLastQuestion}
                   className="flex items-center gap-2 bg-[var(--clay-black)] text-[var(--pure-white)] font-bold px-4 sm:px-8 py-3 rounded-xl shadow-lg hover:bg-[var(--warm-charcoal)] transition-all disabled:opacity-50"
                 >
-                  <span className="hidden sm:inline">Selanjutnya</span>
+                  <span className="hidden sm:inline"><LocalizedText source={"Selanjutnya"} /></span>
                   <MaterialIcon name="arrow_forward" />
                 </Button>
               </nav>
@@ -390,7 +393,7 @@ export function AttemptTestView({
                 />
               ) : (
                 <div className="text-center py-20">
-                  <p className="text-[var(--warm-charcoal)]">Tidak ada soal aktif.</p>
+                  <p className="text-[var(--warm-charcoal)]"><LocalizedText source={"Tidak ada soal aktif."} /></p>
                 </div>
               )}
 

@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import {
   BarChart,
   Bar,
@@ -80,19 +82,20 @@ function EmptyChart({ message }: { message: string }) {
         to="/bank"
         className="mt-3 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
       >
-        Mulai Latihan
+        <LocalizedText source={"Mulai Latihan"} />
       </Link>
     </div>
   );
 }
 
 export function BreakdownCharts({ byExamType, bySectionType, byFormat }: BreakdownChartsProps) {
+  const { ui } = useLocale();
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Performa per Jenis Ujian
+            <LocalizedText source={"Performa per Jenis Ujian"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -136,7 +139,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyChart message="Belum ada data performa per jenis ujian." />
+            <EmptyChart message={ui("Belum ada data performa per jenis ujian.")} />
           )}
         </CardContent>
       </Card>
@@ -144,7 +147,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Performa per Section
+            <LocalizedText source={"Performa per Section"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -188,7 +191,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyChart message="Belum ada data performa per section." />
+            <EmptyChart message={ui("Belum ada data performa per section.")} />
           )}
         </CardContent>
       </Card>
@@ -196,7 +199,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
       <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)] lg:col-span-2">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Performa per Format Soal
+            <LocalizedText source={"Performa per Format Soal"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -212,7 +215,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
                       {formatLabel(item.format)}
                     </span>
                     <span className="text-xs text-[var(--warm-charcoal)]">
-                      {item.totalQuestions} soal
+                      {item.totalQuestions} <LocalizedText source={"soal"} />
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mb-1">
@@ -220,7 +223,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
                       {item.accuracyPct}%
                     </span>
                     <span className="text-xs text-[var(--warm-charcoal)]">
-                      {formatTime(item.avgTimeSpentSec)}/soal
+                      {formatTime(item.avgTimeSpentSec)}<LocalizedText source={"/soal"} />
                     </span>
                   </div>
                   <AccuracyBar pct={item.accuracyPct} />
@@ -228,7 +231,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
               ))}
             </div>
           ) : (
-            <EmptyChart message="Belum ada data performa per format soal." />
+            <EmptyChart message={ui("Belum ada data performa per format soal.")} />
           )}
         </CardContent>
       </Card>

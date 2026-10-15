@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import { trpc } from "@/utils/trpc";
@@ -47,7 +48,7 @@ export function BlogDetailPage() {
       <div className="px-6 md:px-12 lg:px-16 max-w-3xl mx-auto w-full pt-12 pb-32">
         <div className="text-center py-20">
           <MaterialIcon name="hourglass_top" className="text-4xl text-[var(--warm-silver)] animate-spin" />
-          <p className="text-[var(--warm-charcoal)] mt-2">Memuat artikel...</p>
+          <p className="text-[var(--warm-charcoal)] mt-2"><LocalizedText source={"Memuat artikel..."} /></p>
         </div>
       </div>
     );
@@ -59,16 +60,16 @@ export function BlogDetailPage() {
         <div className="text-center py-20">
           <MaterialIcon name="error_outline" className="text-5xl text-[var(--pomegranate-600)]" />
           <h1 className="text-2xl font-headline font-bold text-[var(--clay-black)] mt-4">
-            Artikel tidak ditemukan
+            <LocalizedText source={"Artikel tidak ditemukan"} />
           </h1>
           <p className="text-[var(--warm-charcoal)] mt-2">
-            Artikel yang kamu cari tidak tersedia atau telah dihapus.
+            <LocalizedText source={"Artikel yang kamu cari tidak tersedia atau telah dihapus."} />
           </p>
           <Link
             to="/blog"
             className="inline-block mt-6 text-[var(--matcha-600)] font-semibold hover:underline"
           >
-            ← Kembali ke Blog
+            <LocalizedText source={"← Kembali ke Blog"} />
           </Link>
         </div>
       </div>
@@ -85,7 +86,7 @@ export function BlogDetailPage() {
           className="text-sm text-[var(--matcha-600)] font-semibold hover:underline inline-flex items-center gap-1"
         >
           <MaterialIcon name="chevron_left" className="text-base" />
-          Kembali ke Blog
+          <LocalizedText source={"Kembali ke Blog"} />
         </Link>
       </div>
 
@@ -118,7 +119,7 @@ export function BlogDetailPage() {
           </span>
           {post.updatedAt !== post.createdAt && (
             <span className="text-xs">
-              Diperbarui {formatDate(post.updatedAt)}
+              <LocalizedText source={"Diperbarui"} /> {formatDate(post.updatedAt)}
             </span>
           )}
         </div>
@@ -132,7 +133,7 @@ export function BlogDetailPage() {
           className="text-[var(--matcha-600)] font-semibold hover:underline inline-flex items-center gap-1"
         >
           <MaterialIcon name="chevron_left" className="text-base" />
-          Lihat Artikel Lainnya
+          <LocalizedText source={"Lihat Artikel Lainnya"} />
         </Link>
       </div>
     </div>

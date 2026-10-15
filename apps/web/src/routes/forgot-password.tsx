@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -17,6 +19,7 @@ export const Route = createFileRoute("/forgot-password")({
 });
 
 function StepEmail({ onNext }: { onNext: (email: string) => void }) {
+  const { ui } = useLocale();
   const [email, setEmail] = useState("");
   const sendMutation = useMutation(trpc.verification.sendPasswordResetOtp.mutationOptions());
 
@@ -25,43 +28,43 @@ function StepEmail({ onNext }: { onNext: (email: string) => void }) {
     if (!email) return;
     try {
       await sendMutation.mutateAsync({ email });
-      toast.success("Kode OTP telah dikirim ke email Anda");
+      toast.success(uiMessage("Kode OTP telah dikirim ke email Anda"));
       onNext(email);
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || "Gagal mengirim OTP");
+      toast.error(uiMessage(getErrorMessage(err) || "Gagal mengirim OTP"));
     }
   };
 
   return (
     <Card className="mx-auto w-full max-w-md shadow-lg border-muted rounded-xl">
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-3xl font-bold tracking-tight">Lupa Password</CardTitle>
+        <CardTitle className="text-3xl font-bold tracking-tight"><LocalizedText source={"Lupa Password"} /></CardTitle>
         <CardDescription>
-          Masukkan email Anda untuk menerima kode reset password
+          <LocalizedText source={"Masukkan email Anda untuk menerima kode reset password"} />
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email"><LocalizedText source={"Email"} /></Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="nama@email.com"
+              placeholder={ui("nama@email.com")}
               required
             />
           </div>
 
           <Button type="submit" className="w-full" disabled={sendMutation.isPending || !email}>
-            {sendMutation.isPending ? "Mengirim..." : "Kirim Kode"}
+            <LocalizedValue value={sendMutation.isPending ? "Mengirim..." : "Kirim Kode"} />
           </Button>
         </form>
 
         <div className="text-center">
           <Link to="/login" className="text-sm text-muted-foreground hover:text-primary">
-            Kembali ke halaman masuk
+            <LocalizedText source={"Kembali ke halaman masuk"} />
           </Link>
         </div>
       </CardContent>
@@ -70,6 +73,7 @@ function StepEmail({ onNext }: { onNext: (email: string) => void }) {
 }
 
 function StepReset({ email }: { email: string }) {
+  const { ui } = useLocale();
   const navigate = useNavigate();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
@@ -122,10 +126,10 @@ function StepReset({ email }: { email: string }) {
   const handleResend = async () => {
     try {
       await resendMutation.mutateAsync({ email });
-      toast.success("Kode OTP telah dikirim ulang");
+      toast.success(uiMessage("Kode OTP telah dikirim ulang"));
       setCountdown(60);
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || "Gagal mengirim ulang OTP");
+      toast.error(uiMessage(getErrorMessage(err) || "Gagal mengirim ulang OTP"));
     }
   };
 
@@ -134,24 +138,24 @@ function StepReset({ email }: { email: string }) {
     const code = otp.join("");
 
     if (code.length !== 6) {
-      toast.error("Masukkan 6 digit kode OTP");
+      toast.error(uiMessage("Masukkan 6 digit kode OTP"));
       return;
     }
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(newPassword)) {
-      toast.error("Password minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka");
+      toast.error(uiMessage("Password minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("Password tidak cocok");
+      toast.error(uiMessage("Password tidak cocok"));
       return;
     }
 
     try {
       await resetMutation.mutateAsync({ email, otp: code, newPassword });
-      toast.success("Password berhasil direset! Silakan masuk.");
+      toast.success(uiMessage("Password berhasil direset! Silakan masuk."));
       navigate({ to: "/login" });
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || "Gagal mereset password");
+      toast.error(uiMessage(getErrorMessage(err) || "Gagal mereset password"));
       setOtp(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     }
@@ -162,15 +166,15 @@ function StepReset({ email }: { email: string }) {
   return (
     <Card className="mx-auto w-full max-w-md shadow-lg border-muted rounded-xl">
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-3xl font-bold tracking-tight">Reset Password</CardTitle>
+        <CardTitle className="text-3xl font-bold tracking-tight"><LocalizedText source={"Reset Password"} /></CardTitle>
         <CardDescription>
-          Masukkan kode dari email dan password baru Anda
+          <LocalizedText source={"Masukkan kode dari email dan password baru Anda"} />
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Kode OTP</Label>
+            <Label><LocalizedText source={"Kode OTP"} /></Label>
             <div className="flex justify-center gap-2" onPaste={handlePaste}>
               {otp.map((digit, i) => (
                 <Input
@@ -190,24 +194,24 @@ function StepReset({ email }: { email: string }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newPassword">Password Baru</Label>
+            <Label htmlFor="newPassword"><LocalizedText source={"Password Baru"} /></Label>
             <Input
               id="newPassword"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Minimal 8 karakter"
+              placeholder={ui("Minimal 8 karakter")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+            <Label htmlFor="confirmPassword"><LocalizedText source={"Konfirmasi Password Baru"} /></Label>
             <Input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Ulangi password baru"
+              placeholder={ui("Ulangi password baru")}
             />
           </div>
 
@@ -216,11 +220,11 @@ function StepReset({ email }: { email: string }) {
             className="w-full"
             disabled={isMutating || otp.join("").length !== 6 || !newPassword || !confirmPassword}
           >
-            {resetMutation.isPending ? "Menyimpan..." : "Reset Password"}
+            <LocalizedValue value={resetMutation.isPending ? "Menyimpan..." : "Reset Password"} />
           </Button>
 
           <div className="text-center text-sm text-muted-foreground">
-            Tidak menerima kode?{" "}
+            <LocalizedText source={"Tidak menerima kode?"} />{" "}
             <Button
               type="button"
               variant="link"
@@ -238,12 +242,13 @@ function StepReset({ email }: { email: string }) {
 }
 
 function RouteComponent() {
+  const { ui } = useLocale();
   const [email, setEmail] = useState<string | null>(null);
 
   if (!email) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-muted/30">
-        <img src={images.logo.src} alt="Labas Logo" className="h-20 w-auto mb-8 absolute top-8" />
+        <img src={images.logo.src} alt={ui("Labas Logo")} className="h-20 w-auto mb-8 absolute top-8" />
         <StepEmail onNext={setEmail} />
       </div>
     );
@@ -251,7 +256,7 @@ function RouteComponent() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-muted/30">
-      <img src={images.logo.src} alt="Labas Logo" className="h-20 w-auto mb-8 absolute top-8" />
+      <img src={images.logo.src} alt={ui("Labas Logo")} className="h-20 w-auto mb-8 absolute top-8" />
       <StepReset email={email} />
     </div>
   );

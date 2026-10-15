@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import {
   DropdownMenu,
@@ -24,7 +25,7 @@ export default function UserMenu() {
   if (!session) {
     return (
       <Link to="/login">
-        <Button variant="outline">Sign In</Button>
+        <Button variant="outline"><LocalizedText source={"Sign In"} /></Button>
       </Link>
     );
   }
@@ -36,7 +37,7 @@ export default function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-card">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel><LocalizedText source={"My Account"} /></DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
           <DropdownMenuItem
@@ -53,7 +54,7 @@ export default function UserMenu() {
               });
             }}
           >
-            Sign Out
+            <LocalizedText source={"Sign Out"} />
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

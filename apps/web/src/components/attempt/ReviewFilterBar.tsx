@@ -1,3 +1,5 @@
+import { LocalizedValue } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import { useMemo } from "react";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 
@@ -24,6 +26,7 @@ export function ReviewFilterBar({
   allExpanded,
   onToggleAllExpanded,
 }: ReviewFilterBarProps) {
+  const { ui } = useLocale();
   const counts = useMemo(() => {
     const total = questions.length;
     const wrong = questions.filter((q) => q.isCorrect === false).length;
@@ -69,7 +72,7 @@ export function ReviewFilterBar({
             }`}
           >
             <MaterialIcon name={icon} className="text-xs" />
-            {label}
+            {ui(label)}
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
               filterStatus === id ? "bg-white/20" : "bg-[var(--oat-light)]"
             }`}>
@@ -111,7 +114,7 @@ export function ReviewFilterBar({
           className="flex items-center gap-1 text-xs font-medium text-[var(--matcha-600)] hover:text-[var(--matcha-800)] transition-colors"
         >
           <MaterialIcon name={allExpanded ? "unfold_less" : "unfold_more"} className="text-xs" />
-          {allExpanded ? "Tutup Semua" : "Buka Semua"}
+          <LocalizedValue value={allExpanded ? "Tutup Semua" : "Buka Semua"} />
         </button>
       </div>
     </div>

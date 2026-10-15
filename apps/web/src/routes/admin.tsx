@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { createFileRoute, Outlet, Link, redirect, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
@@ -47,9 +48,9 @@ function AdminLayout() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--warm-cream)] gap-4">
         <MaterialIcon name="gpp_bad" className="text-6xl text-[var(--clay-red)]" />
-        <h1 className="text-2xl font-headline font-bold text-[var(--clay-black)]">Access Denied</h1>
-        <p className="text-[var(--warm-charcoal)]">Only admins can access this page.</p>
-        <Link to="/dashboard" className="text-[var(--matcha-700)] underline">Back to Dashboard</Link>
+        <h1 className="text-2xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Access Denied"} /></h1>
+        <p className="text-[var(--warm-charcoal)]"><LocalizedText source={"Only admins can access this page."} /></p>
+        <Link to="/dashboard" className="text-[var(--matcha-700)] underline"><LocalizedText source={"Back to Dashboard"} /></Link>
       </div>
     );
   }
@@ -61,10 +62,10 @@ function AdminLayout() {
           <div className="mb-6 px-2">
             <Link to="/dashboard" className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[var(--clay-black)]">arrow_back</span>
-              <span className="text-sm text-[var(--warm-charcoal)]">Back to App</span>
+              <span className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Back to App"} /></span>
             </Link>
           </div>
-          <div className="px-2 mb-4 text-xs font-semibold uppercase tracking-wider text-[var(--warm-charcoal)]">Admin Panel</div>
+          <div className="px-2 mb-4 text-xs font-semibold uppercase tracking-wider text-[var(--warm-charcoal)]"><LocalizedText source={"Admin Panel"} /></div>
           <nav className="flex flex-col gap-1">
             {adminNavItems.map((item) => {
               const isActive = location.pathname === item.to;
@@ -79,7 +80,7 @@ function AdminLayout() {
                   }`}
                 >
                   <MaterialIcon name={item.icon} className="text-lg" />
-                  {item.label}
+                  <LocalizedValue value={item.label} />
                 </Link>
               );
             })}

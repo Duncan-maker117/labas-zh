@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
@@ -29,7 +30,7 @@ export function MostActiveUsersTable({ data, isLoading }: MostActiveUsersTablePr
       <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            User Paling Aktif
+            <LocalizedText source={"User Paling Aktif"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -52,7 +53,7 @@ export function MostActiveUsersTable({ data, isLoading }: MostActiveUsersTablePr
           <div className="flex items-center gap-2">
             <MaterialIcon name="leaderboard" className="text-xl text-[var(--chart-2)]" />
             <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-              User Paling Aktif (30 Hari)
+              <LocalizedText source={"User Paling Aktif (30 Hari)"} />
             </CardTitle>
           </div>
           <Link
@@ -60,7 +61,7 @@ export function MostActiveUsersTable({ data, isLoading }: MostActiveUsersTablePr
             search={{ page: 1, sortDir: "desc" as const }}
             className="text-xs text-[var(--matcha-700)] hover:underline font-medium"
           >
-            Lihat semua
+            <LocalizedText source={"Lihat semua"} />
           </Link>
         </div>
       </CardHeader>
@@ -68,7 +69,7 @@ export function MostActiveUsersTable({ data, isLoading }: MostActiveUsersTablePr
         {rows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 text-[var(--warm-charcoal)]">
             <MaterialIcon name="group" className="text-3xl text-[var(--warm-silver)] mb-2" />
-            <p className="text-sm">Belum ada aktivitas latihan</p>
+            <p className="text-sm"><LocalizedText source={"Belum ada aktivitas latihan"} /></p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -76,10 +77,10 @@ export function MostActiveUsersTable({ data, isLoading }: MostActiveUsersTablePr
               <thead>
                 <tr className="text-xs text-[var(--warm-charcoal)] border-b border-[var(--oat-border)]">
                   <th className="text-left py-2 font-medium w-8">#</th>
-                  <th className="text-left py-2 font-medium">User</th>
-                  <th className="text-right py-2 font-medium">Latihan</th>
-                  <th className="text-right py-2 font-medium">Skor</th>
-                  <th className="text-right py-2 font-medium">Terakhir</th>
+                  <th className="text-left py-2 font-medium"><LocalizedText source={"User"} /></th>
+                  <th className="text-right py-2 font-medium"><LocalizedText source={"Latihan"} /></th>
+                  <th className="text-right py-2 font-medium"><LocalizedText source={"Skor"} /></th>
+                  <th className="text-right py-2 font-medium"><LocalizedText source={"Terakhir"} /></th>
                 </tr>
               </thead>
               <tbody>

@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -56,13 +57,13 @@ function MeComponent() {
       <div className="mb-8">
         <div className="flex items-center gap-2 text-sm text-[var(--warm-charcoal)] mb-4">
           <Link to="/dashboard" className="hover:text-[var(--clay-black)] transition-colors">
-            Beranda
+            <LocalizedText source={"Beranda"} />
           </Link>
           <MaterialIcon name="chevron_right" className="text-xs" />
-          <span className="text-[var(--clay-black)] font-medium">Profil Saya</span>
+          <span className="text-[var(--clay-black)] font-medium"><LocalizedText source={"Profil Saya"} /></span>
         </div>
         <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-          Profil Saya
+          <LocalizedText source={"Profil Saya"} />
         </h1>
       </div>
 
@@ -72,7 +73,7 @@ function MeComponent() {
           {isEditing ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--clay-black)] mb-1">Nama</label>
+                <label className="block text-sm font-medium text-[var(--clay-black)] mb-1"><LocalizedText source={"Nama"} /></label>
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -80,7 +81,7 @@ function MeComponent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--clay-black)] mb-1">URL Avatar</label>
+                <label className="block text-sm font-medium text-[var(--clay-black)] mb-1"><LocalizedText source={"URL Avatar"} /></label>
                 <Input
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
@@ -88,7 +89,7 @@ function MeComponent() {
                   className="bg-[var(--warm-cream)] border-2 border-[var(--oat-border)] rounded-[var(--radius-lg)]"
                 />
                 <p className="text-xs text-[var(--warm-silver)] mt-1">
-                  Masukkan URL gambar. Kosongkan untuk menggunakan inisial.
+                  <LocalizedText source={"Masukkan URL gambar. Kosongkan untuk menggunakan inisial."} />
                 </p>
               </div>
               <div className="flex gap-3 pt-2">
@@ -97,7 +98,7 @@ function MeComponent() {
                   disabled={updateMutation.isPending}
                   className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)]"
                 >
-                  {updateMutation.isPending ? "Menyimpan..." : "Simpan"}
+                  <LocalizedValue value={updateMutation.isPending ? "Menyimpan..." : "Simpan"} />
                 </Button>
                 <Button
                   variant="outline"
@@ -108,7 +109,7 @@ function MeComponent() {
                   }}
                   className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)]"
                 >
-                  Batal
+                  <LocalizedText source={"Batal"} />
                 </Button>
               </div>
             </div>
@@ -134,7 +135,7 @@ function MeComponent() {
                 className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
               >
                 <MaterialIcon name="edit" className="mr-2" />
-                Edit
+                <LocalizedText source={"Edit"} />
               </Button>
             </div>
           )}
@@ -149,7 +150,7 @@ function MeComponent() {
                 className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
               >
                 <MaterialIcon name="face" className="mr-2" />
-                Ganti Avatar
+                <LocalizedText source={"Ganti Avatar"} />
               </Button>
             </Link>
           </div>
@@ -157,14 +158,14 @@ function MeComponent() {
       </Card>
 
       {/* Stats */}
-      <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-4">Statistik Kreator</h2>
+      <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-4"><LocalizedText source={"Statistik Kreator"} /></h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.totalPackages}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Paket Dibuat</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Paket Dibuat"} /></div>
           </CardContent>
         </Card>
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
@@ -172,7 +173,7 @@ function MeComponent() {
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.totalPackageUsage}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Paket Digunakan</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Paket Digunakan"} /></div>
           </CardContent>
         </Card>
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
@@ -180,7 +181,7 @@ function MeComponent() {
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.totalQuestions}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Soal Dibuat</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Soal Dibuat"} /></div>
           </CardContent>
         </Card>
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
@@ -188,13 +189,13 @@ function MeComponent() {
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.avgPackageRating > 0 ? stats.avgPackageRating : "-"}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Rating Rata-rata</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Rating Rata-rata"} /></div>
           </CardContent>
         </Card>
       </div>
 
       {/* Quick Links */}
-      <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-4">Tautan Cepat</h2>
+      <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-4"><LocalizedText source={"Tautan Cepat"} /></h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link to="/history" className="block">
           <Card className="clay-shadow clay-hover bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
@@ -203,8 +204,8 @@ function MeComponent() {
                 <MaterialIcon name="history" className="text-[var(--clay-black)]" />
               </div>
               <div>
-                <h3 className="font-semibold text-[var(--clay-black)]">Riwayat Latihan</h3>
-                <p className="text-xs text-[var(--warm-charcoal)]">Lihat semua attempt latihan Anda</p>
+                <h3 className="font-semibold text-[var(--clay-black)]"><LocalizedText source={"Riwayat Latihan"} /></h3>
+                <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Lihat semua attempt latihan Anda"} /></p>
               </div>
             </CardContent>
           </Card>
@@ -216,8 +217,8 @@ function MeComponent() {
                 <MaterialIcon name="database" className="text-[var(--matcha-800)]" />
               </div>
               <div>
-                <h3 className="font-semibold text-[var(--clay-black)]">Bank Soal Saya</h3>
-                <p className="text-xs text-[var(--warm-charcoal)]">Kelola soal yang Anda buat</p>
+                <h3 className="font-semibold text-[var(--clay-black)]"><LocalizedText source={"Bank Soal Saya"} /></h3>
+                <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Kelola soal yang Anda buat"} /></p>
               </div>
             </CardContent>
           </Card>
@@ -229,8 +230,8 @@ function MeComponent() {
                 <MaterialIcon name="settings" className="text-[var(--pure-white)]" />
               </div>
               <div>
-                <h3 className="font-semibold text-[var(--clay-black)]">Pengaturan Akun</h3>
-                <p className="text-xs text-[var(--warm-charcoal)]">Ubah password, email, dan lainnya</p>
+                <h3 className="font-semibold text-[var(--clay-black)]"><LocalizedText source={"Pengaturan Akun"} /></h3>
+                <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Ubah password, email, dan lainnya"} /></p>
               </div>
             </CardContent>
           </Card>

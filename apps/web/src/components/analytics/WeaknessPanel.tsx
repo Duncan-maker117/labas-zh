@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { Link } from "@tanstack/react-router";
@@ -57,7 +58,7 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
       <CardHeader>
         <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)] flex items-center gap-2">
           <MaterialIcon name="analytics" className="text-[var(--pomegranate-600)]" />
-          Area untuk Ditingkatkan
+          <LocalizedText source={"Area untuk Ditingkatkan"} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -85,14 +86,14 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
                       {formatLabel(w.name)}
                     </div>
                     <div className="text-xs text-[var(--warm-charcoal)] mt-0.5">
-                      {w.totalQuestions} soal · {w.accuracyPct}% benar
+                      {w.totalQuestions} <LocalizedText source={"soal ·"} /> {w.accuracyPct}<LocalizedText source={"% benar"} />
                     </div>
                   </div>
                   <Link
                     to="/bank"
                     className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
                   >
-                    Latih
+                    <LocalizedText source={"Latih"} />
                   </Link>
                 </div>
               ))}
@@ -100,7 +101,7 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
 
             {recommendations && recommendations.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-[var(--clay-black)]">Rekomendasi</h4>
+                <h4 className="text-sm font-semibold text-[var(--clay-black)]"><LocalizedText source={"Rekomendasi"} /></h4>
                 <ul className="space-y-2">
                   {recommendations.map((rec, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-[var(--warm-charcoal)]">
@@ -115,13 +116,13 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
         ) : (
           <div className="text-center py-8 text-[var(--warm-charcoal)]">
             <MaterialIcon name="insights" className="text-5xl text-[var(--warm-silver)] mx-auto mb-3" />
-            <p className="font-semibold">Belum cukup data</p>
-            <p className="text-sm mt-1">Selesaikan lebih banyak latihan untuk melihat analisis kelemahan.</p>
+            <p className="font-semibold"><LocalizedText source={"Belum cukup data"} /></p>
+            <p className="text-sm mt-1"><LocalizedText source={"Selesaikan lebih banyak latihan untuk melihat analisis kelemahan."} /></p>
             <Link
               to="/bank"
               className="inline-block mt-4 px-4 py-2 text-sm font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
             >
-              Mulai Latihan
+              <LocalizedText source={"Mulai Latihan"} />
             </Link>
           </div>
         )}

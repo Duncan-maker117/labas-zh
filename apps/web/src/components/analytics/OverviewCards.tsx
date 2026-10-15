@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { formatTime } from "@/lib/time";
@@ -28,7 +29,7 @@ export function OverviewCards({ data }: OverviewCardsProps) {
           <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
             {data.totalAttempts}
           </div>
-          <div className="text-xs text-[var(--warm-charcoal)] mt-1">Total Latihan</div>
+          <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Total Latihan"} /></div>
         </CardContent>
       </Card>
 
@@ -40,7 +41,7 @@ export function OverviewCards({ data }: OverviewCardsProps) {
           <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
             {data.completedAttempts}
           </div>
-          <div className="text-xs text-[var(--warm-charcoal)] mt-1">Selesai</div>
+          <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Selesai"} /></div>
         </CardContent>
       </Card>
 
@@ -52,7 +53,7 @@ export function OverviewCards({ data }: OverviewCardsProps) {
           <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
             {data.avgScorePct}%
           </div>
-          <div className="text-xs text-[var(--warm-charcoal)] mt-1">Rata-rata Skor</div>
+          <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Rata-rata Skor"} /></div>
         </CardContent>
       </Card>
 
@@ -64,7 +65,7 @@ export function OverviewCards({ data }: OverviewCardsProps) {
           <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
             {data.overallAccuracyPct}%
           </div>
-          <div className="text-xs text-[var(--warm-charcoal)] mt-1">Akurasi</div>
+          <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Akurasi"} /></div>
         </CardContent>
       </Card>
 
@@ -76,7 +77,7 @@ export function OverviewCards({ data }: OverviewCardsProps) {
           <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
             {formatTime(data.totalTimeSpentSec)}
           </div>
-          <div className="text-xs text-[var(--warm-charcoal)] mt-1">Waktu Total</div>
+          <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Waktu Total"} /></div>
         </CardContent>
       </Card>
 
@@ -88,7 +89,7 @@ export function OverviewCards({ data }: OverviewCardsProps) {
           <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
             {data.totalQuestionsAnswered}
           </div>
-          <div className="text-xs text-[var(--warm-charcoal)] mt-1">Soal Dijawab</div>
+          <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Soal Dijawab"} /></div>
         </CardContent>
       </Card>
     </div>

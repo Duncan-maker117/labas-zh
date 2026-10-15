@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@labas/ui/components/card";
@@ -39,6 +41,7 @@ const colorMap: Record<string, { bg: string; text: string; badge: string }> = {
 };
 
 export function GettingStartedCard() {
+  const { ui } = useLocale();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -64,16 +67,16 @@ export function GettingStartedCard() {
             </div>
             <div>
               <h2 className="text-xl font-headline font-bold text-[var(--clay-black)]">
-                Mulai Belajar
+                <LocalizedText source={"Mulai Belajar"} />
               </h2>
               <p className="text-sm text-[var(--warm-charcoal)]">
-                Ikuti 3 langkah mudah untuk memulai latihan.
+                <LocalizedText source={"Ikuti 3 langkah mudah untuk memulai latihan."} />
               </p>
             </div>
           </div>
           <button
             onClick={dismiss}
-            aria-label="Tutup"
+            aria-label={ui("Tutup")}
             className="text-[var(--warm-silver)] hover:text-[var(--clay-black)] transition-colors cursor-pointer"
           >
             <MaterialIcon name="close" className="text-xl" />
@@ -96,11 +99,11 @@ export function GettingStartedCard() {
                   <div className="flex items-center gap-2 mb-1">
                     <MaterialIcon name={step.icon} className={`text-sm ${c.text}`} />
                     <h3 className="font-headline font-bold text-[var(--clay-black)] group-hover:text-[var(--matcha-800)] transition-colors">
-                      {step.title}
+                      {ui(step.title)}
                     </h3>
                   </div>
                   <p className="text-xs text-[var(--warm-charcoal)] leading-relaxed">
-                    {step.desc}
+                    {ui(step.desc)}
                   </p>
                 </div>
                 <MaterialIcon name="chevron_right" className="text-lg text-[var(--warm-silver)] group-hover:text-[var(--matcha-800)] shrink-0 self-center transition-colors" />

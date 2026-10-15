@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { type ApiKeyConfig } from "@/hooks/use-api-key";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@labas/ui/components/card";
@@ -29,6 +31,7 @@ export function ApiKeyList({
   onStartEdit,
   onRemove,
 }: ApiKeyListProps) {
+  const { ui } = useLocale();
   return (
     <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
       <CardHeader>
@@ -36,9 +39,9 @@ export function ApiKeyList({
           <div className="flex items-center gap-3">
             <MaterialIcon name="key" className="text-xl" />
             <div>
-              <CardTitle className="font-headline text-[var(--clay-black)]">API Keys</CardTitle>
+              <CardTitle className="font-headline text-[var(--clay-black)]"><LocalizedText source={"API Keys"} /></CardTitle>
               <CardDescription className="text-[var(--warm-charcoal)]">
-                {configs.length} konfigurasi tersimpan
+                {configs.length} <LocalizedText source={"konfigurasi tersimpan"} />
               </CardDescription>
             </div>
           </div>
@@ -48,7 +51,7 @@ export function ApiKeyList({
               className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)] clay-shadow clay-hover text-sm"
             >
               <MaterialIcon name="add" className="mr-1" />
-              Tambah
+              <LocalizedText source={"Tambah"} />
             </Button>
           )}
         </div>
@@ -59,16 +62,16 @@ export function ApiKeyList({
         ) : configs.length === 0 ? (
           <div className="text-center py-8">
             <MaterialIcon name="key_off" className="text-4xl text-[var(--warm-silver)] mx-auto mb-3" />
-            <p className="text-[var(--warm-charcoal)] font-semibold">Belum ada API key</p>
+            <p className="text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Belum ada API key"} /></p>
             <p className="text-xs text-[var(--warm-silver)] mt-1">
-              Tambahkan minimal satu key untuk generate soal.
+              <LocalizedText source={"Tambahkan minimal satu key untuk generate soal."} />
             </p>
             <Button
               onClick={onStartAdd}
               className="mt-4 bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] rounded-[var(--radius-lg)]"
             >
               <MaterialIcon name="add" className="mr-1" />
-              Tambah API Key
+              <LocalizedText source={"Tambah API Key"} />
             </Button>
           </div>
         ) : (
@@ -102,7 +105,7 @@ export function ApiKeyList({
                       <button
                         onClick={() => onStartEdit(config)}
                         className="p-2 rounded-[var(--radius-md)] hover:bg-[var(--oat-light)] text-[var(--warm-charcoal)] transition-colors"
-                        title="Edit"
+                        title={ui("Edit")}
                       >
                         <MaterialIcon name="edit" className="text-sm" />
                       </button>
@@ -113,7 +116,7 @@ export function ApiKeyList({
                           }
                         }}
                         className="p-2 rounded-[var(--radius-md)] hover:bg-[var(--pomegranate-400)]/10 text-[var(--pomegranate-400)] transition-colors"
-                        title="Hapus"
+                        title={ui("Hapus")}
                       >
                         <MaterialIcon name="delete" className="text-sm" />
                       </button>

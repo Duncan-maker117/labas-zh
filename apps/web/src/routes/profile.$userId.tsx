@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { trpc } from "@/utils/trpc";
@@ -31,7 +32,7 @@ function ProfileComponent() {
       <div className="min-h-screen pt-8 pb-32 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto bg-[var(--warm-cream)]">
         <div className="text-center py-20">
           <MaterialIcon name="person_off" className="text-6xl text-[var(--warm-silver)] mx-auto mb-4" />
-          <p className="text-lg text-[var(--warm-charcoal)] font-semibold">Pengguna tidak ditemukan</p>
+          <p className="text-lg text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Pengguna tidak ditemukan"} /></p>
         </div>
       </div>
     );
@@ -56,7 +57,7 @@ function ProfileComponent() {
                 {user.name ?? "Pengguna"}
               </h1>
               <p className="text-sm text-[var(--warm-charcoal)] mt-1">
-                Bergabung {new Date(user.createdAt).toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+                <LocalizedText source={"Bergabung"} /> {new Date(user.createdAt).toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
               </p>
             </div>
           </div>
@@ -70,7 +71,7 @@ function ProfileComponent() {
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.totalPackages}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Paket Dibuat</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Paket Dibuat"} /></div>
           </CardContent>
         </Card>
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
@@ -78,7 +79,7 @@ function ProfileComponent() {
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.totalPackageUsage}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Paket Digunakan</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Paket Digunakan"} /></div>
           </CardContent>
         </Card>
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
@@ -86,7 +87,7 @@ function ProfileComponent() {
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.totalQuestions}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Soal Dibuat</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Soal Dibuat"} /></div>
           </CardContent>
         </Card>
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
@@ -94,7 +95,7 @@ function ProfileComponent() {
             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
               {stats.avgPackageRating > 0 ? stats.avgPackageRating : "-"}
             </div>
-            <div className="text-xs text-[var(--warm-charcoal)] mt-1">Rating Rata-rata</div>
+            <div className="text-xs text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Rating Rata-rata"} /></div>
           </CardContent>
         </Card>
       </div>
@@ -102,13 +103,13 @@ function ProfileComponent() {
       {/* Recent Public Packages */}
       <section>
         <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-4">
-          Paket Publik Terbaru
+          <LocalizedText source={"Paket Publik Terbaru"} />
         </h2>
 
         {recentPackages.length === 0 ? (
           <div className="text-center py-12 text-[var(--warm-charcoal)]">
             <MaterialIcon name="folder_open" className="text-4xl text-[var(--warm-silver)] mx-auto mb-3" />
-            <p>Belum ada paket publik</p>
+            <p><LocalizedText source={"Belum ada paket publik"} /></p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -131,8 +132,8 @@ function ProfileComponent() {
                       {pkg.title}
                     </h3>
                     <div className="flex items-center justify-between text-xs text-[var(--warm-charcoal)]">
-                      <span>{pkg.totalQuestions} soal</span>
-                      <span>{pkg.usageCount}x digunakan</span>
+                      <span>{pkg.totalQuestions} <LocalizedText source={"soal"} /></span>
+                      <span>{pkg.usageCount}<LocalizedText source={"x digunakan"} /></span>
                     </div>
                   </CardContent>
                 </Card>

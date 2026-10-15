@@ -1,6 +1,8 @@
 /* Hallmark · redesign: analytics · genre: modern-minimal · macrostructure: Stat-Led
  * design-system: DESIGN.md · theme: Clay (warm-cream · oat · swatch palette)
  */
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Suspense, lazy, useEffect } from "react";
 import { createFileRoute, redirect, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
@@ -56,6 +58,7 @@ function ChartSkeleton() {
 }
 
 function AnalyticsComponent() {
+  const { ui } = useLocale();
   const navigate = useNavigate();
   const routeSearch = useSearch({ strict: false }) as Record<string, string>;
   const examTypeId = routeSearch.examTypeId ?? "";
@@ -96,30 +99,30 @@ function AnalyticsComponent() {
         <div className="pt-8 mb-6">
           <div className="flex items-center gap-2 text-sm text-[var(--warm-charcoal)] mb-4">
             <Link to="/dashboard" className="hover:text-[var(--clay-black)] transition-colors">
-              Beranda
+              <LocalizedText source={"Beranda"} />
             </Link>
             <MaterialIcon name="chevron_right" className="text-xs" />
-            <span className="text-[var(--clay-black)] font-medium">Analitik</span>
+            <span className="text-[var(--clay-black)] font-medium"><LocalizedText source={"Analitik"} /></span>
           </div>
 
           <div className="flex items-center justify-between gap-4">
             <div>
               <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-                Analitik
+                <LocalizedText source={"Analitik"} />
               </h1>
               <p className="text-base text-[var(--warm-charcoal)] mt-1">
-                Pantau perkembangan dan identifikasi area untuk ditingkatkan.
+                <LocalizedText source={"Pantau perkembangan dan identifikasi area untuk ditingkatkan."} />
               </p>
             </div>
             <Select
               value={examTypeId}
               onValueChange={(v) => navigate({ search: { examTypeId: v || undefined } as any, replace: true })}
             >
-              <SelectTrigger className="w-48 h-11 clay-shadow rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] cursor-pointer" aria-label="Filter jenis ujian">
-                <SelectValue placeholder="Semua Ujian" />
+              <SelectTrigger className="w-48 h-11 clay-shadow rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] cursor-pointer" aria-label={ui("Filter jenis ujian")}>
+                <SelectValue placeholder={ui("Semua Ujian")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Semua Ujian</SelectItem>
+                <SelectItem value=""><LocalizedText source={"Semua Ujian"} /></SelectItem>
                 {EXAM_TYPES.map((t) => (
                   <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                 ))}
@@ -141,11 +144,11 @@ function AnalyticsComponent() {
                     {overview.data.overallAccuracyPct}%
                   </span>
                   <span className="text-sm font-semibold text-[var(--warm-charcoal)] uppercase tracking-wide">
-                    Akurasi
+                    <LocalizedText source={"Akurasi"} />
                   </span>
                 </div>
                 <p className="text-sm text-[var(--warm-charcoal)] mt-1">
-                  {overview.data.totalQuestionsAnswered} soal dijawab &middot; {overview.data.totalAttempts} latihan &middot; {overview.data.avgScorePct}% rata-rata skor
+                  {overview.data.totalQuestionsAnswered} <LocalizedText source={"soal dijawab ·"} /> {overview.data.totalAttempts} <LocalizedText source={"latihan ·"} /> {overview.data.avgScorePct}<LocalizedText source={"% rata-rata skor"} />
                 </p>
               </div>
             </div>
@@ -155,19 +158,19 @@ function AnalyticsComponent() {
         {!overview.data && (
           <div className="mb-8 p-8 rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--oat-border)] bg-[var(--pure-white)] text-center">
             <MaterialIcon name="insights" className="text-5xl text-[var(--warm-silver)] mx-auto mb-3" />
-            <p className="font-semibold text-[var(--clay-black)]">Belum ada data analitik</p>
-            <p className="text-sm text-[var(--warm-charcoal)] mt-1">Selesaikan latihan pertamamu untuk melihat statistik.</p>
+            <p className="font-semibold text-[var(--clay-black)]"><LocalizedText source={"Belum ada data analitik"} /></p>
+            <p className="text-sm text-[var(--warm-charcoal)] mt-1"><LocalizedText source={"Selesaikan latihan pertamamu untuk melihat statistik."} /></p>
             <Link
               to="/bank"
               className="inline-block mt-4 px-5 py-2.5 text-sm font-semibold rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover transition-all"
             >
-              Mulai Latihan
+              <LocalizedText source={"Mulai Latihan"} />
             </Link>
           </div>
         )}
 
         {/* Ringkasan */}
-        <SectionLabel label="Ringkasan" />
+        <SectionLabel label={ui("Ringkasan")} />
         <OverviewCards data={overview.data} />
       </div>
 
@@ -187,7 +190,7 @@ function AnalyticsComponent() {
 
         {/* Area Lemah */}
         <div className="mt-12">
-          <SectionLabel label="Area Lemah" />
+          <SectionLabel label={ui("Area Lemah")} />
           <WeaknessPanel
             weaknesses={weaknesses.data?.weaknesses}
             recommendations={weaknesses.data?.recommendations}

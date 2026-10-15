@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 
@@ -21,10 +22,10 @@ export function CalloutCard({ privateCount, label = "soal", onPublishAll, onDism
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-[var(--clay-black)]">
-            Kamu punya <span className="text-[var(--slushie-800)]">{privateCount} {label} privat</span>
+            <LocalizedText source={"Kamu punya"} /> <span className="text-[var(--slushie-800)]">{privateCount} {label} <LocalizedText source={"privat"} /></span>
           </p>
           <p className="text-xs text-[var(--warm-charcoal)] mt-1 leading-relaxed">
-            Soal privat hanya bisa kamu lihat. Jadikan publik agar soal bisa muncul di daftar paket soal dan diakses pengguna lain.
+            <LocalizedText source={"Soal privat hanya bisa kamu lihat. Jadikan publik agar soal bisa muncul di daftar paket soal dan diakses pengguna lain."} />
           </p>
           <div className="flex items-center gap-2 mt-3">
             <Button
@@ -33,13 +34,13 @@ export function CalloutCard({ privateCount, label = "soal", onPublishAll, onDism
               className="rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] text-xs cursor-pointer"
             >
               <MaterialIcon name="public" className="text-xs mr-1" />
-              Jadikan Semua Publik
+              <LocalizedText source={"Jadikan Semua Publik"} />
             </Button>
             <button
               onClick={onDismiss}
               className="text-xs text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors cursor-pointer font-medium"
             >
-              Tutup
+              <LocalizedText source={"Tutup"} />
             </button>
           </div>
         </div>

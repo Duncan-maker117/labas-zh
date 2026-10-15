@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@labas/ui/components/button";
@@ -54,6 +56,7 @@ export function FilterBar({
   onOpenMobileSheet,
   advancedFilters,
 }: FilterBarProps) {
+  const { ui } = useLocale();
   return (
     <div data-tour={dataTour} className="sticky top-0 z-30 bg-[var(--warm-cream)]/90 backdrop-blur-md border-b border-[var(--oat-border)] transition-all duration-200">
       <div className="px-6 md:px-12 lg:px-16 max-w-7xl mx-auto pt-4 pb-3 space-y-3">
@@ -62,28 +65,28 @@ export function FilterBar({
           <div
             className="flex gap-2"
             role="tablist"
-            aria-label="Mode bank soal"
+            aria-label={ui("Mode bank soal")}
             onKeyDown={(e) => handleRovingKeyDown(e, "tab")}
           >
             <ModeButton active={mode === "soal"} onClick={() => onSetMode("soal")}>
-              Dari Soal
+              <LocalizedText source={"Dari Soal"} />
             </ModeButton>
             <ModeButton active={mode === "section"} onClick={() => onSetMode("section")}>
-              Dari Section
+              <LocalizedText source={"Dari Section"} />
             </ModeButton>
           </div>
           {mode === "soal" && (
             <div
               className="flex gap-2"
               role="tablist"
-              aria-label="Sumber soal"
+              aria-label={ui("Sumber soal")}
               onKeyDown={(e) => handleRovingKeyDown(e, "tab")}
             >
               <TabButton active={tab === "mine"} onClick={() => onSetTab("mine")}>
-                Soal Saya
+                <LocalizedText source={"Soal Saya"} />
               </TabButton>
               <TabButton active={tab === "public"} onClick={() => onSetTab("public")}>
-                Publik
+                <LocalizedText source={"Publik"} />
               </TabButton>
             </div>
           )}
@@ -93,7 +96,7 @@ export function FilterBar({
         <div
           className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
           role="radiogroup"
-          aria-label="Jenis ujian"
+          aria-label={ui("Jenis ujian")}
           onKeyDown={(e) => handleRovingKeyDown(e, "radio")}
         >
           <ChipButton
@@ -101,7 +104,7 @@ export function FilterBar({
             onClick={() => onSetExamType("")}
             disabled={!!lockedExamType}
           >
-            Semua
+            <LocalizedText source={"Semua"} />
           </ChipButton>
           {EXAM_TYPES.map((t) => {
             const isLocked = !!lockedExamType && lockedExamType !== t.id;
@@ -128,7 +131,7 @@ export function FilterBar({
           <div
             className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
             role="radiogroup"
-            aria-label="Visibilitas soal"
+            aria-label={ui("Visibilitas soal")}
             onKeyDown={(e) => handleRovingKeyDown(e, "radio")}
           >
             <VisChipButton
@@ -136,21 +139,21 @@ export function FilterBar({
               onClick={() => onSetVisibility("all")}
             >
               <MaterialIcon name="visibility" className="text-xs" />
-              Semua
+              <LocalizedText source={"Semua"} />
             </VisChipButton>
             <VisChipButton
               active={visibility === "private"}
               onClick={() => onSetVisibility("private")}
             >
               <MaterialIcon name="lock" className="text-xs" />
-              Privat
+              <LocalizedText source={"Privat"} />
             </VisChipButton>
             <VisChipButton
               active={visibility === "public"}
               onClick={() => onSetVisibility("public")}
             >
               <MaterialIcon name="public" className="text-xs" />
-              Publik
+              <LocalizedText source={"Publik"} />
             </VisChipButton>
           </div>
         )}
@@ -179,7 +182,7 @@ export function FilterBar({
                 }`}
               >
                 <SlidersHorizontal className="w-4 h-4 mr-2" />
-                <span className="text-sm">Filter</span>
+                <span className="text-sm"><LocalizedText source={"Filter"} /></span>
                 {activeChips.length > 0 && (
                   <span className="ml-2 bg-[var(--clay-black)] text-[var(--pure-white)] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                     {activeChips.length}
@@ -190,11 +193,11 @@ export function FilterBar({
                 <Button
                   variant="outline"
                   onClick={onClearFilters}
-                  aria-label="Reset filter"
+                  aria-label={ui("Reset filter")}
                   className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] h-11 clay-hover cursor-pointer"
                 >
                   <MaterialIcon name="filter_alt_off" />
-                  <span className="ml-2 hidden sm:inline">Reset</span>
+                  <span className="ml-2 hidden sm:inline"><LocalizedText source={"Reset"} /></span>
                 </Button>
               )}
             </div>
@@ -211,7 +214,7 @@ export function FilterBar({
                 }`}
               >
                 <SlidersHorizontal className="w-4 h-4 mr-2" />
-                <span className="text-sm">Filter</span>
+                <span className="text-sm"><LocalizedText source={"Filter"} /></span>
                 {activeChips.length > 0 && (
                   <span className="ml-2 bg-[var(--clay-black)] text-[var(--pure-white)] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                     {activeChips.length}
@@ -248,7 +251,7 @@ export function FilterBar({
               onClick={onClearFilters}
               className="text-xs text-[var(--pomegranate-400)] font-medium hover:underline cursor-pointer px-1"
             >
-              Reset semua
+              <LocalizedText source={"Reset semua"} />
             </button>
           </div>
         )}

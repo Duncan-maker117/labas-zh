@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { Input } from "@labas/ui/components/input";
 import { Button } from "@labas/ui/components/button";
@@ -30,6 +32,7 @@ export function AutoBundleModal({
   }) => void;
   isPending: boolean;
 }) {
+  const { ui } = useLocale();
   const dateStr = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" });
   const [count, setCount] = useState(Math.min(availableCount, 10));
   const [title, setTitle] = useState(`${examTypeName} ${sectionTypeName} Bundle — ${dateStr}`);
@@ -42,7 +45,7 @@ export function AutoBundleModal({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline font-bold text-[var(--clay-black)]">
-            Auto Bundle
+            <LocalizedText source={"Auto Bundle"} />
           </DialogTitle>
         </DialogHeader>
 
@@ -56,7 +59,7 @@ export function AutoBundleModal({
             </span>
           )}
           <span className="text-sm text-[var(--warm-charcoal)]">
-            {availableCount} soal tersedia
+            {availableCount} <LocalizedText source={"soal tersedia"} />
           </span>
         </div>
 
@@ -64,7 +67,7 @@ export function AutoBundleModal({
           <div className="mb-4 p-3 rounded-[var(--radius-md)] bg-[var(--lemon-400)]/20 border-2 border-[var(--lemon-500)]/30 text-sm text-[var(--lemon-800)] flex items-start gap-2">
             <MaterialIcon name="info" className="text-sm mt-0.5 shrink-0" />
             <span>
-              Soal yang tersedia sedikit ({availableCount} soal). Paket tetap bisa dibuat, tapi disarankan untuk menambah soal.
+              <LocalizedText source={"Soal yang tersedia sedikit ("} />{availableCount} <LocalizedText source={"soal). Paket tetap bisa dibuat, tapi disarankan untuk menambah soal."} />
             </span>
           </div>
         )}
@@ -72,31 +75,31 @@ export function AutoBundleModal({
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Judul Paket
+              <LocalizedText source={"Judul Paket"} />
             </label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. IELTS Reading Bundle"
+              placeholder={ui("e.g. IELTS Reading Bundle")}
               className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
             />
           </div>
 
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Deskripsi
+              <LocalizedText source={"Deskripsi"} />
             </label>
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Deskripsi singkat..."
+              placeholder={ui("Deskripsi singkat...")}
               className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
             />
           </div>
 
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Jumlah Soal: {count}
+              <LocalizedText source={"Jumlah Soal:"} /> {count}
             </label>
             <input
               type="range"
@@ -110,7 +113,7 @@ export function AutoBundleModal({
 
           <div>
             <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              Urutan Soal
+              <LocalizedText source={"Urutan Soal"} />
             </label>
             <div className="flex gap-2">
               <button
@@ -122,7 +125,7 @@ export function AutoBundleModal({
                 }`}
               >
                 <MaterialIcon name="shuffle" className="text-sm mr-1" />
-                Acak
+                <LocalizedText source={"Acak"} />
               </button>
               <button
                 onClick={() => setSortOrder("difficulty")}
@@ -133,7 +136,7 @@ export function AutoBundleModal({
                 }`}
               >
                 <MaterialIcon name="trending_up" className="text-sm mr-1" />
-                Difficulty
+                <LocalizedText source={"Difficulty"} />
               </button>
             </div>
           </div>
@@ -146,7 +149,7 @@ export function AutoBundleModal({
               className="w-4 h-4 rounded border-[var(--oat-border)]"
             />
             <span className="text-sm text-[var(--warm-charcoal)]">
-              Publikasikan ke Bank Soal
+              <LocalizedText source={"Publikasikan ke Bank Soal"} />
             </span>
           </label>
         </div>
@@ -157,7 +160,7 @@ export function AutoBundleModal({
             onClick={onClose}
             className="flex-1 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
           >
-            Batal
+            <LocalizedText source={"Batal"} />
           </Button>
           <Button
             onClick={() =>
@@ -172,7 +175,7 @@ export function AutoBundleModal({
             disabled={!title || isPending || count < 1}
             className="flex-1 bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)]"
           >
-            {isPending ? "Membuat..." : "Buat Paket"}
+            <LocalizedValue value={isPending ? "Membuat..." : "Buat Paket"} />
           </Button>
         </div>
       </DialogContent>

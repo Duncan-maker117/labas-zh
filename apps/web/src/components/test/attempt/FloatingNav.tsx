@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import type { RefObject, KeyboardEvent } from "react";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 
@@ -20,6 +22,7 @@ export function FloatingNav({
   onScrollToTop,
   navSliderRef,
 }: FloatingNavProps) {
+  const { ui } = useLocale();
   const isAnswered = (qId: string) => !!answers[qId];
   const isMarked = (qId: string) => markedQuestions.has(qId);
 
@@ -46,14 +49,14 @@ export function FloatingNav({
   return (
     <nav
       className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 p-2 bg-[var(--clay-black)]/95 backdrop-blur-md rounded-full shadow-2xl border border-white/10 z-40 max-w-[90vw]"
-      aria-label="Navigasi soal"
+      aria-label={ui("Navigasi soal")}
     >
       <button
         onClick={() => {
           navSliderRef?.current?.scrollBy({ left: -200, behavior: "smooth" });
         }}
         className="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all"
-        aria-label="Geser navigasi ke kiri"
+        aria-label={ui("Geser navigasi ke kiri")}
       >
         <MaterialIcon name="chevron_left" className="text-sm" />
       </button>
@@ -62,7 +65,7 @@ export function FloatingNav({
         ref={navSliderRef}
         className="flex items-center gap-1 overflow-x-auto hide-scrollbar max-w-[60vw] sm:max-w-[50vw] md:max-w-[40vw] lg:max-w-[30vw]"
         role="tablist"
-        aria-label="Daftar soal"
+        aria-label={ui("Daftar soal")}
         onKeyDown={handleKeyDown}
       >
         {questions.map((q, gIdx) => {
@@ -102,7 +105,7 @@ export function FloatingNav({
           navSliderRef?.current?.scrollBy({ left: 200, behavior: "smooth" });
         }}
         className="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all"
-        aria-label="Geser navigasi ke kanan"
+        aria-label={ui("Geser navigasi ke kanan")}
       >
         <MaterialIcon name="chevron_right" className="text-sm" />
       </button>
@@ -112,10 +115,10 @@ export function FloatingNav({
       <button
         onClick={onScrollToTop}
         className="flex items-center gap-1 px-3 py-2 shrink-0 rounded-full text-white/80 font-semibold text-xs hover:text-white transition-all"
-        aria-label="Kembali ke atas"
+        aria-label={ui("Kembali ke atas")}
       >
         <MaterialIcon name="arrow_upward" className="text-sm" />
-        <span className="hidden sm:inline">Atas</span>
+        <span className="hidden sm:inline"><LocalizedText source={"Atas"} /></span>
       </button>
     </nav>
   );

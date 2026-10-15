@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@labas/ui/components/tabs";
 import { ScoreTrendChart } from "./ScoreTrendChart";
 import { BreakdownCharts, type ExamTypeItem, type SectionTypeItem, type FormatItem } from "./BreakdownCharts";
@@ -29,19 +30,19 @@ export default function ChartsBundle({
           value="trend"
           className="h-11 px-5 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
         >
-          Tren Skor
+          <LocalizedText source={"Tren Skor"} />
         </TabsTrigger>
         <TabsTrigger
           value="performa"
           className="h-11 px-5 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
         >
-          Performa
+          <LocalizedText source={"Performa"} />
         </TabsTrigger>
         <TabsTrigger
           value="waktu"
           className="h-11 px-5 rounded-[var(--radius-lg)] text-sm font-semibold data-[active=true]:bg-[var(--clay-black)] data-[active=true]:text-[var(--pure-white)] data-[active=true]:clay-shadow bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)] transition-all"
         >
-          Waktu
+          <LocalizedText source={"Waktu"} />
         </TabsTrigger>
       </TabsList>
 

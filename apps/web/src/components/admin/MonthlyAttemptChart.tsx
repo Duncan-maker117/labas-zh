@@ -1,3 +1,5 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import {
   BarChart,
   Bar,
@@ -26,12 +28,13 @@ interface MonthlyAttemptChartProps {
 }
 
 export function MonthlyAttemptChart({ data, isLoading }: MonthlyAttemptChartProps) {
+  const { locale, ui } = useLocale();
   if (isLoading) {
     return (
       <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Aktivitas Latihan Bulanan
+            <LocalizedText source={"Aktivitas Latihan Bulanan"} />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -46,14 +49,14 @@ export function MonthlyAttemptChart({ data, isLoading }: MonthlyAttemptChartProp
       <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
         <CardHeader>
           <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-            Aktivitas Latihan Bulanan
+            <LocalizedText source={"Aktivitas Latihan Bulanan"} />
           </CardTitle>
         </CardHeader>
         <CardContent className="h-64 flex flex-col items-center justify-center text-[var(--warm-charcoal)]">
           <MaterialIcon name="calendar_month" className="text-4xl text-[var(--warm-silver)] mb-3" />
-          <p className="font-semibold">Belum ada data bulanan</p>
+          <p className="font-semibold"><LocalizedText source={"Belum ada data bulanan"} /></p>
           <p className="text-xs text-[var(--warm-silver)] mt-1">
-            Data akan muncul setelah user menyelesaikan latihan.
+            <LocalizedText source={"Data akan muncul setelah user menyelesaikan latihan."} />
           </p>
         </CardContent>
       </Card>
@@ -64,7 +67,7 @@ export function MonthlyAttemptChart({ data, isLoading }: MonthlyAttemptChartProp
     <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
       <CardHeader>
         <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)]">
-          Aktivitas Latihan Bulanan
+          <LocalizedText source={"Aktivitas Latihan Bulanan"} />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -103,7 +106,7 @@ export function MonthlyAttemptChart({ data, isLoading }: MonthlyAttemptChartProp
               formatter={(value: unknown, name: unknown) => {
                 const num = typeof value === "number" ? value : 0;
                 const n = typeof name === "string" ? name : "";
-                if (n === "count") return [num.toLocaleString("id-ID"), "Latihan Selesai"];
+                if (n === "count") return [num.toLocaleString(locale), ui("Latihan Selesai")];
                 if (n === "avgScore") return [`${num}%`, "Rata-rata Skor"];
                 return [num, n];
               }}

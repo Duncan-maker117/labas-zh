@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import {
   Select,
   SelectContent,
@@ -26,15 +28,16 @@ export function AdvancedFilters({
   onSetFormat,
   onSetDifficulty,
 }: AdvancedFiltersProps) {
+  const { ui } = useLocale();
   return (
     <>
       <Select value={section} onValueChange={(v: string | null) => onSetSection(v ?? "")}>
         <SelectTrigger className="w-full md:w-38 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue placeholder="Section" />
+          <SelectValue placeholder={ui("Section")} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="">Semua Section</SelectItem>
+            <SelectItem value=""><LocalizedText source={"Semua Section"} /></SelectItem>
             {SECTIONS.map((s) => (
               <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
             ))}
@@ -43,11 +46,11 @@ export function AdvancedFilters({
       </Select>
       <Select value={format} onValueChange={(v: string | null) => onSetFormat(v ?? "")}>
         <SelectTrigger className="w-full md:w-40 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue placeholder="Format" />
+          <SelectValue placeholder={ui("Format")} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="">Semua Format</SelectItem>
+            <SelectItem value=""><LocalizedText source={"Semua Format"} /></SelectItem>
             {FORMATS.map((f) => (
               <SelectItem key={f} value={f}>{formatLabel(f)}</SelectItem>
             ))}
@@ -59,11 +62,11 @@ export function AdvancedFilters({
         onValueChange={(v: string | null) => onSetDifficulty(v ? Number(v) : undefined)}
       >
         <SelectTrigger className="w-full md:w-36 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue placeholder="Level" />
+          <SelectValue placeholder={ui("Level")} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="">Semua Level</SelectItem>
+            <SelectItem value=""><LocalizedText source={"Semua Level"} /></SelectItem>
             {DIFFICULTIES.map((d) => (
               <SelectItem key={d.value} value={String(d.value)}>{d.label}</SelectItem>
             ))}

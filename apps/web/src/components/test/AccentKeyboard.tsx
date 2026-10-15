@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useCallback } from "react";
 
 const ACCENT_CHARS: Record<string, string[]> = {
@@ -20,7 +21,7 @@ export function AccentKeyboard({ examType, onInsert, disabled }: AccentKeyboardP
   return (
     <div className={`flex flex-wrap gap-1.5 p-3 rounded-[var(--radius-lg)] bg-[var(--oat-light)] border border-[var(--oat-border)] ${disabled ? "opacity-50" : ""}`}>
       <span className="w-full text-[10px] font-medium text-[var(--warm-charcoal)] uppercase tracking-wider mb-0.5">
-        Special Characters
+        <LocalizedText source={"Special Characters"} />
       </span>
       {chars.map((char: string) => (
         <button

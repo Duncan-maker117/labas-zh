@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -44,6 +46,7 @@ type PackageDetail = Record<string, unknown> & {
 };
 
 function AdminFeatured() {
+  const { locale, ui } = useLocale();
   const [tab, setTab] = useState<Tab>("featured");
   const [search, debouncedSearch, setSearch] = useDebouncedValue("", 300);
   const [page, setPage] = useState(1);
@@ -69,9 +72,9 @@ function AdminFeatured() {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listFeatured.queryKey() });
         queryClient.invalidateQueries({ queryKey: trpc.admin.searchContent.queryKey() });
-        toast.success("Package updated");
+        toast.success(uiMessage("Package updated"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
       onSettled: () => setTogglingId(null),
     }),
   );
@@ -82,9 +85,9 @@ function AdminFeatured() {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.admin.listFeatured.queryKey() });
         queryClient.invalidateQueries({ queryKey: trpc.admin.searchContent.queryKey() });
-        toast.success("Question updated");
+        toast.success(uiMessage("Question updated"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
       onSettled: () => setTogglingId(null),
     }),
   );
@@ -102,7 +105,7 @@ function AdminFeatured() {
 
   function formatDate(d: string | Date | null | undefined) {
     if (!d) return "-";
-    return new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+    return new Date(d).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
   }
 
   const tabs: { key: Tab; label: string }[] = [
@@ -123,8 +126,8 @@ function AdminFeatured() {
     return (
       <div className="text-center py-12">
         <MaterialIcon name={icon} className="text-5xl text-[var(--warm-silver)] mx-auto mb-3" />
-        <p className="text-sm font-semibold text-[var(--warm-charcoal)]">{title}</p>
-        <p className="text-xs text-[var(--warm-silver)] mt-1">{message}</p>
+        <p className="text-sm font-semibold text-[var(--warm-charcoal)]">{ui(title)}</p>
+        <p className="text-xs text-[var(--warm-silver)] mt-1">{ui(message)}</p>
       </div>
     );
   }
@@ -145,7 +148,7 @@ function AdminFeatured() {
                   <span className="px-3 py-1 rounded-full bg-[var(--matcha-300)] text-[var(--matcha-800)] text-xs font-semibold">{pkg.examTypeName}</span>
                 )}
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${pkg.isFeatured ? "bg-[var(--sunbeam-300)] text-[var(--sunbeam-800)]" : "bg-[var(--oat-border)] text-[var(--warm-charcoal)]"}`}>
-                  {pkg.isFeatured ? "Featured" : "Not Featured"}
+                  <LocalizedValue value={pkg.isFeatured ? "Featured" : "Not Featured"} />
                 </span>
               </div>
             </div>
@@ -159,46 +162,46 @@ function AdminFeatured() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-              <p className="text-xs text-[var(--warm-charcoal)]">Questions</p>
+              <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Questions"} /></p>
               <p className="text-xl font-bold text-[var(--clay-black)]">{pkg.totalQuestions ?? "-"}</p>
             </div>
             <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-              <p className="text-xs text-[var(--warm-charcoal)]">Sections</p>
+              <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Sections"} /></p>
               <p className="text-xl font-bold text-[var(--clay-black)]">{pkg.totalSections ?? "-"}</p>
             </div>
             <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-              <p className="text-xs text-[var(--warm-charcoal)]">Duration</p>
+              <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Duration"} /></p>
               <p className="text-xl font-bold text-[var(--clay-black)]">{pkg.estimatedDurationMin ? `${pkg.estimatedDurationMin}m` : "-"}</p>
             </div>
             <div className="bg-[var(--pure-white)] rounded-[var(--radius-xl)] p-4 border border-[var(--oat-border)]">
-              <p className="text-xs text-[var(--warm-charcoal)]">Used</p>
+              <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"Used"} /></p>
               <p className="text-xl font-bold text-[var(--clay-black)]">{pkg.usageCount?.toLocaleString() ?? 0}</p>
             </div>
           </div>
 
           <div className="space-y-2 text-sm text-[var(--warm-charcoal)] border-t border-[var(--oat-border)] pt-4">
             <div className="flex justify-between">
-              <span>Creator</span>
+              <span><LocalizedText source={"Creator"} /></span>
               <span className="font-medium text-[var(--clay-black)]">{creator}</span>
             </div>
             <div className="flex justify-between">
-              <span>Visibility</span>
-              <span className={`font-semibold ${pkg.isPublic ? "text-[var(--matcha-700)]" : "text-[var(--warm-charcoal)]"}`}>{pkg.isPublic ? "Public" : "Private"}</span>
+              <span><LocalizedText source={"Visibility"} /></span>
+              <span className={`font-semibold ${pkg.isPublic ? "text-[var(--matcha-700)]" : "text-[var(--warm-charcoal)]"}`}><LocalizedValue value={pkg.isPublic ? "Public" : "Private"} /></span>
             </div>
             <div className="flex justify-between">
-              <span>Created</span>
+              <span><LocalizedText source={"Created"} /></span>
               <span className="text-[var(--clay-black)]">{formatDate(pkg.createdAt)}</span>
             </div>
           </div>
 
           <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[var(--oat-border)]">
-            <Button variant="outline" onClick={onClose} className="rounded-[var(--radius-lg)]">Close</Button>
+            <Button variant="outline" onClick={onClose} className="rounded-[var(--radius-lg)]"><LocalizedText source={"Close"} /></Button>
             <Button
               className="rounded-[var(--radius-lg)]"
               onClick={() => { togglePkgMutation.mutate({ packageId: pkg.id }); onClose(); }}
               disabled={togglingId === pkg.id}
             >
-              {togglingId === pkg.id ? "..." : pkg.isFeatured ? "Unfeature" : "Feature"}
+              <LocalizedValue value={togglingId === pkg.id ? "..." : pkg.isFeatured ? "Unfeature" : "Feature"} />
             </Button>
           </div>
         </DialogContent>
@@ -208,8 +211,8 @@ function AdminFeatured() {
 
   return (
     <div>
-      <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)] mb-2">Editor&apos;s Pick</h1>
-      <p className="text-[var(--warm-charcoal)] mb-6">Curate featured content for the homepage.</p>
+      <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)] mb-2"><LocalizedText source={"Editor's Pick"} /></h1>
+      <p className="text-[var(--warm-charcoal)] mb-6"><LocalizedText source={"Curate featured content for the homepage."} /></p>
 
       <Tabs value={tab} onValueChange={handleTabChange} className="mb-6">
         <TabsList variant="line" className="h-10 bg-transparent border-b border-[var(--oat-border)]">
@@ -219,7 +222,7 @@ function AdminFeatured() {
               value={t.key}
               className="px-4 py-2.5 text-sm font-medium rounded-t-[var(--radius-lg)] data-[active=true]:bg-[var(--pure-white)] data-[active=true]:text-[var(--clay-black)] data-[active=true]:border data-[active=true]:border-[var(--oat-border)] data-[active=true]:border-b-[var(--pure-white)] data-[active=true]:-mb-[1px] text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors"
             >
-              {t.label}
+              {ui(t.label)}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -241,11 +244,11 @@ function AdminFeatured() {
             <div className="space-y-8">
               <section>
                 <h2 className="text-lg font-headline font-bold text-[var(--clay-black)] mb-4 flex items-center gap-2">
-                  Featured Packages
+                  <LocalizedText source={"Featured Packages"} />
                   <span className="text-sm text-[var(--warm-charcoal)]">({fPackages.length})</span>
                 </h2>
                 {fPackages.length === 0 ? (
-                  <EmptyState icon="inventory_2" title="No featured packages" message="Browse and feature packages from the tabs above." />
+                  <EmptyState icon="inventory_2" title={ui("No featured packages")} message={ui("Browse and feature packages from the tabs above.")} />
                 ) : (
                   <div className="space-y-2">
                     {fPackages.map((pkg) => (
@@ -262,11 +265,11 @@ function AdminFeatured() {
               </section>
               <section>
                 <h2 className="text-lg font-headline font-bold text-[var(--clay-black)] mb-4 flex items-center gap-2">
-                  Featured Questions
+                  <LocalizedText source={"Featured Questions"} />
                   <span className="text-sm text-[var(--warm-charcoal)]">({fQuestions.length})</span>
                 </h2>
                 {fQuestions.length === 0 ? (
-                  <EmptyState icon="help_outline" title="No featured questions" message="Browse and feature questions from the tabs above." />
+                  <EmptyState icon="help_outline" title={ui("No featured questions")} message={ui("Browse and feature questions from the tabs above.")} />
                 ) : (
                   <div className="space-y-2">
                     {fQuestions.map((q) => (
@@ -285,7 +288,7 @@ function AdminFeatured() {
                           onClick={(e) => { e.stopPropagation(); toggleQMutation.mutate({ questionId: q.id }); }}
                           disabled={togglingId === q.id}
                         >
-                          {togglingId === q.id ? "..." : "Unfeature"}
+                          <LocalizedValue value={togglingId === q.id ? "..." : "Unfeature"} />
                         </Button>
                       </div>
                     ))}
@@ -301,10 +304,10 @@ function AdminFeatured() {
           <div className="relative max-w-md mb-4">
             <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)]" />
             <Input
-              placeholder="Search packages..."
+              placeholder={ui("Search packages...")}
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              aria-label="Search packages"
+              aria-label={ui("Search packages")}
               className="pl-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11"
             />
           </div>
@@ -326,10 +329,10 @@ function AdminFeatured() {
           <div className="relative max-w-md mb-4">
             <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)]" />
             <Input
-              placeholder="Search questions..."
+              placeholder={ui("Search questions...")}
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              aria-label="Search questions"
+              aria-label={ui("Search questions")}
               className="pl-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11"
             />
           </div>
@@ -405,12 +408,12 @@ function PackageCardItem({
           {isFeatured && (
             <span className="px-2.5 py-1 rounded-full bg-[var(--sunbeam-300)] text-[var(--sunbeam-800)] text-xs font-semibold">
               <MaterialIcon name="star" className="text-[10px] mr-0.5 inline" />
-              Featured
+              <LocalizedText source={"Featured"} />
             </span>
           )}
           {isSearchResult && !isFeatured && (
             <span className="px-2.5 py-1 rounded-full bg-[var(--oat-border)] text-[var(--warm-charcoal)] text-xs font-semibold">
-              Not Featured
+              <LocalizedText source={"Not Featured"} />
             </span>
           )}
         </div>
@@ -444,13 +447,13 @@ function PackageCardItem({
           {pkg.estimatedDurationMin && (
             <span className="flex items-center gap-1">
               <MaterialIcon name="timer" className="text-xs" />
-              {pkg.estimatedDurationMin}m
+              {pkg.estimatedDurationMin}<LocalizedText source={"m"} />
             </span>
           )}
           {pkg.usageCount !== undefined && (
             <span className="flex items-center gap-1">
               <MaterialIcon name="trending_up" className="text-xs" />
-              {pkg.usageCount.toLocaleString()} uses
+              {pkg.usageCount.toLocaleString()} <LocalizedText source={"uses"} />
             </span>
           )}
           {pkg.avgRating && (
@@ -472,7 +475,7 @@ function PackageCardItem({
           onClick={onToggle}
           disabled={isToggling}
         >
-          {isToggling ? "..." : isFeatured ? "Unfeature" : "Feature"}
+          <LocalizedValue value={isToggling ? "..." : isFeatured ? "Unfeature" : "Feature"} />
         </Button>
       </div>
     </div>
@@ -523,8 +526,8 @@ function SearchResults({
       {items.length === 0 ? (
         <div className="text-center py-12">
           <MaterialIcon name="search_off" className="text-5xl text-[var(--warm-silver)] mx-auto mb-3" />
-          <p className="text-sm font-semibold text-[var(--warm-charcoal)]">No {tab} found</p>
-          <p className="text-xs text-[var(--warm-silver)] mt-1">Try adjusting your search or browse a different category.</p>
+          <p className="text-sm font-semibold text-[var(--warm-charcoal)]"><LocalizedText source={"No"} /> {tab} <LocalizedText source={"found"} /></p>
+          <p className="text-xs text-[var(--warm-silver)] mt-1"><LocalizedText source={"Try adjusting your search or browse a different category."} /></p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -560,7 +563,7 @@ function SearchResults({
                   <p className="text-xs text-[var(--warm-charcoal)]">
                     {format ? `${format} · ${examTypeId}` : examTypeId}
                     {isFeatured && (
-                      <span className="ml-2 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-[var(--sunbeam-300)] text-[var(--sunbeam-800)]">Featured</span>
+                      <span className="ml-2 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-[var(--sunbeam-300)] text-[var(--sunbeam-800)]"><LocalizedText source={"Featured"} /></span>
                     )}
                   </p>
                 </div>
@@ -570,7 +573,7 @@ function SearchResults({
                   onClick={(e) => { e.stopPropagation(); onToggleQuestion(id); }}
                   disabled={togglingId === id}
                 >
-                  {togglingId === id ? "..." : isFeatured ? "Unfeature" : "Feature"}
+                  <LocalizedValue value={togglingId === id ? "..." : isFeatured ? "Unfeature" : "Feature"} />
                 </Button>
               </div>
             );

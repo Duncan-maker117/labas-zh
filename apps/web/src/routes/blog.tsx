@@ -1,3 +1,5 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
+import { uiMessage } from "@/lib/locale";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { routeShell } from "@/lib/route-shell";
 import { buildSocialMeta, SITE_URL } from "@/lib/site-seo";
@@ -8,10 +10,10 @@ export const Route = createFileRoute("/blog")({
   staticData: routeShell.public,
   head: () => ({
     meta: [
-      { title: "Blog — Labas" },
+      { title: uiMessage("Blog — Labas") },
       ...buildSocialMeta({
-        title: "Blog — Labas",
-        description: "Artikel dan tips seputar persiapan ujian bahasa, IELTS, TOEFL, JLPT, TOPIK, dan lainnya.",
+        title: uiMessage("Blog — Labas"),
+        description: uiMessage("Artikel dan tips seputar persiapan ujian bahasa, IELTS, TOEFL, JLPT, TOPIK, dan lainnya."),
         url: `${SITE_URL}/blog`,
       }),
     ],
@@ -24,7 +26,7 @@ function BlogLayout() {
   if (!env.VITE_BLOG_ENABLED) {
     return (
       <div className="min-h-screen bg-[var(--warm-cream)] flex items-center justify-center">
-        <p className="text-[var(--warm-charcoal)] text-lg">此内容暂未开放。</p>
+        <p className="text-[var(--warm-charcoal)] text-lg"><LocalizedText source={"此内容暂未开放。"} /></p>
       </div>
     );
   }
@@ -37,7 +39,7 @@ function BlogLayout() {
       </main>
       <footer className="w-full bg-[var(--pure-white)] py-8 border-t-2 border-[var(--oat-border)] text-center">
         <p className="text-sm text-[var(--warm-charcoal)]">
-          &copy; {new Date().getFullYear()} Labas
+          &copy; {new Date().getFullYear()} <LocalizedText source={"Labas"} />
         </p>
       </footer>
     </div>

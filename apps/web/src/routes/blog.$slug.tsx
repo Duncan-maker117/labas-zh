@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { uiMessage } from "@/lib/locale";
 import { routeShell } from "@/lib/route-shell";
 import { buildSocialMeta, SITE_URL } from "@/lib/site-seo";
 import { trpc } from "@/utils/trpc";
@@ -16,10 +17,10 @@ export const Route = createFileRoute("/blog/$slug")({
   },
   head: () => ({
     meta: [
-      { title: "Blog — Labas" },
+      { title: uiMessage("Blog — Labas") },
       ...buildSocialMeta({
-        title: "Blog — Labas",
-        description: "Baca artikel seputar tips dan trik ujian bahasa.",
+        title: uiMessage("Blog — Labas"),
+        description: uiMessage("Baca artikel seputar tips dan trik ujian bahasa."),
         url: `${SITE_URL}/blog`,
       }),
     ],

@@ -1,3 +1,5 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -50,7 +52,7 @@ function JobLogPanel({ logs, isRunning }: { logs: LogEntry[]; isRunning?: boolea
         <div className="mt-2 pt-2 border-t border-[var(--matcha-400)]/40">
           <div className="flex items-center gap-1 text-[var(--matcha-400)] text-[8px] font-semibold mb-1">
             <MaterialIcon name="psychology" className="text-xs" />
-            AI Thinking
+            <LocalizedText source={"AI Thinking"} />
           </div>
           <div className="text-[var(--matcha-300)]/90 italic">{reasoning}</div>
         </div>
@@ -100,7 +102,7 @@ function JobLogPanel({ logs, isRunning }: { logs: LogEntry[]; isRunning?: boolea
                 {isCurrentRunning && (
                   <span className="text-[var(--matcha-400)]/70 mt-0.5 flex items-center gap-1">
                     <span className="w-1 h-1 bg-[var(--matcha-400)] rounded-full animate-pulse" />
-                    AI sedang memproses...
+                    <LocalizedText source={"AI sedang memproses..."} />
                   </span>
                 )}
               </div>
@@ -165,9 +167,9 @@ const ACTIVE_STATUSES = new Set([
   "running_quality",
 ]);
 
-function formatDate(d: string | Date | null) {
+function formatDate(d: string | Date | null, locale: string) {
   if (!d) return "—";
-  return new Date(d).toLocaleString("id-ID", {
+  return new Date(d).toLocaleString(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -179,6 +181,7 @@ function formatDate(d: string | Date | null) {
 const JOBS_PER_PAGE = 10;
 
 function RouteComponent() {
+  const { locale, ui } = useLocale();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const page = search.page;
@@ -229,31 +232,31 @@ function RouteComponent() {
     <div className="min-h-screen pt-8 pb-32 px-6 md:px-12 lg:px-16 max-w-6xl mx-auto bg-[var(--warm-cream)]">
       <section className="mb-10">
         <h1 className="text-4xl font-headline font-extrabold text-[var(--clay-black)] tracking-tight">
-          Riwayat Generasi
+          <LocalizedText source={"Riwayat Generasi"} />
         </h1>
         <p className="text-lg text-[var(--warm-charcoal)] mt-2">
-          Pantau dan kelola proses generate soal AI-mu.
+          <LocalizedText source={"Pantau dan kelola proses generate soal AI-mu."} />
         </p>
       </section>
 
       {jobsQuery.isLoading ? (
         <div className="flex items-center gap-3 text-[var(--warm-charcoal)]">
           <MaterialIcon name="sync" className="animate-spin" />
-          Memuat riwayat...
+          <LocalizedText source={"Memuat riwayat..."} />
         </div>
       ) : jobsQuery.isError ? (
         <div className="p-4 rounded-[var(--radius-md)] bg-[var(--pomegranate-400)]/10 text-[var(--pomegranate-400)] border-2 border-[var(--pomegranate-400)]/20">
-          Gagal memuat riwayat: {jobsQuery.error.message}
+          <LocalizedText source={"Gagal memuat riwayat:"} /> {jobsQuery.error.message}
         </div>
       ) : !jobs.length ? (
         <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
           <CardContent className="py-16 text-center">
             <MaterialIcon name="schedule" className="text-5xl text-[var(--oat-border)] mb-4" />
-            <p className="text-[var(--warm-charcoal)] text-lg">Belum ada riwayat generasi.</p>
+            <p className="text-[var(--warm-charcoal)] text-lg"><LocalizedText source={"Belum ada riwayat generasi."} /></p>
             <p className="text-sm text-[var(--warm-charcoal)] mt-1">
-              Mulai generate soal di{" "}
+              <LocalizedText source={"Mulai generate soal di"} />{" "}
               <Link to="/generate" className="text-[var(--matcha-600)] font-semibold underline">
-                AI Lab
+                <LocalizedText source={"AI Lab"} />
               </Link>
               .
             </p>
@@ -284,11 +287,11 @@ function RouteComponent() {
                         }`}
                       >
                         <MaterialIcon name={STATUS_ICONS[job.status] ?? "help"} className="text-sm" />
-                        {job.status.toUpperCase()}
+                        {ui(job.status)}
                       </div>
                       <div className="text-sm text-[var(--warm-charcoal)]">
-                        {job.examTypeId} · {job.sectionTypeId} · {job.questionCount} soal ·{" "}
-                        {isAgentic ? "Agentic" : "Quick"}
+                        {job.examTypeId} · {job.sectionTypeId} · {job.questionCount} <LocalizedText source={"soal ·"} />{" "}
+                        <LocalizedValue value={isAgentic ? "Agentic" : "Quick"} />
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -302,7 +305,7 @@ function RouteComponent() {
                           onClick={() => cancelJob.mutate({ jobId: job.id })}
                         >
                           <MaterialIcon name="cancel" className="text-sm mr-1" />
-                          Batalkan
+                          <LocalizedText source={"Batalkan"} />
                         </Button>
                       )}
                       {(job.status === "failed" || job.status === "cancelled") && (
@@ -315,11 +318,11 @@ function RouteComponent() {
                           onClick={() => retryJob.mutate({ jobId: job.id })}
                         >
                           <MaterialIcon name="refresh" className="text-sm mr-1" />
-                          Retry
+                          <LocalizedText source={"Retry"} />
                         </Button>
                       )}
                       <div className="text-xs text-[var(--warm-charcoal)]">
-                        {formatDate(job.createdAt)}
+                        {formatDate(job.createdAt, locale)}
                       </div>
                     </div>
                   </div>
@@ -327,7 +330,7 @@ function RouteComponent() {
                   {ACTIVE_STATUSES.has(job.status) && (
                     <div className="mt-3">
                       <div className="flex justify-between text-xs text-[var(--warm-charcoal)] mb-1.5">
-                        <span className="truncate mr-2">{job.progressMessage ?? "Processing..."}</span>
+                        <span className="truncate mr-2">{ui(job.progressMessage ?? "Processing...")}</span>
                         <span className="shrink-0 font-semibold">{job.progress}%</span>
                       </div>
                       <div className="w-full h-2.5 bg-[var(--oat-light)] rounded-full overflow-hidden border border-[var(--oat-border)]">
@@ -349,7 +352,7 @@ function RouteComponent() {
                         onClick={() => setExpandedLogId((prev) => (prev === job.id ? null : job.id))}
                       >
                         <MaterialIcon name={isLogExpanded ? "expand_less" : "expand_more"} className="text-sm mr-1" />
-                        {isLogExpanded ? "Sembunyikan Log" : "Lihat Log"}
+                        <LocalizedValue value={isLogExpanded ? "Sembunyikan Log" : "Lihat Log"} />
                       </Button>
                       {isLogExpanded && <JobLogPanel logs={logs} isRunning={ACTIVE_STATUSES.has(job.status)} />}
                     </div>
@@ -370,7 +373,7 @@ function RouteComponent() {
                           if (splits && splits.length > 1) {
                             return (
                               <span>
-                                {result.questions.length} soal · {splits.length} section{" "}
+                                {result.questions.length} <LocalizedText source={"soal ·"} /> {splits.length} <LocalizedText source={"section"} />{" "}
                                 {splits.map((s) => `${s.section} ${s.count}`).join(", ")} · {result.meta.model}
                                 {job.tokensUsed ? ` · ${job.tokensUsed} tokens` : ""}
                                 {result.meta.durationMs ? ` · ${(result.meta.durationMs / 1000).toFixed(1)}s` : ""}
@@ -379,7 +382,7 @@ function RouteComponent() {
                           }
                           return (
                             <span>
-                              {result.questions.length} soal dihasilkan · {result.meta.model}
+                              {result.questions.length} <LocalizedText source={"soal dihasilkan ·"} /> {result.meta.model}
                               {job.tokensUsed ? ` · ${job.tokensUsed} tokens` : ""}
                               {result.meta.durationMs ? ` · ${(result.meta.durationMs / 1000).toFixed(1)}s` : ""}
                             </span>
@@ -393,7 +396,7 @@ function RouteComponent() {
                         className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] text-xs cursor-pointer"
                       >
                         <MaterialIcon name={isExpanded ? "expand_less" : "expand_more"} className="text-sm mr-1" />
-                        {isExpanded ? "Tutup" : "Lihat Soal"}
+                        <LocalizedValue value={isExpanded ? "Tutup" : "Lihat Soal"} />
                       </Button>
                     </div>
 
@@ -409,7 +412,7 @@ function RouteComponent() {
                                 {q.format.replace(/_/g, " ")}
                               </span>
                               <span className="text-xs text-[var(--warm-charcoal)]">
-                                Difficulty {q.difficulty}/5
+                                <LocalizedText source={"Difficulty"} /> {q.difficulty}/5
                               </span>
                             </div>
                             <p className="text-sm font-medium text-[var(--clay-black)] mb-2">

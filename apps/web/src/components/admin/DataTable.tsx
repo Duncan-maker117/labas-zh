@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import type { ReactNode } from "react";
 
 interface ColumnDef<T> {
@@ -61,6 +63,7 @@ function DataTableInner<T>({
   onSelectionChange,
   classNames = {},
 }: DataTableProps<T>) {
+  const { ui } = useLocale();
   const cn = {
     wrapper: classNames.wrapper ?? "bg-[var(--pure-white)] rounded-[var(--radius-xl)] border border-[var(--oat-border)] overflow-hidden",
     table: classNames.table ?? "w-full text-sm",
@@ -121,7 +124,7 @@ function DataTableInner<T>({
                   type="checkbox"
                   checked={allSelected}
                   onChange={toggleAll}
-                  aria-label="Select all rows"
+                  aria-label={ui("Select all rows")}
                   className="cursor-pointer"
                 />
               </th>
@@ -152,7 +155,7 @@ function DataTableInner<T>({
           {isLoading ? (
             <tr>
               <td colSpan={colCount} className={`${cn.td} text-center py-16 text-[var(--warm-charcoal)]`}>
-                Loading...
+                <LocalizedText source={"Loading..."} />
               </td>
             </tr>
           ) : data.length === 0 ? (

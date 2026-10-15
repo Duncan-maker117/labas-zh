@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@labas/ui/components/dialog";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
@@ -19,12 +20,12 @@ export function DonationModal({
             <MaterialIcon name="favorite" className="text-4xl text-[var(--pomegranate-400)]" />
           </div>
           <DialogTitle className="text-center text-2xl font-headline font-extrabold text-[var(--clay-black)]">
-            Dukung Labas!
+            <LocalizedText source={"Dukung Labas!"} />
           </DialogTitle>
           <DialogDescription className="text-center text-base text-[var(--warm-charcoal)] pt-2 leading-relaxed">
-            Selamat, kamu baru saja menyelesaikan {triggerAction === "exam" ? "latihan soal" : "generate soal AI"}! 🎉
+            <LocalizedText source={"Selamat, kamu baru saja menyelesaikan"} /> <LocalizedValue value={triggerAction === "exam" ? "latihan soal" : "generate soal AI"} />! 🎉
             <br/><br/>
-            Jika Labas membantumu, dukung kami untuk menutupi biaya server & mengembangkan fitur baru dengan mentraktir kopi. ☕
+            <LocalizedText source={"Jika Labas membantumu, dukung kami untuk menutupi biaya server & mengembangkan fitur baru dengan mentraktir kopi. ☕"} />
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3 mt-6">
@@ -35,7 +36,7 @@ export function DonationModal({
             className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-[var(--radius-lg)] font-bold transition-all bg-[#F3B63A] text-black hover:brightness-95 clay-shadow clay-hover"
           >
             <MaterialIcon name="favorite" className="text-xl" />
-            Support via Saweria
+            <LocalizedText source={"Support via Saweria"} />
           </a>
           <a
             href="https://ko-fi.com/rogasper"
@@ -44,7 +45,7 @@ export function DonationModal({
             className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-[var(--radius-lg)] font-bold transition-all bg-[#13C3FF] text-white hover:brightness-95 clay-shadow clay-hover"
           >
             <MaterialIcon name="local_cafe" className="text-xl" />
-            Support via Ko-fi
+            <LocalizedText source={"Support via Ko-fi"} />
           </a>
           <Button
             variant="ghost"
@@ -52,7 +53,7 @@ export function DonationModal({
             onClick={() => onOpenChange(false)}
             className="mt-3 w-full text-sm font-semibold text-[var(--warm-silver)] hover:text-[var(--clay-black)] rounded-[var(--radius-lg)]"
           >
-            Mungkin Nanti Saja
+            <LocalizedText source={"Mungkin Nanti Saja"} />
           </Button>
         </div>
       </DialogContent>

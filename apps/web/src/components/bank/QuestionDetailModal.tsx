@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent } from "@labas/ui/components/card";
@@ -63,14 +64,14 @@ export function QuestionDetailModal({
       </span>
       {question.difficulty && (
         <span className="px-3 py-1.5 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-sm font-semibold">
-          Level {question.difficulty}
+          <LocalizedText source={"Level"} /> {question.difficulty}
         </span>
       )}
       {isAdmin && (
         <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
           isPublic ? "bg-[var(--matcha-300)] text-[var(--matcha-800)]" : "bg-[var(--oat-border)] text-[var(--warm-charcoal)]"
         }`}>
-          {isPublic ? "Public" : "Private"}
+          <LocalizedValue value={isPublic ? "Public" : "Private"} />
         </span>
       )}
     </div>
@@ -133,7 +134,7 @@ export function QuestionDetailModal({
                 <CardContent className="p-6">
                   <h2 className="font-headline text-lg font-bold text-[var(--clay-black)] mb-4 flex items-center gap-2">
                     <MaterialIcon name="menu_book" />
-                    {isAdmin ? "Passage" : "Teks Bacaan"}
+                    <LocalizedValue value={isAdmin ? "Passage" : "Teks Bacaan"} />
                   </h2>
                   <div className="text-[var(--clay-black)] leading-relaxed whitespace-pre-wrap text-sm">
                     {question.passageText}
@@ -146,7 +147,7 @@ export function QuestionDetailModal({
               <CardContent className="p-6">
                 <h2 className="font-headline text-lg font-bold text-[var(--clay-black)] mb-4 flex items-center gap-2">
                   <MaterialIcon name="help_outline" />
-                  {isAdmin ? "Question" : "Pertanyaan"}
+                  <LocalizedValue value={isAdmin ? "Question" : "Pertanyaan"} />
                 </h2>
                 <p className="text-lg text-[var(--clay-black)] font-medium mb-4">
                   {question.questionText}
@@ -155,7 +156,7 @@ export function QuestionDetailModal({
                 {!question.options && (
                   <div className="p-4 rounded-[var(--radius-md)] border-2 border-[var(--oat-border)] bg-[var(--oat-light)] mt-4 text-sm text-[var(--warm-charcoal)]">
                     <span className="font-semibold text-[var(--clay-black)]">
-                      Jenis soal:{" "}
+                      <LocalizedText source={"Jenis soal:"} />{" "}
                     </span>
                     {formatLabel(question.format ?? "")}
                   </div>
@@ -172,14 +173,14 @@ export function QuestionDetailModal({
                 <CardContent className="p-5">
                   <h3 className="font-headline font-bold text-[var(--clay-black)] mb-3 flex items-center gap-2 text-sm">
                     <MaterialIcon name="check_circle" className="text-base text-[var(--matcha-600)]" />
-                    Correct Answer
+                    <LocalizedText source={"Correct Answer"} />
                   </h3>
                   <p className="text-lg font-bold text-[var(--matcha-700)] mb-3">
                     {question.correctAnswer ?? "-"}
                   </p>
                   {question.explanation && (
                     <div className="pt-3 border-t border-[var(--oat-border)]">
-                      <p className="text-xs font-medium text-[var(--warm-charcoal)] mb-1">Explanation</p>
+                      <p className="text-xs font-medium text-[var(--warm-charcoal)] mb-1"><LocalizedText source={"Explanation"} /></p>
                       <p className="text-sm text-[var(--clay-black)] leading-relaxed">
                         {question.explanation}
                       </p>
@@ -192,11 +193,10 @@ export function QuestionDetailModal({
                 <CardContent className="p-6">
                   <h2 className="font-headline text-lg font-bold text-[var(--clay-black)] mb-2 flex items-center gap-2">
                     <MaterialIcon name="lock" />
-                    Jawaban & Penjelasan
+                    <LocalizedText source={"Jawaban & Penjelasan"} />
                   </h2>
                   <p className="text-sm text-[var(--warm-charcoal)]">
-                    Jawaban dan penjelasan akan tersedia setelah kamu mencoba mengerjakan
-                    soal ini dalam paket latihan.
+                    <LocalizedText source={"Jawaban dan penjelasan akan tersedia setelah kamu mencoba mengerjakan soal ini dalam paket latihan."} />
                   </p>
                 </CardContent>
               </Card>
@@ -206,21 +206,21 @@ export function QuestionDetailModal({
             <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
               <CardContent className="p-5">
                 <h3 className="font-headline font-bold text-[var(--clay-black)] mb-3 text-sm">
-                  {isAdmin ? "Details" : "Info"}
+                  <LocalizedValue value={isAdmin ? "Details" : "Info"} />
                 </h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-[var(--warm-charcoal)]">Source</span>
+                    <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"Source"} /></span>
                     <span className="text-[var(--clay-black)] font-medium capitalize">{question.source ?? "-"}</span>
                   </div>
                   {isAdmin && question.aiModel && (
                     <div className="flex items-center justify-between">
-                      <span className="text-[var(--warm-charcoal)]">AI Model</span>
+                      <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"AI Model"} /></span>
                       <span className="text-[var(--clay-black)] font-medium text-xs">{question.aiModel}</span>
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="text-[var(--warm-charcoal)]">Creator</span>
+                    <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"Creator"} /></span>
                     <span className="text-[var(--clay-black)] font-medium">{question.creatorName ?? question.creatorUserId?.slice(0, 12) ?? "-"}</span>
                   </div>
                   {question.skillTags && question.skillTags.length > 0 && (
@@ -246,7 +246,7 @@ export function QuestionDetailModal({
                 variant={isPublic ? "outline" : "default"}
                 onClick={onToggleVisibility}
               >
-                {isPublic ? "Make Private" : "Make Public"}
+                <LocalizedValue value={isPublic ? "Make Private" : "Make Public"} />
               </Button>
             )}
           </div>
@@ -272,12 +272,12 @@ export function QuestionDetailModal({
             </div>
             {ratingQuery.data?.avgRating && (
               <span className="text-sm text-[var(--warm-charcoal)]">
-                {ratingQuery.data.avgRating}/5 ({question.usageCount}x digunakan)
+                {ratingQuery.data.avgRating}/5 ({question.usageCount}<LocalizedText source={"x digunakan)"} />
               </span>
             )}
             {!ratingQuery.data?.avgRating && (
               <span className="text-sm text-[var(--warm-charcoal)]">
-                {question.usageCount}x digunakan
+                {question.usageCount}<LocalizedText source={"x digunakan"} />
               </span>
             )}
           </div>
@@ -300,18 +300,18 @@ export function QuestionDetailModal({
                 }`}
             >
               <MaterialIcon name={isSelected ? "remove" : "add"} className="mr-2" />
-              {!isSelectable
+              <LocalizedValue value={!isSelectable
                 ? "Jenis ujian berbeda"
                 : isSelected
                   ? "Hapus dari Pilihan"
-                  : "Tambah ke Paket"}
+                  : "Tambah ke Paket"} />
             </Button>
           )}
           <Button
             onClick={onClose}
             className={`rounded-[var(--radius-lg)] ${isAdmin ? "bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)]" : "bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)]"} clay-hover`}
           >
-            {isAdmin ? "Close" : "Tutup"}
+            <LocalizedValue value={isAdmin ? "Close" : "Tutup"} />
           </Button>
         </div>
       </DialogContent>

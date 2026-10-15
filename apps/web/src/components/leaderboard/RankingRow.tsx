@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { motion } from "motion/react";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { Avatar } from "@/components/ui/Avatar";
@@ -72,14 +73,14 @@ export function RankingRow({
                   {entry.name}
                 </p>
                 <p className="text-xs text-[var(--warm-charcoal)]">
-                  {entry.avgScorePct}% avg &middot; {entry.attemptsCount} latihan
+                  {entry.avgScorePct}<LocalizedText source={"% avg ·"} /> {entry.attemptsCount} <LocalizedText source={"latihan"} />
                 </p>
               </div>
               <div className="text-right shrink-0">
                 <p className="text-lg font-headline font-extrabold text-[var(--clay-black)]">
                   {entry.totalScore}
                 </p>
-                <p className="text-xs text-[var(--warm-charcoal)]">pts</p>
+                <p className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"pts"} /></p>
               </div>
             </div>
           </CardContent>
