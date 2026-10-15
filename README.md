@@ -1,3 +1,11 @@
+## 中文版在线预览
+
+**[点击打开 Labas 中文版网站](https://damages-crucial-pentium-moscow.trycloudflare.com)**
+
+这是当前版本的临时体验入口。提供服务的电脑、网站进程和 Cloudflare 隧道需要持续运行；停止或重启隧道后，地址可能失效或改变。GitHub 仓库保存源码及版本记录，上传代码不会让临时网站自动保持在线。
+
+---
+
 <p align="center">
   <img src="./apps/web/public/logo.png" alt="Labas" width="200" />
 </p>
