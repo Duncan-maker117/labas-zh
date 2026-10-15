@@ -1,3 +1,4 @@
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, startTransition } from "react";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -56,6 +57,7 @@ function defaultConfig(): Omit<ApiKeyConfig, "id" | "apiKey"> {
 type Tab = "api-keys" | "token-usage" | "security" | "account";
 
 function TokenUsageSection() {
+  const { locale, ui } = useLocale();
   const { data, isLoading } = useQuery(trpc.ai.tokenUsageToday.queryOptions());
 
   const totalTokens = data?.totalTokens ?? 0;
@@ -71,10 +73,10 @@ function TokenUsageSection() {
             <MaterialIcon name="toll" className="text-xl" />
             <div>
               <CardTitle className="font-headline text-[var(--clay-black)]">
-                Penggunaan Token Hari Ini
+                <LocalizedText source={"Penggunaan Token Hari Ini"} />
               </CardTitle>
               <CardDescription className="text-[var(--warm-charcoal)]">
-                Total token yang terpakai untuk generate soal hari ini.
+                <LocalizedText source={"Total token yang terpakai untuk generate soal hari ini."} />
               </CardDescription>
             </div>
           </div>
@@ -83,16 +85,16 @@ function TokenUsageSection() {
           <div className="flex items-center gap-4 p-4 bg-[var(--matcha-300)] rounded-[var(--radius-lg)]">
             <MaterialIcon name="toll" className="text-3xl text-[var(--matcha-800)]" />
             <div>
-              <p className="text-sm text-[var(--matcha-800)]/80">Total Token Terpakai</p>
+              <p className="text-sm text-[var(--matcha-800)]/80"><LocalizedText source={"Total Token Terpakai"} /></p>
               <p className="text-3xl font-extrabold text-[var(--matcha-800)]">
-                {isLoading ? "..." : totalTokens.toLocaleString("id-ID")}
+                {isLoading ? "..." : totalTokens.toLocaleString(locale)}
               </p>
             </div>
           </div>
 
           <div>
             <h2 className="text-sm font-semibold text-[var(--clay-black)] mb-3">
-              Riwayat Generate Hari Ini
+              <LocalizedText source={"Riwayat Generate Hari Ini"} />
             </h2>
             {isLoading ? (
               <div className="space-y-2">
@@ -103,9 +105,9 @@ function TokenUsageSection() {
             ) : jobs.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-[var(--oat-border)] rounded-[var(--radius-lg)]">
                 <MaterialIcon name="receipt_long" className="text-4xl text-[var(--warm-silver)] mx-auto mb-3" />
-                <p className="text-[var(--warm-charcoal)] font-semibold">Belum ada generate hari ini</p>
+                <p className="text-[var(--warm-charcoal)] font-semibold"><LocalizedText source={"Belum ada generate hari ini"} /></p>
                 <p className="text-xs text-[var(--warm-silver)] mt-1">
-                  Generate soal baru untuk melihat penggunaan token.
+                  <LocalizedText source={"Generate soal baru untuk melihat penggunaan token."} />
                 </p>
               </div>
             ) : (
@@ -113,13 +115,13 @@ function TokenUsageSection() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-[var(--oat-border)] text-[var(--warm-charcoal)]">
-                      <th className="text-left py-2 px-3 font-medium">Waktu</th>
-                      <th className="text-left py-2 px-3 font-medium">Mode</th>
-                      <th className="text-left py-2 px-3 font-medium">Status</th>
-                      <th className="text-left py-2 px-3 font-medium">Ujian</th>
-                      <th className="text-left py-2 px-3 font-medium">Section</th>
-                      <th className="text-right py-2 px-3 font-medium">Soal</th>
-                      <th className="text-right py-2 px-3 font-medium">Token</th>
+                      <th className="text-left py-2 px-3 font-medium"><LocalizedText source={"Waktu"} /></th>
+                      <th className="text-left py-2 px-3 font-medium"><LocalizedText source={"Mode"} /></th>
+                      <th className="text-left py-2 px-3 font-medium"><LocalizedText source={"Status"} /></th>
+                      <th className="text-left py-2 px-3 font-medium"><LocalizedText source={"Ujian"} /></th>
+                      <th className="text-left py-2 px-3 font-medium"><LocalizedText source={"Section"} /></th>
+                      <th className="text-right py-2 px-3 font-medium"><LocalizedText source={"Soal"} /></th>
+                      <th className="text-right py-2 px-3 font-medium"><LocalizedText source={"Token"} /></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -134,7 +136,7 @@ function TokenUsageSection() {
                           }`}
                         >
                           <td className="py-2.5 px-3 text-[var(--clay-black)] whitespace-nowrap">
-                            {new Date(job.createdAt).toLocaleTimeString("id-ID", {
+                            {new Date(job.createdAt).toLocaleTimeString(locale, {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}
@@ -147,29 +149,29 @@ function TokenUsageSection() {
                                   : "bg-[var(--lavender-300)] text-[var(--lavender-800)]"
                               }`}
                             >
-                              {job.mode === "agentic" ? "Agentic" : "Quick"}
+                              <LocalizedValue value={job.mode === "agentic" ? "Agentic" : "Quick"} />
                             </span>
                           </td>
                           <td className="py-2.5 px-3">
                             {job.status === "completed" ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[var(--matcha-800)]">
                                 <MaterialIcon name="check_circle" className="text-xs" />
-                                Selesai
+                                <LocalizedText source={"Selesai"} />
                               </span>
                             ) : isFailed ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[var(--pomegranate-400)]">
                                 <MaterialIcon name="error" className="text-xs" />
-                                Gagal
+                                <LocalizedText source={"Gagal"} />
                               </span>
                             ) : isCancelled ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[var(--warm-charcoal)]">
                                 <MaterialIcon name="cancel" className="text-xs" />
-                                Dibatalkan
+                                <LocalizedText source={"Dibatalkan"} />
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[var(--warm-silver)]">
                                 <MaterialIcon name="hourglass_empty" className="text-xs" />
-                                {job.status}
+                                {ui(job.status)}
                               </span>
                             )}
                           </td>
@@ -177,7 +179,7 @@ function TokenUsageSection() {
                           <td className="py-2.5 px-3 text-[var(--clay-black)]">{job.sectionTypeId}</td>
                           <td className="py-2.5 px-3 text-right text-[var(--clay-black)]">{job.questionCount}</td>
                           <td className="py-2.5 px-3 text-right text-[var(--clay-black)] font-medium">
-                            {job.tokensUsed?.toLocaleString("id-ID") ?? "-"}
+                            {job.tokensUsed?.toLocaleString(locale) ?? "-"}
                           </td>
                         </tr>
                       );

@@ -1,3 +1,4 @@
+import { LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "@tanstack/react-router";
@@ -678,7 +679,7 @@ export function RouteComponent() {
                       className={`text-sm ${isActive ? "text-[var(--matcha-400)]" : ""} ${questions.length === 0 && !isActive ? "animate-spin" : ""}`}
                     />
                     <span>
-                      {res.mode === "agentic" ? "Agentic" : "Quick"}
+                      <LocalizedValue value={res.mode === "agentic" ? "Agentic" : "Quick"} />
                     </span>
                     <span className="text-xs text-[var(--warm-charcoal)]">
                       {questions.length} {ui("soal")}

@@ -1,3 +1,5 @@
+import { useLocale, uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/admin/settings")({
 });
 
 function AdminSettings() {
+  const { ui } = useLocale();
   const queryClient = useQueryClient();
 
   // ── Platform AI Config ──
@@ -52,10 +55,10 @@ function AdminSettings() {
         queryClient.invalidateQueries({
           queryKey: trpc.admin.getPlatformAiConfig.queryKey(),
         });
-        toast.success("AI configuration saved");
+        toast.success(uiMessage("AI configuration saved"));
         setAiApiKey("");
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -81,9 +84,9 @@ function AdminSettings() {
         queryClient.invalidateQueries({
           queryKey: trpc.admin.dashboardStats.queryKey(),
         });
-        toast.success("Config updated");
+        toast.success(uiMessage("Config updated"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -120,9 +123,9 @@ function AdminSettings() {
         queryClient.invalidateQueries({
           queryKey: trpc.admin.getAnnouncement.queryKey(),
         });
-        toast.success("Announcement published");
+        toast.success(uiMessage("Announcement published"));
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -132,14 +135,14 @@ function AdminSettings() {
         queryClient.invalidateQueries({
           queryKey: trpc.admin.getAnnouncement.queryKey(),
         });
-        toast.success("Announcement removed");
+        toast.success(uiMessage("Announcement removed"));
         setAnnMessage("");
         setAnnSeverity("info");
         setAnnExpiryDate(undefined);
         setAnnExpiryTime("");
         setAnnNoExpiry(true);
       },
-      onError: (e: unknown) => toast.error(getErrorMessage(e)),
+      onError: (e: unknown) => toast.error(uiMessage(getErrorMessage(e))),
     }),
   );
 
@@ -155,10 +158,10 @@ function AdminSettings() {
   return (
     <div>
       <h1 className="text-3xl font-headline font-bold text-[var(--clay-black)] mb-1">
-        Settings
+        <LocalizedText source={"Settings"} />
       </h1>
       <p className="text-[var(--warm-charcoal)] mb-8">
-        Platform configuration and announcements.
+        <LocalizedText source={"Platform configuration and announcements."} />
       </p>
 
       <div className="space-y-6 max-w-2xl">
@@ -167,13 +170,13 @@ function AdminSettings() {
           <CardHeader>
             <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)] flex items-center gap-2">
               <MaterialIcon name="smart_toy" />
-              AI Provider Configuration
+              <LocalizedText source={"AI Provider Configuration"} />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                Provider
+                <LocalizedText source={"Provider"} />
               </label>
               <Select
                 value={aiProvider}
@@ -185,7 +188,7 @@ function AdminSettings() {
                 <SelectContent>
                   {PROVIDERS.map((p) => (
                     <SelectItem key={p.value} value={p.value}>
-                      {p.label}
+                      {ui(p.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -193,7 +196,7 @@ function AdminSettings() {
             </div>
             <div>
               <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                Base URL
+                <LocalizedText source={"Base URL"} />
               </label>
               <Input
                 value={aiBaseUrl}
@@ -203,7 +206,7 @@ function AdminSettings() {
             </div>
             <div>
               <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                Model
+                <LocalizedText source={"Model"} />
               </label>
               <Input
                 value={aiModel}
@@ -213,11 +216,10 @@ function AdminSettings() {
             </div>
             <div>
               <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                API Key
+                <LocalizedText source={"API Key"} />
                 {aiConfig.data?.apiKeyConfigured && (
                   <span className="text-xs text-[var(--matcha-700)] ml-2 font-normal">
-                    ({aiConfig.data.apiKeyPreview}) — leave empty to keep
-                    current
+                    ({aiConfig.data.apiKeyPreview}<LocalizedText source={") — leave empty to keep current"} />
                   </span>
                 )}
               </label>
@@ -245,7 +247,7 @@ function AdminSettings() {
               disabled={saveAiConfig.isPending || aiConfig.isLoading}
               className="h-10 rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)]"
             >
-              {saveAiConfig.isPending ? "Saving..." : "Save AI Config"}
+              <LocalizedValue value={saveAiConfig.isPending ? "Saving..." : "Save AI Config"} />
             </Button>
           </CardContent>
         </Card>
@@ -255,7 +257,7 @@ function AdminSettings() {
           <CardHeader>
             <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)] flex items-center gap-2">
               <MaterialIcon name="token" />
-              Free Credit Configuration
+              <LocalizedText source={"Free Credit Configuration"} />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -281,13 +283,13 @@ function AdminSettings() {
                 />
               </button>
               <span className="text-sm font-medium text-[var(--clay-black)]">
-                Enable Free Credits
+                <LocalizedText source={"Enable Free Credits"} />
               </span>
             </label>
 
             <div>
               <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                Max Pool Size (tokens)
+                <LocalizedText source={"Max Pool Size (tokens)"} />
               </label>
               <Input
                 type="number"
@@ -299,7 +301,7 @@ function AdminSettings() {
                 onClick={() => {
                   const val = parseInt(fcMaxPool, 10);
                   if (isNaN(val) || val <= 0) {
-                    toast.error("Enter a valid number");
+                    toast.error(uiMessage("Enter a valid number"));
                     return;
                   }
                   setConfigMutation.mutate({
@@ -310,7 +312,7 @@ function AdminSettings() {
                 disabled={setConfigMutation.isPending}
                 className="mt-2 h-10 mx-2 rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)]"
               >
-                Save Pool Size
+                <LocalizedText source={"Save Pool Size"} />
               </Button>
             </div>
           </CardContent>
@@ -321,18 +323,18 @@ function AdminSettings() {
           <CardHeader>
             <CardTitle className="text-lg font-headline font-bold text-[var(--clay-black)] flex items-center gap-2">
               <MaterialIcon name="campaign" />
-              Announcement
+              <LocalizedText source={"Announcement"} />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                Message
+                <LocalizedText source={"Message"} />
               </label>
               <textarea
                 value={annMessage}
                 onChange={(e) => setAnnMessage(e.target.value)}
-                placeholder="Enter announcement message..."
+                placeholder={ui("Enter announcement message...")}
                 rows={3}
                 className="w-full rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] p-3 text-sm text-[var(--clay-black)] resize-y"
               />
@@ -341,7 +343,7 @@ function AdminSettings() {
             <div className="flex gap-4">
               <div className="flex-1">
                 <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                  Severity
+                  <LocalizedText source={"Severity"} />
                 </label>
                 <Select
                   value={annSeverity}
@@ -359,7 +361,7 @@ function AdminSettings() {
                           name="info"
                           className="text-sm text-[var(--slushie-500)]"
                         />
-                        Info
+                        <LocalizedText source={"Info"} />
                       </span>
                     </SelectItem>
                     <SelectItem value="warning">
@@ -368,7 +370,7 @@ function AdminSettings() {
                           name="warning"
                           className="text-sm text-[var(--lemon-500)]"
                         />
-                        Warning
+                        <LocalizedText source={"Warning"} />
                       </span>
                     </SelectItem>
                     <SelectItem value="error">
@@ -377,7 +379,7 @@ function AdminSettings() {
                           name="error"
                           className="text-sm text-[var(--pomegranate-400)]"
                         />
-                        Error
+                        <LocalizedText source={"Error"} />
                       </span>
                     </SelectItem>
                   </SelectContent>
@@ -386,7 +388,7 @@ function AdminSettings() {
 
               <div className="flex-1">
                 <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-                  Expiry
+                  <LocalizedText source={"Expiry"} />
                 </label>
                 <div className="flex gap-2">
                   <DatePicker
@@ -414,7 +416,7 @@ function AdminSettings() {
                       }
                     }}
                   />
-                  <span className="text-xs text-[var(--warm-charcoal)]">No expiry</span>
+                  <span className="text-xs text-[var(--warm-charcoal)]"><LocalizedText source={"No expiry"} /></span>
                 </Label>
               </div>
             </div>
@@ -440,7 +442,7 @@ function AdminSettings() {
                 />
                 <div className="flex-1">
                   <p className="text-xs font-semibold uppercase tracking-wider text-[var(--warm-charcoal)] mb-0.5">
-                    Preview
+                    <LocalizedText source={"Preview"} />
                   </p>
                   <p className="text-sm text-[var(--clay-black)]">
                     {annMessage}
@@ -467,11 +469,11 @@ function AdminSettings() {
                 disabled={saveAnnouncement.isPending || !annMessage.trim()}
                 className="flex-1 h-10 rounded-[var(--radius-lg)] bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)]"
               >
-                {saveAnnouncement.isPending
+                <LocalizedValue value={saveAnnouncement.isPending
                   ? "Publishing..."
                   : announcement.data
                     ? "Update Announcement"
-                    : "Publish Announcement"}
+                    : "Publish Announcement"} />
               </Button>
               {announcement.data && (
                 <Button
@@ -480,7 +482,7 @@ function AdminSettings() {
                   disabled={deleteAnnouncement.isPending}
                   className="h-10 rounded-[var(--radius-lg)] border-2 border-[var(--pomegranate-400)] text-[var(--pomegranate-600)] hover:bg-[var(--pomegranate-100)]"
                 >
-                  Remove
+                  <LocalizedText source={"Remove"} />
                 </Button>
               )}
             </div>

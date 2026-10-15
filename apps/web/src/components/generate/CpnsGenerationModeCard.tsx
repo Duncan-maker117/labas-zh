@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@labas/ui/components/button";
 import {
@@ -30,7 +31,7 @@ export function CpnsGenerationModeCard({
   return (
     <div className="mb-8 p-5 rounded-[var(--radius-xl)] bg-[var(--pure-white)] border-2 border-[var(--oat-border)]">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium text-[var(--clay-black)]">Generation Mode</p>
+        <p className="text-sm font-medium text-[var(--clay-black)]"><LocalizedText source={"Generation Mode"} /></p>
       </div>
       <div className="flex items-center gap-4">
         <button
@@ -41,7 +42,7 @@ export function CpnsGenerationModeCard({
             }`}
         >
           <MaterialIcon name="vpn_key" className="text-sm" />
-          BYOK
+          <LocalizedText source={"BYOK"} />
         </button>
         {hasFreeCredits && (
           <button
@@ -52,12 +53,12 @@ export function CpnsGenerationModeCard({
               }`}
           >
             <MaterialIcon name="stars" className="text-sm" />
-            Free Credits
+            <LocalizedText source={"Free Credits"} />
           </button>
         )}
         {useFreeCredits && (
           <Link to="/settings" className="text-xs text-[var(--matcha-600)] underline ml-2">
-            Atur BYOK di Settings
+            <LocalizedText source={"Atur BYOK di Settings"} />
           </Link>
         )}
       </div>
@@ -65,7 +66,7 @@ export function CpnsGenerationModeCard({
       {useFreeCredits && myCreditData && (
         <div className="mt-4 pt-4 border-t border-[var(--oat-border)] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-[var(--warm-charcoal)]">Token kamu</span>
+            <span className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Token kamu"} /></span>
             <span className={`text-lg font-headline font-bold ${tokenBalance > 0 ? "text-[var(--clay-black)]" : "text-[var(--clay-red)]"}`}>
               {tokenBalance.toLocaleString()}
             </span>
@@ -81,17 +82,17 @@ export function CpnsGenerationModeCard({
           {myCreditData.cooldownRemaining > 0 && (
             <p className="flex items-center gap-1.5 text-xs text-[var(--sunbeam-800)] bg-[var(--sunbeam-300)]/30 px-3 py-1.5 rounded-[var(--radius-md)]">
               <MaterialIcon name="schedule" className="text-base leading-none shrink-0" />
-              <span>Cooldown: {myCreditData.cooldownRemaining} hari lagi untuk auto-refill.</span>
+              <span><LocalizedText source={"Cooldown:"} /> {myCreditData.cooldownRemaining} <LocalizedText source={"hari lagi untuk auto-refill."} /></span>
             </p>
           )}
           {tokenBalance <= 0 && myCreditData.cooldownRemaining === 0 && (
             <p className="text-xs text-[var(--matcha-700)] bg-[var(--matcha-300)]/30 px-3 py-1.5 rounded-[var(--radius-md)]">
-              Token habis. Auto-refill tersedia saat kamu generate.
+              <LocalizedText source={"Token habis. Auto-refill tersedia saat kamu generate."} />
             </p>
           )}
           {tokenBalance <= 0 && myCreditData.cooldownRemaining > 0 && (
             <p className="text-xs text-[var(--clay-red)]/80 bg-[var(--clay-red)]/5 px-3 py-1.5 rounded-[var(--radius-md)]">
-              Token habis & dalam cooldown. Gunakan BYOK atau tunggu {myCreditData.cooldownRemaining} hari.
+              <LocalizedText source={"Token habis & dalam cooldown. Gunakan BYOK atau tunggu"} /> {myCreditData.cooldownRemaining} <LocalizedText source={"hari."} />
             </p>
           )}
         </div>
@@ -99,7 +100,7 @@ export function CpnsGenerationModeCard({
 
       {!useFreeCredits && hasConfigs && (
         <div className="mt-4 pt-4 border-t border-[var(--oat-border)]">
-          <label className="text-sm font-medium text-[var(--clay-black)] mb-2 block">Provider / API Key</label>
+          <label className="text-sm font-medium text-[var(--clay-black)] mb-2 block"><LocalizedText source={"Provider / API Key"} /></label>
           <div className="flex gap-3">
             <Select value={selectedKeyId} onValueChange={(v) => v && setSelectedKeyId(v)}>
               <SelectTrigger className="flex-1 h-11">
@@ -118,7 +119,7 @@ export function CpnsGenerationModeCard({
             <Link to="/settings">
               <Button variant="outline" size="xl" className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover">
                 <MaterialIcon name="settings" className="mr-1" />
-                Kelola
+                <LocalizedText source={"Kelola"} />
               </Button>
             </Link>
           </div>
@@ -127,23 +128,23 @@ export function CpnsGenerationModeCard({
 
       {!useFreeCredits && !hasConfigs && !hasFreeCredits && (
         <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-          Tambahkan API key di Settings dahulu.
+          <LocalizedText source={"Tambahkan API key di Settings dahulu."} />
         </p>
       )}
 
       {!useFreeCredits && !hasConfigs && hasFreeCredits && (
         <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-          Belum ada API key?{" "}
+          <LocalizedText source={"Belum ada API key?"} />{" "}
           <button onClick={() => setUseFreeCredits(true)} className="text-[var(--matcha-600)] underline">
-            Gunakan kredit gratis
+            <LocalizedText source={"Gunakan kredit gratis"} />
           </button>
-          {" "}atau tambah di Settings.
+          {" "}<LocalizedText source={"atau tambah di Settings."} />
         </p>
       )}
 
       {useFreeCredits && !hasFreeCredits && (
         <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-          Free credits sedang dinonaktifkan oleh admin.
+          <LocalizedText source={"Free credits sedang dinonaktifkan oleh admin."} />
         </p>
       )}
     </div>

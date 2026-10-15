@@ -1,3 +1,5 @@
+import { uiMessage } from "@/lib/locale";
+import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -112,11 +114,11 @@ export function CpnsGenerateComponent() {
       onSuccess: (data: any) => {
         addJob(data.jobId);
         setError(null);
-        toast.success("Generasi soal dimulai!");
+        toast.success(uiMessage("Generasi soal dimulai!"));
       },
       onError: (err: any) => {
         setError(err.message ?? "Terjadi kesalahan");
-        toast.error(err.message ?? "Terjadi kesalahan");
+        toast.error(uiMessage(err.message ?? "Terjadi kesalahan"));
       },
     }) as any,
   );
@@ -152,10 +154,10 @@ export function CpnsGenerateComponent() {
             isPublic: true,
             sections,
           });
-          toast.success("Paket Full Test SKD siap!");
+          toast.success(uiMessage("Paket Full Test SKD siap!"));
           navigate({ to: "/cpns/packages" });
         } catch (err: unknown) {
-          toast.error("Gagal menggabungkan paket", { description: getErrorMessage(err) });
+          toast.error(uiMessage("Gagal menggabungkan paket"), { description: getErrorMessage(err) });
         }
       };
       autoCombine();
@@ -186,10 +188,10 @@ export function CpnsGenerateComponent() {
         isPublic: true,
         sections,
       });
-      toast.success("Paket Full Test SKD siap!");
+      toast.success(uiMessage("Paket Full Test SKD siap!"));
       navigate({ to: "/cpns/packages" });
     } catch (err: unknown) {
-      toast.error("Gagal menggabungkan paket", { description: getErrorMessage(err) });
+      toast.error(uiMessage("Gagal menggabungkan paket"), { description: getErrorMessage(err) });
     }
   };
 
@@ -215,7 +217,7 @@ export function CpnsGenerateComponent() {
 
   const handleGenerate = async () => {
     if (!hasConfigs && !useFreeCredits) {
-      toast.error("Pilih API key atau gunakan free credits");
+      toast.error(uiMessage("Pilih API key atau gunakan free credits"));
       return;
     }
     hasCombined.current = false;
@@ -251,9 +253,9 @@ export function CpnsGenerateComponent() {
           <MaterialIcon name="auto_awesome" className="text-lg text-[var(--pure-white)]" />
         </div>
         <div>
-          <h1 className="text-xl font-headline font-bold text-[var(--clay-black)]">Generate Soal CPNS</h1>
+          <h1 className="text-xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Generate Soal CPNS"} /></h1>
           <p className="text-xs text-[var(--warm-charcoal)]">
-            Buat soal latihan CPNS berbasis AI — TIU, TWK, dan TKP
+            <LocalizedText source={"Buat soal latihan CPNS berbasis AI — TIU, TWK, dan TKP"} />
           </p>
         </div>
       </div>
@@ -269,7 +271,7 @@ export function CpnsGenerateComponent() {
                 : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
               }`}
           >
-            {tab === "latihan" ? "Latihan" : "Full Test SKD"}
+            <LocalizedValue value={tab === "latihan" ? "Latihan" : "Full Test SKD"} />
           </button>
         ))}
       </div>
@@ -277,7 +279,7 @@ export function CpnsGenerateComponent() {
       {/* Generation Mode — full width, above grid */}
       <div className="mb-8 p-5 rounded-[var(--radius-xl)] bg-[var(--pure-white)] border-2 border-[var(--oat-border)]">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-medium text-[var(--clay-black)]">Generation Mode</p>
+          <p className="text-sm font-medium text-[var(--clay-black)]"><LocalizedText source={"Generation Mode"} /></p>
         </div>
         <div className="flex items-center gap-4">
           <button
@@ -288,7 +290,7 @@ export function CpnsGenerateComponent() {
               }`}
           >
             <MaterialIcon name="vpn_key" className="text-sm" />
-            BYOK
+            <LocalizedText source={"BYOK"} />
           </button>
           {hasFreeCredits && (
             <button
@@ -299,12 +301,12 @@ export function CpnsGenerateComponent() {
                 }`}
             >
               <MaterialIcon name="stars" className="text-sm" />
-              Free Credits
+              <LocalizedText source={"Free Credits"} />
             </button>
           )}
           {useFreeCredits && (
             <Link to="/settings" className="text-xs text-[var(--matcha-600)] underline ml-2">
-              Atur BYOK di Settings
+              <LocalizedText source={"Atur BYOK di Settings"} />
             </Link>
             )}
           </div>
@@ -316,9 +318,9 @@ export function CpnsGenerateComponent() {
                     <MaterialIcon name="workspace_premium" className="text-lg text-[var(--pure-white)]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-[var(--clay-black)]">Full Test SKD Selesai!</p>
+                    <p className="text-sm font-bold text-[var(--clay-black)]"><LocalizedText source={"Full Test SKD Selesai!"} /></p>
                     <p className="text-xs text-[var(--warm-charcoal)]">
-                      {completedResults.reduce((sum, r) => sum + (r.result?.questions?.length ?? 0), 0)} soal dari TIU, TWK, dan TKP
+                      {completedResults.reduce((sum, r) => sum + (r.result?.questions?.length ?? 0), 0)} <LocalizedText source={"soal dari TIU, TWK, dan TKP"} />
                     </p>
                   </div>
                   <Button
@@ -326,7 +328,7 @@ export function CpnsGenerateComponent() {
                     disabled={combineMutation.isPending}
                     className="bg-[var(--clay-black)] text-[var(--pure-white)] rounded-[var(--radius-lg)] text-sm"
                   >
-                    {combineMutation.isPending ? "Menggabungkan..." : "Buat Paket Gabungan SKD"}
+                    <LocalizedValue value={combineMutation.isPending ? "Menggabungkan..." : "Buat Paket Gabungan SKD"} />
                   </Button>
                 </div>
               </CardContent>
@@ -336,7 +338,7 @@ export function CpnsGenerateComponent() {
         {useFreeCredits && myCredit.data && (
           <div className="mt-4 pt-4 border-t border-[var(--oat-border)] space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[var(--warm-charcoal)]">Token kamu</span>
+              <span className="text-sm text-[var(--warm-charcoal)]"><LocalizedText source={"Token kamu"} /></span>
               <span className={`text-lg font-headline font-bold ${tokenBalance > 0 ? "text-[var(--clay-black)]" : "text-[var(--clay-red)]"}`}>
                 {tokenBalance.toLocaleString()}
               </span>
@@ -352,17 +354,17 @@ export function CpnsGenerateComponent() {
             {myCredit.data.cooldownRemaining > 0 && (
               <p className="flex items-center gap-1.5 text-xs text-[var(--sunbeam-800)] bg-[var(--sunbeam-300)]/30 px-3 py-1.5 rounded-[var(--radius-md)]">
                 <MaterialIcon name="schedule" className="text-base leading-none shrink-0" />
-                <span>Cooldown: {myCredit.data.cooldownRemaining} hari lagi untuk auto-refill.</span>
+                <span><LocalizedText source={"Cooldown:"} /> {myCredit.data.cooldownRemaining} <LocalizedText source={"hari lagi untuk auto-refill."} /></span>
               </p>
             )}
             {tokenBalance <= 0 && myCredit.data.cooldownRemaining === 0 && (
               <p className="text-xs text-[var(--matcha-700)] bg-[var(--matcha-300)]/30 px-3 py-1.5 rounded-[var(--radius-md)]">
-                Token habis. Auto-refill tersedia saat kamu generate.
+                <LocalizedText source={"Token habis. Auto-refill tersedia saat kamu generate."} />
               </p>
             )}
             {tokenBalance <= 0 && myCredit.data.cooldownRemaining > 0 && (
               <p className="text-xs text-[var(--clay-red)]/80 bg-[var(--clay-red)]/5 px-3 py-1.5 rounded-[var(--radius-md)]">
-                Token habis & dalam cooldown. Gunakan BYOK atau tunggu {myCredit.data.cooldownRemaining} hari.
+                <LocalizedText source={"Token habis & dalam cooldown. Gunakan BYOK atau tunggu"} /> {myCredit.data.cooldownRemaining} <LocalizedText source={"hari."} />
               </p>
             )}
           </div>
@@ -370,7 +372,7 @@ export function CpnsGenerateComponent() {
 
         {!useFreeCredits && hasConfigs && (
           <div className="mt-4 pt-4 border-t border-[var(--oat-border)]">
-            <label className="text-sm font-medium text-[var(--clay-black)] mb-2 block">Provider / API Key</label>
+            <label className="text-sm font-medium text-[var(--clay-black)] mb-2 block"><LocalizedText source={"Provider / API Key"} /></label>
             <div className="flex gap-3">
               <select
                 value={selectedKeyId}
@@ -386,7 +388,7 @@ export function CpnsGenerateComponent() {
               <Link to="/settings">
                 <Button variant="outline" size="xl" className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover">
                   <MaterialIcon name="settings" className="mr-1" />
-                  Kelola
+                  <LocalizedText source={"Kelola"} />
                 </Button>
               </Link>
             </div>
@@ -395,23 +397,23 @@ export function CpnsGenerateComponent() {
 
         {!useFreeCredits && !hasConfigs && !hasFreeCredits && (
           <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-            Tambahkan API key di Settings dahulu.
+            <LocalizedText source={"Tambahkan API key di Settings dahulu."} />
           </p>
         )}
 
         {!useFreeCredits && !hasConfigs && hasFreeCredits && (
           <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-            Belum ada API key?{" "}
+            <LocalizedText source={"Belum ada API key?"} />{" "}
             <button onClick={() => setUseFreeCredits(true)} className="text-[var(--matcha-600)] underline">
-              Gunakan kredit gratis
+              <LocalizedText source={"Gunakan kredit gratis"} />
             </button>
-            {" "}atau tambah di Settings.
+            {" "}<LocalizedText source={"atau tambah di Settings."} />
           </p>
         )}
 
         {useFreeCredits && !hasFreeCredits && (
           <p className="mt-3 text-xs text-[var(--warm-charcoal)]">
-            Free credits sedang dinonaktifkan oleh admin.
+            <LocalizedText source={"Free credits sedang dinonaktifkan oleh admin."} />
           </p>
         )}
       </div>
@@ -422,7 +424,7 @@ export function CpnsGenerateComponent() {
           {!isFullTest && (
             <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
               <CardContent className="p-5">
-                <p className="text-sm font-semibold text-[var(--clay-black)] mb-3">Pilih Section</p>
+                <p className="text-sm font-semibold text-[var(--clay-black)] mb-3"><LocalizedText source={"Pilih Section"} /></p>
                 <div className="grid grid-cols-3 gap-3">
                   {([...CPNS_SECTIONS] as CpnsSection[]).map((s) => (
                     <button
@@ -451,7 +453,7 @@ export function CpnsGenerateComponent() {
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <MaterialIcon name="assignment" className="text-[var(--blueberry-800)] text-lg" />
-                  <p className="text-sm font-bold text-[var(--clay-black)]">Full Test SKD</p>
+                  <p className="text-sm font-bold text-[var(--clay-black)]"><LocalizedText source={"Full Test SKD"} /></p>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   {(CPNS_SECTIONS as unknown as CpnsSection[]).map((s) => {
@@ -460,16 +462,16 @@ export function CpnsGenerateComponent() {
                       <div key={s}>
                         <p className="text-xs text-[var(--warm-charcoal)]">{s}</p>
                         <p className="text-lg font-bold text-[var(--clay-black)]">{cfg.questionCount}</p>
-                        <p className="text-xs text-[var(--warm-silver)]">{cfg.durationMin}m</p>
+                        <p className="text-xs text-[var(--warm-silver)]">{cfg.durationMin}<LocalizedText source={"m"} /></p>
                       </div>
                     );
                   })}
                 </div>
                 <div className="mt-3 pt-3 border-t border-[var(--oat-border)] flex justify-between text-xs text-[var(--warm-charcoal)]">
-                  <span>Total: <strong className="text-[var(--clay-black)]">{CPNS_FULL_TEST.totalQuestions} soal</strong></span>
-                  <span>{CPNS_FULL_TEST.totalDurationMin} menit</span>
-                  <span>Skor max: <strong className="text-[var(--clay-black)]">{CPNS_FULL_TEST.totalMaxScore}</strong></span>
-                  <span>Target: <strong className="text-[var(--matcha-600)]">{CPNS_FULL_TEST.totalTargetScore}</strong></span>
+                  <span><LocalizedText source={"Total:"} /> <strong className="text-[var(--clay-black)]">{CPNS_FULL_TEST.totalQuestions} <LocalizedText source={"soal"} /></strong></span>
+                  <span>{CPNS_FULL_TEST.totalDurationMin} <LocalizedText source={"menit"} /></span>
+                  <span><LocalizedText source={"Skor max:"} /> <strong className="text-[var(--clay-black)]">{CPNS_FULL_TEST.totalMaxScore}</strong></span>
+                  <span><LocalizedText source={"Target:"} /> <strong className="text-[var(--matcha-600)]">{CPNS_FULL_TEST.totalTargetScore}</strong></span>
                 </div>
               </CardContent>
             </Card>
@@ -479,7 +481,7 @@ export function CpnsGenerateComponent() {
           {!isFullTest && (
             <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
               <CardContent className="p-5">
-                <p className="text-sm font-semibold text-[var(--clay-black)] mb-3">Jumlah Soal</p>
+                <p className="text-sm font-semibold text-[var(--clay-black)] mb-3"><LocalizedText source={"Jumlah Soal"} /></p>
                 <div className="flex gap-2">
                   {currentPresets.map((p) => (
                     <button
@@ -491,7 +493,7 @@ export function CpnsGenerateComponent() {
                         }`}
                     >
                       <p className="text-lg font-bold text-[var(--clay-black)]">{p.value}</p>
-                      <p className="text-xs text-[var(--warm-silver)]">{p.desc}</p>
+                      <p className="text-xs text-[var(--warm-silver)]"><LocalizedValue value={p.desc} /></p>
                     </button>
                   ))}
                 </div>
@@ -502,7 +504,7 @@ export function CpnsGenerateComponent() {
           {/* Difficulty */}
           <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
             <CardContent className="p-5">
-              <p className="text-sm font-semibold text-[var(--clay-black)] mb-3">Tingkat Kesulitan</p>
+              <p className="text-sm font-semibold text-[var(--clay-black)] mb-3"><LocalizedText source={"Tingkat Kesulitan"} /></p>
               <div className="flex gap-2">
                 {CPNS_DIFFICULTY_LABELS.map((label, i) => (
                   <button
@@ -525,27 +527,27 @@ export function CpnsGenerateComponent() {
         <div className="space-y-4">
           <Card className="bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)] sticky top-24">
             <CardContent className="p-5">
-              <p className="text-sm font-bold text-[var(--clay-black)] mb-4">Ringkasan</p>
+              <p className="text-sm font-bold text-[var(--clay-black)] mb-4"><LocalizedText source={"Ringkasan"} /></p>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[var(--warm-charcoal)]">Mode</span>
+                  <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"Mode"} /></span>
                   <span className="font-semibold">{isFullTest ? "Full Test SKD" : "Latihan " + selectedSection}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--warm-charcoal)]">Jumlah Soal</span>
+                  <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"Jumlah Soal"} /></span>
                   <span className="font-semibold">{questionCount}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--warm-charcoal)]">Estimasi Waktu</span>
-                  <span className="font-semibold">{durationMin} menit</span>
+                  <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"Estimasi Waktu"} /></span>
+                  <span className="font-semibold">{durationMin} <LocalizedText source={"menit"} /></span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--warm-charcoal)]">Skor Maksimal</span>
+                  <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"Skor Maksimal"} /></span>
                   <span className="font-semibold">{maxScore}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--warm-charcoal)]">Metode</span>
-                  <span className="font-semibold">{isFullTest || selectedCount > 15 ? "Agentic" : "Quick"}</span>
+                  <span className="text-[var(--warm-charcoal)]"><LocalizedText source={"Metode"} /></span>
+                  <span className="font-semibold"><LocalizedValue value={isFullTest || selectedCount > 15 ? "Agentic" : "Quick"} /></span>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-[var(--oat-border)]">
@@ -557,12 +559,12 @@ export function CpnsGenerateComponent() {
                   {isGenerating ? (
                     <>
                       <span className="animate-spin inline-block mr-2">⟳</span>
-                      Menggenerate...
+                      <LocalizedText source={"Menggenerate..."} />
                     </>
                   ) : (
                     <>
                       <MaterialIcon name="auto_awesome" className="text-xl mr-2" />
-                      Generate & Mulai
+                      <LocalizedText source={"Generate & Mulai"} />
                     </>
                   )}
                 </Button>
@@ -576,7 +578,7 @@ export function CpnsGenerateComponent() {
       <div ref={resultsRef} className={completedResults.length > 0 ? "" : "hidden"}>
         <div className="mt-12">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-headline font-bold text-[var(--clay-black)]">Hasil Generate</h2>
+            <h2 className="text-xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Hasil Generate"} /></h2>
               <Button
                 variant="ghost"
                 size="sm"
@@ -584,7 +586,7 @@ export function CpnsGenerateComponent() {
                 className="text-[var(--warm-charcoal)] hover:text-[var(--pomegranate-400)]"
               >
                 <MaterialIcon name="delete_sweep" className="text-sm mr-1" />
-                Bersihkan
+                <LocalizedText source={"Bersihkan"} />
               </Button>
             </div>
             <div
@@ -618,8 +620,8 @@ export function CpnsGenerateComponent() {
                       name={questions.length > 0 ? "check_circle" : "sync" as any}
                       className={"text-sm " + (isActive ? "text-[var(--matcha-400)]" : "") + (questions.length === 0 && !isActive ? " animate-spin" : "")}
                     />
-                    <span>{res.mode === "agentic" ? "Agentic" : "Quick"}</span>
-                    <span className="text-xs text-[var(--warm-charcoal)]">{questions.length} soal</span>
+                    <span><LocalizedValue value={res.mode === "agentic" ? "Agentic" : "Quick"} /></span>
+                    <span className="text-xs text-[var(--warm-charcoal)]">{questions.length} <LocalizedText source={"soal"} /></span>
                     <span
                       onClick={(e) => { e.stopPropagation(); dismissResult(res.jobId); }}
                       role="button"
