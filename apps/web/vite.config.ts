@@ -4,11 +4,22 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+const previewUrl = process.env.LABAS_PREVIEW_URL;
+const previewHost = previewUrl ? new URL(previewUrl).hostname : undefined;
+
 export default defineConfig({
   server: {
-    port: 3001,
+    port: previewHost ? 3002 : 3001,
     host: "127.0.0.1",
     strictPort: true,
+    allowedHosts: previewHost ? [previewHost] : undefined,
+    proxy: previewHost
+      ? {
+          "/api": "http://127.0.0.1:3003",
+          "/trpc": "http://127.0.0.1:3003",
+          "/health": "http://127.0.0.1:3003",
+        }
+      : undefined,
   },
   resolve: {
     tsconfigPaths: true,
