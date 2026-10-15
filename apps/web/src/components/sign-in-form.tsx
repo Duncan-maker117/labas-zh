@@ -11,10 +11,12 @@ import { authClient } from "@/lib/auth-client";
 import { env } from "@labas/env/web";
 import { trackUmamiEvent, AnalyticsEvent } from "@/lib/umami";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { useState } from "react";
 
 import Loader from "./loader";
 
 export default function SignInForm() {
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate({
     from: "/login",
   });
@@ -22,10 +24,18 @@ export default function SignInForm() {
 
   const form = useForm({
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
     onSubmit: async ({ value }) => {
+      if (isSignUp) {
+        await authClient.signUp.email({ name: value.name, email: value.email, password: value.password }, {
+          onSuccess: () => { navigate({ to: "/dashboard" }); toast.success("注册成功"); },
+          onError: (error) => toast.error(error.error.message || "注册失败"),
+        });
+        return;
+      }
       await authClient.signIn.email(
         {
           email: value.email,
@@ -35,11 +45,11 @@ export default function SignInForm() {
           onSuccess: () => {
             trackUmamiEvent(AnalyticsEvent.SIGN_IN);
             navigate({ to: "/dashboard" });
-            toast.success("Sign in successful");
+            toast.success("登录成功");
           },
           onError: (error) => {
             const msg = error.error.message || error.error.statusText;
-            toast.error(msg || "Gagal masuk");
+            toast.error(msg || "登录失败");
           },
         },
       );
@@ -73,8 +83,8 @@ export default function SignInForm() {
   return (
     <Card className="mx-auto w-full max-w-md shadow-lg border-muted rounded-xl">
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-3xl font-bold tracking-tight">Selamat Datang</CardTitle>
-        <CardDescription>Masuk dengan Google atau email dan password</CardDescription>
+        <CardTitle className="text-3xl font-bold tracking-tight">{isSignUp ? "创建账号" : "欢迎回来"}</CardTitle>
+        <CardDescription>{isSignUp ? "注册后开始你的语言考试练习" : "使用 Google 或邮箱密码登录"}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <Button
@@ -102,7 +112,7 @@ export default function SignInForm() {
               fill="#EA4335"
             />
           </svg>
-          Masuk dengan Google
+          使用 Google 登录
         </Button>
 
         <div className="relative">
@@ -110,7 +120,7 @@ export default function SignInForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">Atau</span>
+            <span className="bg-card px-2 text-muted-foreground">或</span>
           </div>
         </div>
 
@@ -122,6 +132,7 @@ export default function SignInForm() {
           }}
           className="space-y-4"
         >
+          {isSignUp && <form.Field name="name">{(field) => <div className="space-y-2"><Label htmlFor={field.name}>姓名</Label><Input id={field.name} name={field.name} value={field.state.value} onChange={(event) => field.handleChange(event.target.value)} /></div>}</form.Field>}
           <div>
             <form.Field name="email">
               {(field) => (
@@ -151,12 +162,12 @@ export default function SignInForm() {
               {(field) => (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor={field.name}>Password</Label>
+                    <Label htmlFor={field.name}>密码</Label>
                     <Link
                       to="/forgot-password"
                       className="text-xs text-muted-foreground hover:text-primary"
                     >
-                      Lupa password?
+                      忘记密码？
                     </Link>
                   </div>
                   <PasswordInput
@@ -182,11 +193,12 @@ export default function SignInForm() {
           >
             {({ canSubmit, isSubmitting }) => (
               <Button type="submit" size="xl" className="w-full rounded-[var(--radius-lg)]" disabled={!canSubmit || isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Sign In"}
+                {isSubmitting ? "正在登录…" : "登录"}
               </Button>
             )}
           </form.Subscribe>
         </form>
+        <p className="text-center text-sm text-muted-foreground">{isSignUp ? "已有账号？" : "还没有账号？"}<button type="button" className="ml-1 font-semibold text-primary underline-offset-4 hover:underline" onClick={() => setIsSignUp((current) => !current)}>{isSignUp ? "登录" : "创建账号"}</button></p>
       </CardContent>
     </Card>
   );

@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
 import { useSidebar } from "@/hooks/use-sidebar";
-import { useAppMode } from "@/lib/app-mode";
+import { useLocale } from "@/lib/locale";
 import { triggerGlobalTour } from "@/components/TourGuide";
-import { CommunityModal } from "@/components/CommunityModal";
 import { images } from "@/lib/app-images";
 import {
   Sheet,
@@ -58,44 +57,6 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-const cpnsNavGroups: NavGroup[] = [
-  {
-    items: [{ to: "/cpns/dashboard", label: "Dashboard", icon: "dashboard" }],
-  },
-  {
-    label: "Generate",
-    items: [
-      { to: "/cpns/generate", label: "AI Lab", icon: "auto_awesome" },
-      { to: "/jobs", label: "Jobs", icon: "schedule", search: { examTypeId: "CPNS" } },
-    ],
-  },
-  {
-    label: "Bank",
-    items: [{ to: "/cpns/bank", label: "Bank Soal", icon: "database" }],
-  },
-  {
-    label: "Latihan",
-    items: [
-      { to: "/cpns/packages", label: "Paket Soal", icon: "folder" },
-      { to: "/cpns/history", label: "Riwayat", icon: "history" },
-    ],
-  },
-  {
-    label: "Track",
-    items: [
-      { to: "/analytics", label: "Analytics", icon: "analytics", search: { examTypeId: "CPNS" } },
-      { to: "/leaderboard", label: "Klasemen", icon: "leaderboard", search: { examTypeId: "CPNS" } },
-    ],
-  },
-];
-
-const cpnsMobileNavItems: NavItem[] = [
-  { to: "/cpns/dashboard", label: "Dashboard", icon: "dashboard" },
-  { to: "/cpns/generate", label: "AI Lab", icon: "auto_awesome" },
-  { to: "/cpns/bank", label: "Bank", icon: "database" },
-  { to: "/cpns/packages", label: "Latihan", icon: "folder" },
-];
-
 const bottomItems: NavItem[] = [
   { to: "/me", label: "Profil", icon: "person" },
   { to: "/settings", label: "Settings", icon: "settings" },
@@ -137,9 +98,9 @@ export function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { collapsed, toggle } = useSidebar();
+  const { locale, setLocale, t } = useLocale();
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session;
-  const [communityModalOpen, setCommunityModalOpen] = useState(false);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
 
   const { data: adminData } = useQuery(
@@ -147,29 +108,8 @@ export function Sidebar() {
   );
   const isAdmin = !!adminData?.isAdmin;
 
-  const { mode: appMode, setMode: setAppMode } = useAppMode();
-
-  const [sidebarMode, setSidebarMode] = useState<"bahasa" | "kedinasan">(
-    location.pathname.startsWith("/cpns") ? "kedinasan" : "bahasa",
-  );
-
-  useEffect(() => {
-    setSidebarMode(appMode);
-  }, [appMode]);
-
-  const isCpnsMode = sidebarMode === "kedinasan";
-  const activeNavGroups = isCpnsMode ? cpnsNavGroups : navGroups;
-  const activeMobileItems = isCpnsMode ? cpnsMobileNavItems : mobileNavItems;
-
-  function switchMode(mode: "bahasa" | "kedinasan") {
-    setSidebarMode(mode);
-    setAppMode(mode);
-    if (mode === "bahasa") {
-      navigate({ to: "/dashboard" });
-    } else {
-      navigate({ to: "/cpns/dashboard" });
-    }
-  }
+  const activeNavGroups = navGroups;
+  const activeMobileItems = mobileNavItems;
 
   async function handleSignOut() {
     await authClient.signOut();
@@ -178,19 +118,11 @@ export function Sidebar() {
 
   return (
     <>
-      <CommunityModal isOpen={communityModalOpen} onOpenChange={setCommunityModalOpen} />
       {/* Desktop Sidebar */}
       <aside
         className={`fixed left-0 top-0 h-full flex flex-col z-40 bg-[var(--warm-cream)] border-r border-[var(--oat-border)] hidden md:flex transition-all duration-300 overflow-y-auto ${
           collapsed ? "w-16 items-center px-2 py-4" : "w-64 py-4 px-3"
         }`}
-        style={isCpnsMode ? {
-          "--matcha-600": "var(--blueberry-800)",
-          "--matcha-500": "var(--blueberry-800)",
-          "--matcha-400": "#5b8cba",
-          "--matcha-300": "#c2d9f5",
-          "--matcha-800": "var(--blueberry-800)",
-        } as React.CSSProperties : undefined}
       >
         <div className={`mb-8 ${collapsed ? "px-0 text-center" : "px-3"}`}>
           <img
@@ -203,61 +135,29 @@ export function Sidebar() {
           />
           {!collapsed && (
             <p className="text-xs text-[var(--warm-charcoal)] uppercase tracking-widest font-semibold mt-1">
-              Exam Prep Portal
+              外语考试练习
             </p>
           )}
         </div>
-
-        {/* Mode Switcher */}
-        {!collapsed && (
-          <div className="px-3 mb-4">
-            <div className="flex rounded-[var(--radius-lg)] bg-[var(--oat-light)] p-0.5 border border-[var(--oat-border)]" role="tablist" aria-label="Mode aplikasi">
-              <button
-                type="button"
-                onClick={() => switchMode("bahasa")}
-                role="tab"
-                aria-selected={!isCpnsMode}
-                className={`flex-1 px-3 py-2 rounded-[var(--radius-md)] text-xs font-semibold text-center transition-all cursor-pointer ${
-                  !isCpnsMode
-                    ? "bg-[var(--matcha-300)] text-[var(--matcha-800)] shadow-sm"
-                    : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
-                }`}
-              >
-                Bahasa
-              </button>
-              <button
-                type="button"
-                onClick={() => switchMode("kedinasan")}
-                role="tab"
-                aria-selected={isCpnsMode}
-                className={`flex-1 px-3 py-2 rounded-[var(--radius-md)] text-xs font-semibold text-center transition-all cursor-pointer ${
-                  isCpnsMode
-                    ? "bg-[var(--matcha-300)] text-[var(--matcha-800)] shadow-sm"
-                    : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
-                }`}
-              >
-                Kedinasan
-              </button>
-            </div>
-          </div>
-        )}
 
         <nav className="flex-1 space-y-4 w-full">
           {activeNavGroups.map((group) => (
             <div key={group.label ?? "ungrouped"} className="space-y-1">
               {!collapsed && group.label && (
                 <p className="px-3 text-[10px] font-bold text-[var(--warm-charcoal)]/50 uppercase tracking-wider">
-                  {group.label}
+                  {group.label === "Generate" ? t("groupGenerate") : group.label === "Bank" ? t("groupBank") : group.label === "Latihan" ? t("groupPractice") : t("groupProgress")}
                 </p>
               )}
               {group.items.map((item) => {
+                const translatedLabel = item.to === "/dashboard" ? t("dashboard") : item.to === "/generate" ? t("generate") : item.to === "/jobs" ? t("jobs") : item.to === "/bank" ? t("bank") : item.to === "/packages" ? t("packages") : item.to === "/history" ? t("history") : item.to === "/analytics" ? t("analytics") : item.to === "/leaderboard" ? t("leaderboard") : item.label;
+                const localizedItem = { ...item, label: translatedLabel };
                 const isActive =
                   location.pathname === item.to ||
                   (location.pathname.startsWith(`${item.to}/`) && item.to !== "/");
                 return (
                   <NavLink
                     key={item.to}
-                    item={item}
+                    item={localizedItem}
                     isActive={isActive}
                     collapsed={collapsed}
                   />
@@ -287,29 +187,19 @@ export function Sidebar() {
 
         <div className="mt-auto space-y-1 pt-4 border-t border-[var(--oat-border)] w-full">
           {bottomItems.map((item) => {
+            const localizedItem = { ...item, label: item.to === "/settings" ? t("settings") : t("profile") };
             const isActive = location.pathname === item.to;
             return (
               <NavLink
                 key={item.to}
-                item={item}
+                item={localizedItem}
                 isActive={isActive}
                 collapsed={collapsed}
               />
             );
           })}
 
-          <button
-            type="button"
-            onClick={() => setCommunityModalOpen(true)}
-            aria-label="Komunitas WhatsApp"
-            className={`flex items-center gap-3 rounded-[var(--radius-lg)] transition-all clay-hover cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)] w-full ${
-              collapsed ? "justify-center py-3 px-2" : "py-3 px-3 text-left"
-            }`}
-            title={collapsed ? "Komunitas" : undefined}
-          >
-            <NavIcon name="forum" />
-            {!collapsed && <span className="text-sm font-medium">Komunitas</span>}
-          </button>
+          {!collapsed && <label className="flex items-center gap-2 px-3 py-2 text-xs text-[var(--warm-charcoal)]"><span>{t("language")}</span><select aria-label={t("language")} value={locale} onChange={(event) => setLocale(event.target.value as "zh-CN" | "en-US" | "id-ID")} className="min-w-0 flex-1 rounded border border-[var(--oat-border)] bg-white px-2 py-1 text-xs text-[var(--clay-black)]"><option value="zh-CN">简体中文</option><option value="en-US">English</option><option value="id-ID">Bahasa Indonesia</option></select></label>}
 
           {/* Help Tour Button */}
           <button
@@ -385,15 +275,7 @@ export function Sidebar() {
       </button>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-6 pt-3 bg-[var(--warm-cream)]/90 backdrop-blur-xl border-t border-[var(--oat-border)] rounded-t-[var(--radius-xl)]"
-        style={isCpnsMode ? {
-          "--matcha-600": "var(--blueberry-800)",
-          "--matcha-500": "var(--blueberry-800)",
-          "--matcha-400": "#5b8cba",
-          "--matcha-300": "#c2d9f5",
-          "--matcha-800": "var(--blueberry-800)",
-        } as React.CSSProperties : undefined}
-      >
+      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-6 pt-3 bg-[var(--warm-cream)]/90 backdrop-blur-xl border-t border-[var(--oat-border)] rounded-t-[var(--radius-xl)]">
         {activeMobileItems.map((item) => {
           const isActive = location.pathname === item.to;
           return (
@@ -414,11 +296,11 @@ export function Sidebar() {
         })}
         <button
           onClick={() => setMobileSheetOpen(true)}
-          aria-label="More menu"
+          aria-label={t("more")}
           className={`flex flex-col items-center justify-center px-3 py-1.5 transition-all rounded-[var(--radius-lg)] cursor-pointer text-[var(--warm-charcoal)]`}
         >
           <NavIcon name="menu" />
-          <span className="text-[10px] font-medium uppercase tracking-wider mt-1">More</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider mt-1">{t("more")}</span>
         </button>
       </nav>
 
@@ -426,45 +308,15 @@ export function Sidebar() {
       <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
         <SheetContent side="bottom" className="bg-[var(--warm-cream)] max-h-[80vh] overflow-y-auto rounded-t-[var(--radius-xl)] px-4 pb-10 pt-2">
           <SheetHeader className="px-2 pt-2 pb-3">
-            <SheetTitle className="text-sm font-headline font-bold text-[var(--clay-black)]">Menu</SheetTitle>
+          <SheetTitle className="text-sm font-headline font-bold text-[var(--clay-black)]">{t("menu")}</SheetTitle>
           </SheetHeader>
-          {/* Mobile mode switcher */}
-          <div className="px-2 mb-3">
-            <div className="flex rounded-[var(--radius-lg)] bg-[var(--oat-light)] p-0.5 border border-[var(--oat-border)]" role="tablist" aria-label="Mode aplikasi">
-              <button
-                type="button"
-                onClick={() => { setMobileSheetOpen(false); switchMode("bahasa"); }}
-                role="tab"
-                aria-selected={!isCpnsMode}
-                className={`flex-1 px-3 py-2 rounded-[var(--radius-md)] text-xs font-semibold text-center transition-all cursor-pointer ${
-                  !isCpnsMode
-                    ? "bg-[var(--matcha-300)] text-[var(--matcha-800)] shadow-sm"
-                    : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
-                }`}
-              >
-                Bahasa
-              </button>
-              <button
-                type="button"
-                onClick={() => { setMobileSheetOpen(false); switchMode("kedinasan"); }}
-                role="tab"
-                aria-selected={isCpnsMode}
-                className={`flex-1 px-3 py-2 rounded-[var(--radius-md)] text-xs font-semibold text-center transition-all cursor-pointer ${
-                  isCpnsMode
-                    ? "bg-[var(--matcha-300)] text-[var(--matcha-800)] shadow-sm"
-                    : "text-[var(--warm-charcoal)] hover:text-[var(--clay-black)]"
-                }`}
-              >
-                Kedinasan
-              </button>
-            </div>
-          </div>
+          <label className="flex items-center gap-2 px-3 py-2 text-xs text-[var(--warm-charcoal)]">{t("language")}<select aria-label={t("language")} value={locale} onChange={(event) => setLocale(event.target.value as "zh-CN" | "en-US" | "id-ID")} className="flex-1 rounded border border-[var(--oat-border)] bg-white px-2 py-1 text-xs text-[var(--clay-black)]"><option value="zh-CN">简体中文</option><option value="en-US">English</option><option value="id-ID">Bahasa Indonesia</option></select></label>
           <div className="space-y-4">
             {activeNavGroups.map((group) => (
               <div key={group.label ?? "ungrouped"} className="space-y-1">
                 {group.label && (
                   <p className="px-3 text-[10px] font-bold text-[var(--warm-charcoal)]/50 uppercase tracking-wider">
-                    {group.label}
+                    {group.label === "Generate" ? t("groupGenerate") : group.label === "Bank" ? t("groupBank") : group.label === "Latihan" ? t("groupPractice") : t("groupProgress")}
                   </p>
                 )}
                 {group.items.map((item) => {
@@ -481,7 +333,7 @@ export function Sidebar() {
                       }`}
                     >
                       <NavIcon name={item.icon} />
-                      <span className="text-sm font-medium">{item.label}</span>
+                      <span className="text-sm font-medium">{item.to === "/dashboard" ? t("dashboard") : item.to === "/generate" ? t("generate") : item.to === "/jobs" ? t("jobs") : item.to === "/bank" ? t("bank") : item.to === "/packages" ? t("packages") : item.to === "/history" ? t("history") : item.to === "/analytics" ? t("analytics") : item.to === "/leaderboard" ? t("leaderboard") : item.label}</span>
                     </Link>
                   );
                 })}
@@ -519,23 +371,16 @@ export function Sidebar() {
                     }`}
                   >
                     <NavIcon name={item.icon} />
-                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-sm font-medium">{item.to === "/settings" ? t("settings") : t("profile")}</span>
                   </Link>
                 );
               })}
-              <button
-                onClick={() => { setCommunityModalOpen(true); setMobileSheetOpen(false); }}
-                className="flex items-center gap-3 rounded-[var(--radius-lg)] transition-all py-3 px-3 cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)] w-full text-left"
-              >
-                <NavIcon name="forum" />
-                <span className="text-sm font-medium">Komunitas</span>
-              </button>
               <button
                 onClick={() => { triggerGlobalTour(); setMobileSheetOpen(false); }}
                 className="flex items-center gap-3 rounded-[var(--radius-lg)] transition-all py-3 px-3 cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)] w-full text-left"
               >
                 <NavIcon name="help" />
-                <span className="text-sm font-medium">Panduan</span>
+                <span className="text-sm font-medium">{t("help")}</span>
               </button>
             </div>
 
@@ -547,7 +392,7 @@ export function Sidebar() {
                   className="flex items-center gap-3 rounded-[var(--radius-lg)] transition-all py-3 px-3 cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)] w-full text-left"
                 >
                   <NavIcon name="logout" />
-                  <span className="text-sm font-medium">Keluar</span>
+                  <span className="text-sm font-medium">{t("signOut")}</span>
                 </button>
               ) : (
                 <Link
@@ -556,7 +401,7 @@ export function Sidebar() {
                   className="flex items-center gap-3 rounded-[var(--radius-lg)] transition-all py-3 px-3 cursor-pointer text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] hover:text-[var(--clay-black)]"
                 >
                   <NavIcon name="login" />
-                  <span className="text-sm font-medium">Masuk</span>
+                  <span className="text-sm font-medium">{t("signIn")}</span>
                 </Link>
               )}
             </div>

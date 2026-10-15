@@ -9,7 +9,7 @@ export const env = createEnv({
     VITE_CLOUDFLARE_TURNSTILE_SITE_KEY: z.string().optional(),
     VITE_BLOG_ENABLED: z
       .string()
-      .default("true")
+      .default("false")
       .transform((v) => v === "true"),
   },
   runtimeEnv: (import.meta as any).env,

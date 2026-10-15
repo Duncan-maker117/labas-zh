@@ -1,3 +1,98 @@
+# Labas 中文版项目规则
+
+本文件是项目级规则，适用于整个仓库；进入任何目录后，先读本文件和该子目录自己的 `AGENTS.md`。子目录规则可以补充细节，不能绕过下列数据安全、Git 和支付要求。
+
+## 项目目标
+
+- 这是面向中文用户的外语考试练习产品，中文为默认界面语言；英语、日语、韩语等是用户学习的目标语言，不能因为界面中文化而移除这些考试。
+- 保留登录、题库、练习套题、考试模拟、成绩/历史、学习分析、AI 出题等核心能力。
+- 印尼 CPNS/Kedinasan 与当前产品定位无关：默认不出现在导航和新流程中，旧 `/cpns/*` 地址应有明确处理。移除前端入口不等于可以删除历史记录、数据库表或生成数据。
+- 用户会持续修改页面和功能。每次变更都要小而聚焦，可从 Git diff 看清楚，不做顺手重构或跨模块大改。
+- 本地源码修改由用户自行部署。未经用户明确要求，不登录、发布或修改任何线上站点，也不向上游仓库推送。
+
+## 模块边界
+
+| 目录 | 负责内容 | 不要放入的内容 |
+|---|---|---|
+| `apps/web/src/routes/` | 路由定义、加载/重定向、页面级数据装配 | 复杂共享业务逻辑、大块重复 UI |
+| `apps/web/src/components/routes/` | Dashboard、题库、练习、设置等页面视图 | 数据库访问、支付签名校验 |
+| `apps/web/src/components/`、`hooks/`、`lib/` | 可复用 UI、前端状态/交互、浏览器工具、语言文案 | 服务端权限判定、密钥、支付凭据 |
+| `packages/api/src/routers/` | tRPC 输入校验、授权、业务流程和数据读写 | React/UI、直接信任前端传来的权限标志 |
+| `packages/ai/` | AI provider、提示词、生成 schema 与 AI 流程 | 页面文案、支付状态 |
+| `packages/db/` | Drizzle schema、迁移、查询和种子数据 | 绕过迁移直接改生产数据库 |
+| `packages/auth/` | Better Auth 与身份认证配置 | 产品角色之外的临时 UI 状态 |
+| `apps/server/` | Hono 入口、HTTP 中间件、后台任务/回调接入 | 页面组件和业务规则副本 |
+| `packages/ui/` | 多页面复用的基础 UI 组件和设计系统 | 单页面专用业务组件 |
+
+跨包只通过既有 workspace API 和公开导出协作；不得让 `apps/*` 互相导入内部源码。新功能先找现有模块和调用链，不要建立重复的第二套实现。
+
+## 每次改动的工作方式
+
+1. 先确认用户要解决的场景、当前实现位置和受影响流程；说明修改原因、范围及主要风险。
+2. 先读相关组件、路由、API、数据库 schema 和本目录规则；按数据流从页面到后端追踪，不凭文件名推断行为。
+3. 选择最小改动面。页面结构、API 合约、数据库 schema 和 AI prompt 分层修改，不把它们塞进一个巨型组件。
+4. 改完检查 `git diff` 与 `git diff --check`；依赖可用时按需运行仓库的 `bun run check-types`、`bun run build`。没有实际运行的检查不得报告为通过。
+5. 按下方 Git 要求自动创建本地回退点，不覆盖用户已有修改，不执行 `git reset`/`clean`/强制操作。用户要求本地启动时，可安装锁文件声明的必要依赖；新增依赖须说明用途。推送和部署仍需用户明确要求。
+6. 涉及删路由或数据模型时，先兼容旧链接和历史数据；需要迁移时给出可回滚方案。禁止在没有用户明确要求时连接或写入真实数据库、执行 `db:push`、迁移或 seed。
+7. 汇报实际改了什么、检查结果、未完成项和真实阻碍；不要把上游 README 的功能说成当前部署已验证的能力。
+
+## 中文与多语言
+
+- 默认 locale 为 `zh-CN`，用户界面文案集中在 locale/i18n 层；新增页面文案不能继续零散硬编码印尼语。
+- 目标语言试题、考试名称、题干、选项和用户提交内容保持原文；只翻译导航、操作提示、错误说明和产品说明。
+- 改一个公共按键或标签时，检查桌面、移动端、加载/空/错误状态以及无障碍名称，避免出现一个页面改了、另一个入口仍是旧文案。
+- 新增语言需提供完整对应文案或清晰回退规则；不能只改 `<html lang>` 就宣称全站完成本地化。
+
+## 未来收费功能的边界
+
+用户提到未来可能收费，这表示需要保留清晰扩展边界；当前不代表已经选定支付渠道或授权接入任何支付服务。开始收费开发前先单独确认套餐、计费周期、退款/取消规则、目标市场和支付服务商。
+
+- 订阅、支付和权益是独立的 billing/entitlement 领域；不要把订阅等同于现有 `user_credit`，也不要用前端按钮隐藏来实现付费权限。
+- 后续数据模型放在 `packages/db`，服务端接口与统一权益检查放在 `packages/api`，Webhook/回调的验签、幂等和状态同步放在 `apps/server` 或独立 server 模块，Pricing/Billing 页面放在 `apps/web`。
+- 权益必须在服务端对生成、导出等受限操作做校验；前端显示仅负责提示。支付回调必须校验签名、处理重复事件，并保留可审计的事件记录。
+- 不在代码中写入 API key、支付密钥、Webhook secret；只扩充 `.env.example` 变量说明，真实密钥由部署环境配置。
+- 不因准备收费而预先引入无用表或 provider SDK；先定义接口和状态，再按用户确认的支付渠道实现，保持可替换、可回滚。
+- 仓库当前含 AGPL-3.0 许可。部署修改版网络服务前，需把许可证与源码提供义务纳入发布方案；作者另行授权是否适用要有明确依据。
+
+## Git 回溯要求
+
+- 用户已明确要求：此网站后续每个完整、聚焦的改动，都要在本地 Git 中留有记录，便于撤回和追溯。完成一项独立改动后，先检查 `git diff`、`git diff --check` 和 `git status`，再创建带清楚范围的本地提交。
+- 一次提交只包含该项任务的相关文件；发现无法确认归属的用户改动时，保留未提交并说明。不要用 `reset`、`clean` 或覆盖历史来整理工作区。
+- 用户负责部署；本地提交不代表授权推送。除非用户另行明确要求，绝不 `git push`。
+- 提交前检查本地 `user.name`/`user.email`。本项目自动保存版本使用仓库级标签 `Codex Local <codex@localhost>`；用户有指定署名时遵循用户要求。该标签仅为本地记录，不需要注册账号或配置真实邮箱，不修改全局 Git 配置。
+- 开始新的独立改动前确认已有版本点；完成后再提交。撤回已提交改动优先使用 `git revert <提交号>` 保留历史。代码回退不会恢复数据库、用户记录或订单；数据库结构变更须同时记录备份、迁移和兼容方案。
+
+## 本地 Skills 使用规则
+
+已安装技能位于 `.agents/skills/`，按任务自动读取对应 `SKILL.md` 并执行，不要求用户自行选择；每次只加载相关技能。该目录被 Git 忽略，换电脑时需重新安装或使用可用的同名技能，不能假设它随源码交付。
+
+| 任务 | 优先使用的技能 |
+|---|---|
+| Hono 路由、中间件、接口和服务启动 | `hono` |
+| 注册、登录、会话、Cookie 和身份认证 | `better-auth-best-practices` |
+| shadcn 组件、表单、弹窗和共享 UI | `shadcn` |
+| workspace、任务、依赖、构建与启动 | `turborepo` |
+| React 组件拆分和组合，减少复杂属性和重复实现 | `vercel-composition-patterns` |
+| 用户明确要求 UI/可访问性检查时 | `web-design-guidelines` |
+
+## 真实用户与上线边界
+
+- 用户目标是真实可用的多用户系统。账号、题库、练习记录等正式业务数据由后端写入 PostgreSQL；不得用浏览器 localStorage 或假数据冒充服务器数据。localStorage 可保存界面语言等个人显示偏好。
+- 必须明确汇报前端、后端、数据库、Redis、邮件和支付分别是否接通；展示页面成功不代表注册、练习、AI 或支付已可用。
+- 用户身份、资源归属、管理员角色及未来付费权益都由服务端校验。开发数据库和正式用户库分离；禁止把测试账号、默认密码和开发邮件工具用于正式服务。
+- Git 管源码，数据库备份管用户数据。上线前需要备份与恢复验证、HTTPS、密钥管理、错误监控和权限检查；收费功能按独立需求实现，未完成时不得展示为可购买。
+
+## SQL 与数据库使用
+
+- 数据库为 PostgreSQL，ORM 为 Drizzle；schema 源文件位于 `packages/db/src/schema/`，迁移位于 `packages/db/src/migrations/`，迁移顺序以 `_journal.json` 为准。schema 是模型来源，迁移是数据库结构变更的可审查记录。
+- 已有数据模型可支持：用户/会话/认证；考试、科目、阅读材料、题目及 JSONB 题型数据；练习套题与题目关联；考试尝试、分科结果和答案；题目/套题评分与反馈；AI 生成任务及输入、输出、日志；用户积分及积分流水；平台配置、管理员审计日志、邮件退信记录。
+- 现有外键级联、唯一约束和索引可支持用户数据归属、题目/套题查找、作答历史、反馈管理和后台审计。新增查询优先复用现有关系与索引；新增索引须对应实际查询条件/排序，避免仅凭猜测堆叠索引。
+- 需要结构变更时先更新 Drizzle schema，再用 `bun run db:generate` 生成迁移并审阅 SQL；在隔离的本地数据库验证后再由用户部署。`db:push`、`db:migrate`、`db:seed` 会影响数据库状态，仅可对明确的本地开发库执行；不可擅自连接、迁移、推送结构或填充真实数据。
+- 分析题目质量、练习完成率、分数变化、用户留存和 AI 生成用量时，应优先从现有尝试/答案/反馈/生成任务记录构建查询或聚合；先明确数据口径和隐私范围，再决定是否增加字段或表。
+- `user_credit` 与 `credit_transaction` 是积分模型，不等于订阅、支付或付费权益。未来收费须使用单独、可审计且可幂等处理的 billing/entitlement 模型，见“未来收费功能的边界”。
+- 最近一次仓库检查中，本机 `127.0.0.1:5432` 未开放且没有真实数据库配置；因此只能依据 schema 和迁移审查模型，不能声称已检查数据库内的实时数据。每次任务应重新确认运行状态。
+
+---
 # AGENTS.md — Labas Project Guide
 
 > This file is for AI agents. Read this first before making any changes.
@@ -34,7 +129,7 @@
 ```
 labas/
 ├── apps/
-│   ├── web/          # Frontend (Vite, TanStack Router) — Port 5173
+│   ├── web/          # Frontend (Vite, TanStack Router) — Port 3001 (see vite.config.ts)
 │   └── server/       # Backend (Hono, tRPC) — Port 3000
 ├── packages/
 │   ├── ui/           # Shared shadcn/ui components & styles
@@ -261,7 +356,7 @@ export const Route = createFileRoute("/my-route")({
 - Schema files live in **`packages/db/src/schema/`**.
 - Use `pgTable` from Drizzle. Primary keys are usually `uuid` with `.defaultRandom()`.
 - Add indexes for frequently queried foreign keys.
-- When adding new tables or columns, run `bun run db:push` to sync the local database.
+- When adding tables or columns, generate and review a versioned migration with `bun run db:generate`; apply it only to an explicitly identified development database. Follow the Chinese database safety rules above; never push a schema directly to production.
 
 ---
 
@@ -346,7 +441,7 @@ export const Route = createFileRoute("/my-route")({
 
 ## 11b. Git & Workflow
 
-- Do **NOT** run `git commit`, `git push`, `git rebase`, or force-push unless the user explicitly asks for it.
+- For this project, the user explicitly requires a local Git commit for each completed, focused change; follow the Chinese "Git 回溯要求" above. Do **NOT** push, rebase, or force-push unless the user explicitly asks for it.
 - Do **NOT** create `README.md` or documentation files unless explicitly requested.
 - Keep changes minimal and focused on the task at hand.
 - Follow existing code style in the file you are editing.

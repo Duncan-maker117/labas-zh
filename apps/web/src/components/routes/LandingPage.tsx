@@ -3,13 +3,9 @@ import { Button } from "@labas/ui/components/button";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { CommunityModal } from "@/components/CommunityModal";
-import { trpc } from "@/utils/trpc";
-import { env } from "@labas/env/web";
-import { BlogCard } from "@/components/blog/BlogCard";
 import { images } from "@/lib/app-images";
 import { OptimizedImage } from "@/components/OptimizedImage";
+import { useLocale } from "@/lib/locale";
 
 function FaqItem({ question, answer, isDark }: { question: string; answer: string; isDark?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,14 +40,9 @@ function FaqItem({ question, answer, isDark }: { question: string; answer: strin
 }
 
 export function LandingPage() {
-  const [communityModalOpen, setCommunityModalOpen] = useState(false);
-  const blogPosts = useQuery(
-    trpc.blog.posts.queryOptions({ perPage: 3 }, { enabled: env.VITE_BLOG_ENABLED }),
-  );
-
+  const { locale, setLocale } = useLocale();
   return (
     <div className="min-h-screen bg-[var(--warm-cream)] flex flex-col font-sans selection:bg-[var(--matcha-300)] selection:text-[var(--clay-black)]">
-      <CommunityModal isOpen={communityModalOpen} onOpenChange={setCommunityModalOpen} />
       {/* Navbar */}
       <nav className="w-full px-6 py-4 md:px-12 lg:px-16 flex items-center justify-between max-w-7xl mx-auto z-50 sticky top-0 bg-[var(--warm-cream)] border-b-2 border-[var(--oat-border)]">
         <div className="flex items-center gap-3">
@@ -59,34 +50,17 @@ export function LandingPage() {
           <span className="font-headline font-semibold text-2xl tracking-[-0.64px] text-[var(--clay-black)] hidden sm:block">Labas</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
-          <button
-            type="button"
-            onClick={() => setCommunityModalOpen(true)}
-            className="text-[var(--warm-charcoal)] hover:text-[var(--matcha-700)] transition-colors p-2 hidden md:flex items-center gap-2"
-            aria-label="Komunitas WhatsApp"
-          >
-            <MaterialIcon name="forum" className="text-xl" />
-            <span className="font-semibold text-base">Komunitas</span>
-          </button>
-          <a href="https://saweria.co/rogasper" target="_blank" rel="noopener noreferrer" className="text-[var(--warm-charcoal)] hover:text-[var(--pomegranate-400)] transition-colors p-2 hidden md:flex items-center gap-2" aria-label="Support via Saweria">
-            <MaterialIcon name="favorite" className="text-xl" />
-            <span className="font-semibold text-base">Support</span>
-          </a>
-          <a href="https://github.com/rogasper/labas-bahasa" target="_blank" rel="noopener noreferrer" className="text-[var(--warm-charcoal)] hover:text-[var(--clay-black)] transition-colors p-2 hidden sm:flex items-center gap-2" aria-label="GitHub Repository">
-            <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current" aria-hidden="true">
-              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-            </svg>
-            <span className="font-semibold text-base">Star us</span>
-          </a>
+          <label className="sr-only" htmlFor="landing-locale">界面语言</label>
+          <select id="landing-locale" value={locale} onChange={(event) => setLocale(event.target.value as "zh-CN" | "en-US" | "id-ID")} className="rounded border border-[var(--oat-border)] bg-transparent px-2 py-2 text-sm text-[var(--clay-black)]"><option value="zh-CN">简体中文</option><option value="en-US">English</option><option value="id-ID">Bahasa Indonesia</option></select>
           <div className="w-px h-6 bg-[var(--oat-border)] hidden sm:block mx-2"></div>
           <Link to="/login">
             <Button variant="ghost" className="text-[var(--clay-black)] font-semibold hover:bg-[var(--oat-light)] rounded-[12px] text-lg px-4 sm:px-6 h-12">
-              Masuk
+              登录
             </Button>
           </Link>
           <Link to="/login">
             <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--dark-charcoal)] rounded-[24px] h-12 px-6 sm:px-8 font-semibold text-lg clay-hover clay-shadow">
-              Mulai Gratis
+              免费开始
             </Button>
           </Link>
         </div>
@@ -98,42 +72,34 @@ export function LandingPage() {
           <div className="flex-1 text-center xl:text-left space-y-8 z-10 w-full max-w-[800px] xl:max-w-none">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--matcha-300)] border-2 border-[var(--matcha-800)] text-[var(--clay-black)] uppercase-label shadow-sm mx-auto xl:mx-0 transform -rotate-2">
               <MaterialIcon name="auto_awesome" className="text-sm" />
-              <span>Didukung oleh AI Generative</span>
+              <span>AI 驱动的语言考试练习</span>
             </div>
-            
+
             <h1 className="text-[50px] md:text-[70px] lg:text-[85px] font-headline font-semibold text-[var(--clay-black)] tracking-[-2.4px] lg:tracking-[-3.2px] leading-[1.0] lg:leading-[0.95] drop-shadow-sm">
-              Platform Latihan Bahasa Cerdas.
+              面向中文学习者的外语考试练习平台
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-[var(--warm-charcoal)] max-w-2xl mx-auto xl:mx-0 leading-relaxed">
-              Persiapkan dirimu untuk ujian bahasa asing dengan latihan soal interaktif, mock test realistis, dan AI Generator super cepat.
+              通过交互式题库、真实考试模拟和 AI 出题，高效准备 TOEFL、IELTS、JLPT、TOPIK 等语言考试。
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center xl:justify-start pt-6">
               <Link to="/login" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto bg-[var(--pure-white)] text-[var(--clay-black)] rounded-[24px] h-[64px] px-8 text-xl font-semibold border-2 border-[var(--oat-border)] clay-shadow clay-hover">
-                  Mulai Latihan Sekarang
+                  立即开始练习
                 </Button>
               </Link>
-              <a href="https://github.com/rogasper/labas-bahasa" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <Button variant="ghost" className="w-full sm:w-auto text-[var(--clay-black)] rounded-[24px] h-[64px] px-8 text-xl font-semibold hover:bg-[var(--oat-light)] border-2 border-transparent flex items-center gap-3">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current" aria-hidden="true">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                  </svg>
-                  Lihat di GitHub
-                </Button>
-              </a>
             </div>
           </div>
-          
+
           {/* MASSIVE HERO IMAGE WITH FLOATING ASSETS - SIDE BY SIDE ON DESKTOP */}
           <div className="flex-1 w-full relative group mt-8 xl:mt-0 flex justify-center xl:justify-end">
             <div className="relative w-full max-w-[650px] lg:max-w-[750px]">
-              <OptimizedImage 
-                src={images.hero.src} 
+              <OptimizedImage
+                src={images.hero.src}
                 srcset={images.hero.srcset}
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw"
-                alt="Labas Dashboard Preview" 
+                alt="Labas Dashboard Preview"
                 priority
                 className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-105 group-hover:-rotate-1 drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-10"
               />
@@ -161,10 +127,10 @@ export function LandingPage() {
             <div className="text-center max-w-3xl mx-auto mb-24 space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--ube-300)]/30 border-2 border-[var(--ube-300)] text-[var(--ube-800)] uppercase-label shadow-sm">
                 <MaterialIcon name="play_circle" className="text-sm" />
-                <span>Lihat Aksinya</span>
+                <span>功能演示</span>
               </div>
               <h2 className="text-[50px] md:text-[60px] font-headline font-semibold text-[var(--clay-black)] tracking-[-2.4px] leading-tight drop-shadow-sm">
-                Pengalaman Belajar Generasi Baru
+                从题库练习到成绩分析，规划你的备考
               </h2>
             </div>
 
@@ -172,31 +138,31 @@ export function LandingPage() {
               {/* Feature 1: Hero Showcase - Generate AI */}
               <div className="flex flex-col items-center text-center pb-8 pt-4">
                 <div className="max-w-3xl space-y-5 mb-10">
-                  <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--ube-300)]/20 border-2 border-[var(--ube-300)]/50 text-[var(--ube-800)] text-sm font-bold tracking-wide uppercase-label mb-2">✨ Fitur Unggulan</div>
+                  <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--ube-300)]/20 border-2 border-[var(--ube-300)]/50 text-[var(--ube-800)] text-sm font-bold tracking-wide uppercase-label mb-2">✨ 核心功能</div>
                   <h3 className="text-[36px] md:text-[45px] lg:text-[55px] font-headline font-semibold text-[var(--clay-black)] leading-[1.1] tracking-[-1.5px]">
-                    Generate Soal <br className="hidden sm:block md:hidden" /> <span className="text-[var(--ube-800)]">Agentic AI</span>
+                    生成练习题 <br className="hidden sm:block md:hidden" /> <span className="text-[var(--ube-800)]">Agentic AI</span>
                   </h3>
                   <p className="text-lg md:text-xl text-[var(--warm-charcoal)] leading-relaxed max-w-2xl mx-auto">
-                    Masukkan teks bacaan bahasa asing, dan biarkan sistem <i>Multi-step Agentic Pipeline</i> kami (Validasi → Generasi → Self-check) menyusun paket soal bermutu secara otomatis.
+                    输入外语阅读材料，系统会生成练习题并进行内容检查。
                   </p>
                 </div>
-                
+
                 <div className="w-full relative group max-w-5xl mx-auto">
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--ube-400)] via-[var(--matcha-300)] to-[var(--lemon-400)] rounded-[48px] transform rotate-1 group-hover:rotate-2 transition-transform duration-700 opacity-60 blur-xl"></div>
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--ube-400)] via-[var(--matcha-300)] to-[var(--lemon-400)] rounded-[48px] transform rotate-1 group-hover:rotate-2 transition-transform duration-700"></div>
                   <div className="relative rounded-[48px] overflow-hidden border-[6px] border-[var(--pure-white)] shadow-[0_30px_80px_rgba(0,0,0,0.2)] bg-[var(--oat-light)] transform transition-transform duration-700 group-hover:-translate-y-2">
-                    <video 
-                      className="w-full aspect-video object-cover" 
-                      autoPlay 
-                      muted 
+                    <video
+                      className="w-full aspect-video object-cover"
+                      autoPlay
+                      muted
                       loop
                       playsInline
                     >
                       <source src="/generate%20soal.mp4" type="video/mp4" />
-                      Browser Anda tidak mendukung tag video.
+                      当前浏览器暂不支持播放此视频。
                     </video>
                   </div>
-                  
+
                   {/* Floating badge 1 */}
                   <div className="absolute -bottom-8 right-4 md:-right-8 bg-[var(--pure-white)] border-2 border-[var(--oat-border)] p-4 md:p-5 rounded-[24px] md:rounded-[28px] shadow-2xl clay-hover transform -rotate-3 z-20 flex items-center gap-3 md:gap-4">
                     <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[var(--ube-300)] flex items-center justify-center">
@@ -207,7 +173,7 @@ export function LandingPage() {
                       <p className="text-xs md:text-sm text-[var(--warm-charcoal)]">Generasi & Self-Check</p>
                     </div>
                   </div>
-                  
+
                   {/* Floating badge 2 */}
                   <div className="absolute -top-8 left-4 md:-left-8 bg-[var(--pure-white)] border-2 border-[var(--oat-border)] p-4 rounded-[24px] shadow-2xl clay-hover transform rotate-3 z-20 flex items-center gap-3 hidden md:flex">
                     <div className="w-12 h-12 rounded-full bg-[var(--lemon-400)] flex items-center justify-center">
@@ -226,43 +192,43 @@ export function LandingPage() {
                 <div className="flex-1 w-full lg:w-1/2 relative group">
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--matcha-400)] to-[var(--lemon-400)] rounded-[40px] transform -rotate-3 group-hover:-rotate-6 transition-transform duration-700"></div>
                   <div className="relative rounded-[40px] overflow-hidden border-4 border-[var(--pure-white)] shadow-[0_20px_60px_rgba(0,0,0,0.15)] transform transition-transform duration-700 group-hover:-translate-y-2 bg-[var(--oat-light)]">
-                    <video 
-                      className="w-full aspect-video object-cover" 
-                      autoPlay 
-                      muted 
+                    <video
+                      className="w-full aspect-video object-cover"
+                      autoPlay
+                      muted
                       loop
                       playsInline
                     >
                       <source src="/paket%20soal.mp4" type="video/mp4" />
-                      Browser Anda tidak mendukung tag video.
+                      当前浏览器暂不支持播放此视频。
                     </video>
                   </div>
-                  
+
                   {/* Floating badge */}
                   <div className="absolute -top-6 -left-6 md:-left-10 bg-[var(--pure-white)] border-2 border-[var(--oat-border)] p-4 rounded-[24px] shadow-xl clay-hover transform rotate-6 z-20 flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-[var(--matcha-300)] flex items-center justify-center">
                       <MaterialIcon name="source" className="text-2xl text-[var(--matcha-800)]" />
                     </div>
                     <div>
-                      <p className="font-bold text-[var(--clay-black)] leading-tight">Bank Soal</p>
+                      <p className="font-bold text-[var(--clay-black)] leading-tight">题库</p>
                       <p className="text-xs text-[var(--warm-charcoal)]">Koleksi Lengkap</p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex-1 w-full lg:w-1/2 space-y-6">
                   <h3 className="text-[40px] lg:text-[50px] font-headline font-semibold text-[var(--clay-black)] leading-[1.1] tracking-[-1.5px]">
                     Kustomisasi <br/> <span className="text-[var(--matcha-600)]">Paket Belajar</span>
                   </h3>
                   <p className="text-xl text-[var(--warm-charcoal)] leading-relaxed">
-                    Eksplorasi Bank Soal untuk merakit paket latihan Anda sendiri. Publikasikan paket soal buatan Anda, atau gunakan paket pilihan dari daftar Editor's Pick.
+                    Eksplorasi 题库 untuk merakit paket latihan Anda sendiri. Publikasikan paket soal buatan Anda, atau gunakan paket pilihan dari daftar Editor's Pick.
                   </p>
                   <ul className="space-y-4 pt-4">
                     <li className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[var(--matcha-300)]/50 flex items-center justify-center">
                         <MaterialIcon name="check" className="text-[var(--matcha-800)]" />
                       </div>
-                      <span className="text-lg font-medium text-[var(--clay-black)]">Bank Soal Terintegrasi</span>
+                      <span className="text-lg font-medium text-[var(--clay-black)]">题库 Terintegrasi</span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[var(--matcha-300)]/50 flex items-center justify-center">
@@ -279,15 +245,15 @@ export function LandingPage() {
                 <div className="flex-1 w-full lg:w-1/2 relative group">
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--slushie-500)] to-[var(--ube-400)] rounded-[40px] transform rotate-3 group-hover:rotate-6 transition-transform duration-700"></div>
                   <div className="relative rounded-[40px] overflow-hidden border-4 border-[var(--pure-white)] shadow-[0_20px_60px_rgba(0,0,0,0.15)] transform transition-transform duration-700 group-hover:-translate-y-2 bg-[var(--oat-light)]">
-                    <video 
-                      className="w-full aspect-video object-cover" 
-                      autoPlay 
-                      muted 
+                    <video
+                      className="w-full aspect-video object-cover"
+                      autoPlay
+                      muted
                       loop
                       playsInline
                     >
                       <source src="/attempt%20exam.mp4" type="video/mp4" />
-                      Browser Anda tidak mendukung tag video.
+                      当前浏览器暂不支持播放此视频。
                     </video>
                   </div>
 
@@ -302,10 +268,10 @@ export function LandingPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex-1 w-full lg:w-1/2 space-y-6">
                   <h3 className="text-[40px] lg:text-[50px] font-headline font-semibold text-[var(--clay-black)] leading-[1.1] tracking-[-1.5px]">
-                    Simulasi Ujian <br/> <span className="text-[var(--slushie-600)]">Fokus Penuh</span>
+                    模拟考试 <br/> <span className="text-[var(--slushie-600)]">Fokus Penuh</span>
                   </h3>
                   <p className="text-xl text-[var(--warm-charcoal)] leading-relaxed">
                     Kerjakan latihan dengan antarmuka ujian sesungguhnya. Selesaikan tes dengan sistem timer yang tervalidasi secara akurat, dan dapatkan kalkulasi skor serta akurasi secara instan.
@@ -321,7 +287,7 @@ export function LandingPage() {
                       <div className="w-8 h-8 rounded-full bg-[var(--slushie-500)]/30 flex items-center justify-center">
                         <MaterialIcon name="check" className="text-[var(--clay-black)]" />
                       </div>
-                      <span className="text-lg font-medium text-[var(--clay-black)]">Kalkulasi Skor Otomatis</span>
+                      <span className="text-lg font-medium text-[var(--clay-black)]">自动计算成绩</span>
                     </li>
                   </ul>
                 </div>
@@ -335,10 +301,10 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
             <div className="text-center max-w-4xl mx-auto mb-24 space-y-6">
               <h2 className="text-[50px] md:text-[60px] font-headline font-semibold text-[var(--clay-black)] tracking-[-2.4px] leading-tight">
-                Fitur Unggulan Labas
+                核心功能
               </h2>
               <p className="text-2xl text-[var(--warm-charcoal)]">
-                Desain yang elegan, namun kokoh untuk mempercepat kesiapan Anda menghadapi ujian.
+                从题目练习到成绩分析，帮助你把备考过程安排得更清晰。
               </p>
             </div>
 
@@ -353,7 +319,7 @@ export function LandingPage() {
                     AI Generator
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    Hasilkan soal latihan baru menggunakan AI. Tentukan topik, level kesulitan, dan format dalam hitungan detik.
+                    使用 AI 按主题、难度和题型生成语言考试练习题。
                   </p>
                 </CardContent>
               </Card>
@@ -365,10 +331,10 @@ export function LandingPage() {
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    Latihan Terfokus
+                    专项练习
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    Akses ribuan soal latihan dari bank soal. Buat paket latihan Anda sendiri dan fokus pada area kelemahan.
+                    从题库挑选题目并创建练习套题，针对薄弱环节进行训练。
                   </p>
                 </CardContent>
               </Card>
@@ -380,10 +346,10 @@ export function LandingPage() {
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    Simulasi Ujian
+                    模拟考试
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    Simulasikan suasana ujian sesungguhnya dengan batas waktu, antarmuka imersif, dan penilaian instan.
+                    在限时环境中完成模拟考试，并查看练习结果。
                   </p>
                 </CardContent>
               </Card>
@@ -395,10 +361,10 @@ export function LandingPage() {
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    Analitik Progres
+                    学习分析
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    Lacak perkembangan nilai Anda dari waktu ke waktu. Analisis mendalam untuk setiap bagian tes bahasa.
+                    查看练习历史和各考试部分的成绩变化。
                   </p>
                 </CardContent>
               </Card>
@@ -410,7 +376,7 @@ export function LandingPage() {
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    Kosakata
+                    词汇训练
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
                     Perkaya kosakata Anda dengan metode cerdas dan pengulangan berkala yang dioptimalkan.
@@ -425,10 +391,10 @@ export function LandingPage() {
                 </div>
                 <CardContent className="p-6">
                   <h3 className="font-headline text-[32px] font-semibold text-[var(--clay-black)] tracking-[-0.64px] mb-3 leading-tight">
-                    Forum Diskusi
+                    讨论与答疑
                   </h3>
                   <p className="text-[var(--warm-charcoal)] text-lg leading-relaxed">
-                    Diskusikan soal-soal sulit dengan komunitas pembelajar lainnya dan dapatkan penjelasan ahli.
+                    围绕难题交流思路，并查看题目解析。
                   </p>
                 </CardContent>
               </Card>
@@ -438,77 +404,38 @@ export function LandingPage() {
 
 
 
-        {/* Blog Section */}
-        {env.VITE_BLOG_ENABLED && blogPosts.data?.data && blogPosts.data.data.length > 0 && (
-          <section className="w-full bg-[var(--pure-white)] py-24 border-b-2 border-dashed border-[var(--oat-border)]">
-            <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
-              <div className="flex items-center justify-between mb-10">
-                <div>
-                  <h2 className="text-[40px] md:text-[48px] font-headline font-semibold text-[var(--clay-black)] tracking-[-1.5px] leading-tight">
-                    Artikel Terbaru
-                  </h2>
-                  <p className="text-lg text-[var(--warm-charcoal)] mt-2">
-                    Tips dan panduan persiapan ujian bahasa
-                  </p>
-                </div>
-                <Link
-                  to="/blog"
-                  className="text-[var(--matcha-600)] font-semibold hover:underline hidden sm:flex items-center gap-1"
-                >
-                  Lihat Semua
-                  <MaterialIcon name="chevron_right" className="text-lg" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {blogPosts.data.data.slice(0, 3).map((post) => (
-                  <BlogCard key={post.slug} post={post} />
-                ))}
-              </div>
-              <div className="text-center mt-8 sm:hidden">
-                <Link
-                  to="/blog"
-                  className="inline-flex items-center gap-1 text-[var(--matcha-600)] font-semibold"
-                >
-                  Lihat Semua Artikel
-                  <MaterialIcon name="chevron_right" className="text-lg" />
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* SWATCH ROOM 1: Ube FAQ Section */}
         <section className="w-full bg-[var(--ube-800)] py-32 rounded-t-[40px] mt-[-40px] z-10 relative shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t-2 border-[var(--oat-border)]/20">
           <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-16">
             <div className="text-center mb-16">
               <h2 className="text-[50px] md:text-[60px] font-headline font-semibold text-[var(--pure-white)] tracking-[-2.4px] mb-6 leading-tight drop-shadow-sm">
-                Pertanyaan Umum
+                常见问题
               </h2>
               <p className="text-[var(--ube-300)] text-2xl max-w-2xl mx-auto">
-                Temukan jawaban cepat untuk pertanyaan seputar Labas.
+                关于平台功能的常见问题。
               </p>
             </div>
 
             <div className="bg-[var(--ube-900)]/40 backdrop-blur-sm border-2 border-[var(--ube-300)]/30 rounded-[32px] p-8 md:p-12 shadow-2xl">
-              <FaqItem 
+              <FaqItem
                 isDark
-                question="Apa itu Labas?" 
-                answer="Labas adalah platform latihan ujian bahasa berbasis AI yang dirancang untuk membantu Anda berlatih dan menguasai bahasa asing melalui simulasi, bank soal interaktif, dan analitik performa." 
+                question="Labas 是什么？"
+                answer="Labas 是一个外语考试练习平台，提供模拟考试、交互式题库和学习分析。"
               />
-              <FaqItem 
+              <FaqItem
                 isDark
-                question="Bagaimana cara kerja AI Generator?" 
-                answer="Fitur AI Generator memungkinkan Anda membuat paket soal baru berdasarkan konteks atau topik tertentu. Anda cukup memasukkan teks acuan, dan AI Agent kami akan memproduksi soal secara otomatis." 
+                question="AI 出题如何使用？"
+                answer="选择考试、主题和题型后，可以生成新的练习题。具体可用能力取决于当前配置的 AI 服务。"
               />
-              <FaqItem 
+              <FaqItem
                 isDark
-                question="Apakah Labas sepenuhnya gratis?" 
-                answer="Platform Labas dapat digunakan secara gratis untuk fitur dasar. Untuk fitur generasi soal berbasis AI, kami menggunakan model Bring-Your-Own-Key (BYOK). Anda cukup memasukkan API Key OpenAI Anda." 
+                question="Labas 完全免费吗？"
+                answer="基础功能与 AI 生成功能的可用范围以实际部署配置为准。使用 AI 功能前，请先在设置中配置兼容的服务密钥。"
               />
-              <FaqItem 
+              <FaqItem
                 isDark
-                question="Bahasa apa saja yang didukung oleh Labas?" 
-                answer="Saat ini Labas mendukung latihan untuk berbagai ujian profisiensi bahasa populer seperti Bahasa Inggris (TOEFL, IELTS, TOEIC), Jepang (JLPT), Korea (TOPIK), dan banyak lagi." 
+                question="支持哪些语言考试？"
+                answer="题库覆盖 TOEFL、IELTS、TOEIC、JLPT、TOPIK、HSK 等多类语言考试，具体题目以题库内容为准。"
               />
             </div>
           </div>
@@ -518,15 +445,15 @@ export function LandingPage() {
         <section className="w-full bg-[var(--matcha-800)] py-40 px-6 rounded-t-[40px] mt-[-40px] z-20 relative shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t-2 border-[var(--matcha-600)]">
           <div className="max-w-4xl mx-auto text-center space-y-12">
             <h2 className="text-[60px] md:text-[80px] font-headline font-semibold text-[var(--pure-white)] tracking-[-3.2px] leading-[0.95] drop-shadow-md">
-              Siap Meningkatkan Skor Anda?
+              准备好开始练习了吗？
             </h2>
             <p className="text-2xl text-[var(--matcha-300)] max-w-2xl mx-auto">
-              Bergabung sekarang dan rasakan perbedaan belajar dengan teknologi yang berpusat pada perkembangan Anda.
+              注册后开始练习，逐步了解自己的备考进度。
             </p>
             <div className="pt-8">
               <Link to="/login" className="inline-block">
                 <Button className="bg-[var(--pure-white)] text-[var(--clay-black)] hover:bg-[var(--oat-light)] rounded-[24px] h-[80px] px-14 text-2xl font-bold clay-shadow clay-hover">
-                  Daftar Sekarang - Gratis
+                  立即开始
                 </Button>
               </Link>
             </div>
@@ -536,45 +463,8 @@ export function LandingPage() {
 
       {/* Footer */}
       <footer className="w-full bg-[var(--pure-white)] py-12 border-t-2 border-[var(--oat-border)] text-center relative z-30">
-        <div className="flex flex-col items-center gap-4 mb-8">
-          <p className="text-[var(--warm-charcoal)] font-semibold text-lg">Hubungi Kami</p>
-          <div className="flex flex-wrap justify-center items-center gap-6 text-[var(--clay-black)]">
-            <a href="mailto:admin@rogasper.com" className="flex items-center gap-2 hover:text-[var(--matcha-700)] transition-colors">
-              <MaterialIcon name="mail" />
-              <span className="font-semibold">admin@rogasper.com</span>
-            </a>
-            <a href="https://instagram.com/rogasper" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--matcha-700)] transition-colors">
-              <MaterialIcon name="photo_camera" />
-              <span className="font-semibold">@rogasper</span>
-            </a>
-            <a href="https://github.com/rogasper/labas-bahasa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--matcha-700)] transition-colors">
-              <MaterialIcon name="code" />
-              <span className="font-semibold">GitHub</span>
-            </a>
-            <a href="https://saweria.co/rogasper" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--pomegranate-400)] transition-colors">
-              <MaterialIcon name="favorite" />
-              <span className="font-semibold">Saweria</span>
-            </a>
-            <a href="https://ko-fi.com/rogasper" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--pomegranate-400)] transition-colors">
-              <MaterialIcon name="local_cafe" />
-              <span className="font-semibold">Ko-fi</span>
-            </a>
-            <button
-              type="button"
-              onClick={() => setCommunityModalOpen(true)}
-              className="flex items-center gap-2 hover:text-[#128C7E] transition-colors"
-            >
-              <MaterialIcon name="forum" />
-              <span className="font-semibold">Komunitas WhatsApp</span>
-            </button>
-            <a href="https://rogasper.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--matcha-700)] transition-colors">
-              <MaterialIcon name="language" />
-              <span className="font-semibold">rogasper.com</span>
-            </a>
-          </div>
-        </div>
         <p className="text-[var(--warm-charcoal)] font-semibold text-lg">
-          &copy; {new Date().getFullYear()} Labas. Didesain dengan penuh kehangatan.
+          &copy; {new Date().getFullYear()} Labas · 外语考试练习
         </p>
       </footer>
     </div>

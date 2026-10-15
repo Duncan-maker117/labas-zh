@@ -16,7 +16,7 @@ export function createAuth() {
     trustedOrigins: [env.CORS_ORIGIN],
     emailAndPassword: {
       enabled: true,
-      disableSignUp: true,
+      disableSignUp: false,
     },
     user: {
       changeEmail: {

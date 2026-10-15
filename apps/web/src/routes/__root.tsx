@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { GlobalGenerationProgress } from "@/components/generate/GlobalGenerationProgress";
 import { AppModeProvider } from "@/lib/app-mode";
+import { LocaleProvider } from "@/lib/locale";
 import { AnnouncementBanner } from "@/components/ui/AnnouncementBanner";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import type { RouteShell } from "@/lib/route-shell";
@@ -65,9 +66,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" },
       ],
       scripts: [
-        ...(import.meta.env.PROD
-          ? [{ src: "https://umami-analytic.rogasper.com/script.js", defer: true, "data-website-id": "67a18412-12c8-44ef-9cd3-e04238d37e9a" }]
-          : []),
+        // Product analytics are opt-in and configured per deployment.
         {
           type: "application/ld+json",
           children: JSON.stringify({
@@ -102,6 +101,7 @@ function RootComponent() {
         disableTransitionOnChange
         storageKey="labas-theme"
       >
+        <LocaleProvider>
         <AppModeProvider>
         <AnnouncementBanner />
         {shell === "fullscreen" ? (
@@ -127,6 +127,7 @@ function RootComponent() {
         {shell !== "public" && <GlobalGenerationProgress />}
         <Toaster richColors />
       </AppModeProvider>
+        </LocaleProvider>
       </ThemeProvider>
       {import.meta.env.DEV && (
         <>

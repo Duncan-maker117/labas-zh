@@ -1,7 +1,7 @@
-export const SITE_URL = "https://labas.rogasper.com";
+export const SITE_URL = typeof window !== "undefined" ? window.location.origin : import.meta.env.VITE_SITE_URL;
 export const SITE_NAME = "Labas";
 
-/** Match rogasper.com: separate OG (PNG) + Twitter (JPEG) assets for crawler compatibility. */
+/** Keep social preview image paths local to the deployment. */
 export const OG_IMAGE_PATH = "/opengraph-image.png";
 export const TWITTER_IMAGE_PATH = "/twitter-image.jpg";
 /** @deprecated Use OG_IMAGE_PATH — kept for old links */
@@ -14,9 +14,9 @@ export const OG_IMAGE_HEIGHT = 630;
 export const OG_IMAGE_ALT =
   "Labas — platform latihan ujian bahasa dengan AI Generator dan simulasi tes";
 
-export const DEFAULT_SITE_TITLE = "Labas — AI-Powered Exam Practice Platform";
+export const DEFAULT_SITE_TITLE = "Labas — 外语考试练习平台";
 export const DEFAULT_SITE_DESCRIPTION =
-  "Generate AI-powered practice questions for JLPT, TOPIK, TOAFL, and more. Practice smarter with adaptive test preparation.";
+  "面向中文学习者的外语考试练习平台，支持题库练习、模拟考试和 AI 出题。";
 
 type SiteHeadInput = {
   title?: string;
@@ -36,7 +36,7 @@ export function buildSocialMeta(input: SiteHeadInput = {}) {
     { property: "og:description", content: description },
     { property: "og:url", content: url },
     { property: "og:site_name", content: SITE_NAME },
-    { property: "og:locale", content: "id_ID" },
+    { property: "og:locale", content: "zh_CN" },
     { property: "og:type", content: "website" },
     { property: "og:image", content: OG_IMAGE_URL },
     { property: "og:image:secure_url", content: OG_IMAGE_URL },

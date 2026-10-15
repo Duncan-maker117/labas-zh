@@ -24,7 +24,7 @@ function BlogLayout() {
   if (!env.VITE_BLOG_ENABLED) {
     return (
       <div className="min-h-screen bg-[var(--warm-cream)] flex items-center justify-center">
-        <p className="text-[var(--warm-charcoal)] text-lg">Blog tidak tersedia.</p>
+        <p className="text-[var(--warm-charcoal)] text-lg">此内容暂未开放。</p>
       </div>
     );
   }

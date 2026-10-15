@@ -239,7 +239,6 @@ export function useTestSession(packageId: string, existingAttemptId?: string, ti
   const handleFinish = useCallback(async () => {
     if (!attemptId) return;
     setIsFinished(true);
-    localStorage.setItem("pendingDonationPrompt", "exam");
     const result = await finishMutation.mutateAsync({ attemptId });
     clearElapsedTime(attemptId);
     clearMarkedQuestions(attemptId);

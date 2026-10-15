@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-utils";
 import { authClient } from "@/lib/auth-client";
 import { env } from "@labas/env/web";
-import { CommunityCard } from "@/components/settings/CommunityCard";
 
 type AccountInfo = {
   id: string;
@@ -278,7 +277,6 @@ export function AccountSettings() {
         </>
       )}
 
-      <CommunityCard />
     </div>
   );
 }
