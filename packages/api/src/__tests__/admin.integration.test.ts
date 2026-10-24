@@ -304,4 +304,24 @@ describe("Admin Integration", () => {
       expect(stats.totalPackages).toBeGreaterThanOrEqual(1);
     });
   });
+
+  it("shows only public language content in the learner dashboard", async () => {
+    await db.insert(schema.examType).values({ id: "CPNS", name: "CPNS", language: "Indonesian" });
+    const [visible, privatePack, cpnsPack] = await db.insert(schema.testPackage).values([
+      { title: "Public language", examTypeId: "IELTS", creatorUserId: userData.user1.id, isPublic: true, isFeatured: true },
+      { title: "Private language", examTypeId: "IELTS", creatorUserId: userData.user1.id, isPublic: false, isFeatured: true },
+      { title: "Historical CPNS", examTypeId: "CPNS", creatorUserId: userData.user1.id, isPublic: true, isFeatured: true },
+    ]).returning();
+    await db.insert(schema.question).values([
+      { examTypeId: "IELTS", sectionTypeId: "READING", passageText: "Private passage", questionText: "Private?", correctAnswer: "A", format: "multiple_choice", creatorUserId: userData.user1.id, isPublic: false, isFeatured: true },
+      { examTypeId: "CPNS", sectionTypeId: "READING", passageText: "Historical passage", questionText: "Historical?", correctAnswer: "A", format: "multiple_choice", creatorUserId: userData.user1.id, isPublic: true, isFeatured: true },
+    ]);
+
+    const result = await userCaller!.getDashboardFeatured();
+    const ids = result.packages.map((pack) => pack.id);
+    expect(ids).toContain(visible!.id);
+    expect(ids).not.toContain(privatePack!.id);
+    expect(ids).not.toContain(cpnsPack!.id);
+    expect(result.questionsTotal).toBe(0);
+  });
 });

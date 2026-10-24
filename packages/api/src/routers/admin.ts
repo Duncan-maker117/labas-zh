@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, desc, sql, count, ilike, or, and, inArray, gte, lte, type SQL } from "drizzle-orm";
+import { eq, ne, desc, sql, count, ilike, or, and, inArray, gte, lte, type SQL } from "drizzle-orm";
 import { adminProcedure, protectedProcedure, router } from "../index";
 import * as schema from "@labas/db";
 import { db } from "@labas/db";
@@ -412,13 +412,21 @@ export const adminRouter = router({
       .from(schema.testPackage)
       .leftJoin(schema.examType, eq(schema.testPackage.examTypeId, schema.examType.id))
       .leftJoin(schema.user, eq(schema.testPackage.creatorUserId, schema.user.id))
-      .where(eq(schema.testPackage.isFeatured, true))
+      .where(and(
+        eq(schema.testPackage.isFeatured, true),
+        eq(schema.testPackage.isPublic, true),
+        ne(schema.testPackage.examTypeId, "CPNS"),
+      ))
       .orderBy(desc(schema.testPackage.updatedAt));
 
     const [questionCount] = await db
       .select({ count: count() })
       .from(schema.question)
-      .where(eq(schema.question.isFeatured, true));
+      .where(and(
+        eq(schema.question.isFeatured, true),
+        eq(schema.question.isPublic, true),
+        ne(schema.question.examTypeId, "CPNS"),
+      ));
     const questionsTotal = Number(questionCount?.count ?? 0);
 
     return { packages, questionsTotal };
