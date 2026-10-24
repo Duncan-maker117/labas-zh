@@ -44,7 +44,7 @@ API_KEY_ENCRYPTION_KEY=$(New-LocalSecret)
 NODE_ENV=development
 SMTP_HOST=127.0.0.1
 SMTP_PORT=1025
-SMTP_FROM=Labas Local <noreply@labas.local>
+SMTP_FROM=DUNCAN Local <noreply@labas.local>
 FREE_CREDITS_ENABLED=false
 TURNSTILE_DISABLED=false
 "@

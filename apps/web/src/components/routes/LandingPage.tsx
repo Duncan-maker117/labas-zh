@@ -7,6 +7,16 @@ import { useState } from "react";
 import { images } from "@/lib/app-images";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { useLocale } from "@/lib/locale";
+import { BrandLogo } from "@/components/BrandLogo";
+
+function FeatureArtwork({ src }: { src: string }) {
+  return (
+    <div className="relative flex aspect-video items-center justify-center bg-white p-8">
+      <div className="absolute left-5 top-4"><BrandLogo className="h-10 w-[120px]" /></div>
+      <img src={src} alt="" loading="lazy" className="h-full max-h-[360px] w-auto max-w-full object-contain pt-8" />
+    </div>
+  );
+}
 
 function FaqItem({ question, answer, isDark }: { question: string; answer: string; isDark?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,22 +56,21 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--warm-cream)] flex flex-col font-sans selection:bg-[var(--matcha-300)] selection:text-[var(--clay-black)]">
       {/* Navbar */}
-      <nav className="w-full px-6 py-4 md:px-12 lg:px-16 flex items-center justify-between max-w-7xl mx-auto z-50 sticky top-0 bg-[var(--warm-cream)] border-b-2 border-[var(--oat-border)]">
+      <nav className="w-full px-4 sm:px-6 py-4 md:px-12 lg:px-16 flex items-center justify-between gap-2 max-w-7xl mx-auto z-50 sticky top-0 bg-[var(--warm-cream)] border-b-2 border-[var(--oat-border)]">
         <div className="flex items-center gap-3">
-          <img src={images.logo.src} alt={ui("Labas Logo")} className="h-10 w-auto object-contain" />
-          <span className="font-headline font-semibold text-2xl tracking-[-0.64px] text-[var(--clay-black)] hidden sm:block"><LocalizedText source={"Labas"} /></span>
+          <BrandLogo responsive className="size-11 sm:h-[60px] sm:w-[180px]" />
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
           <label className="sr-only" htmlFor="landing-locale"><LocalizedText source={"界面语言"} /></label>
-          <select id="landing-locale" value={locale} onChange={(event) => setLocale(event.target.value as "zh-CN" | "en-US" | "id-ID")} className="rounded border border-[var(--oat-border)] bg-transparent px-2 py-2 text-sm text-[var(--clay-black)]"><option value="zh-CN">简体中文</option><option value="en-US">English</option><option value="id-ID">Bahasa Indonesia</option></select>
+          <select id="landing-locale" value={locale} onChange={(event) => setLocale(event.target.value as "zh-CN" | "en-US" | "id-ID")} className="max-w-24 sm:max-w-none rounded border border-[var(--oat-border)] bg-transparent px-2 py-2 text-xs sm:text-sm text-[var(--clay-black)]"><option value="zh-CN">简体中文</option><option value="en-US">English</option><option value="id-ID">Bahasa Indonesia</option></select>
           <div className="w-px h-6 bg-[var(--oat-border)] hidden sm:block mx-2"></div>
           <Link to="/login">
-            <Button variant="ghost" className="text-[var(--clay-black)] font-semibold hover:bg-[var(--oat-light)] rounded-[12px] text-lg px-4 sm:px-6 h-12">
+            <Button variant="ghost" className="text-[var(--clay-black)] font-semibold hover:bg-[var(--oat-light)] rounded-[12px] text-sm sm:text-lg px-2 sm:px-6 h-10 sm:h-12">
               <LocalizedText source={"登录"} />
             </Button>
           </Link>
           <Link to="/login">
-            <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--dark-charcoal)] rounded-[24px] h-12 px-6 sm:px-8 font-semibold text-lg clay-hover clay-shadow">
+            <Button className="bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--dark-charcoal)] rounded-[24px] h-10 sm:h-12 px-3 sm:px-8 font-semibold text-sm sm:text-lg clay-hover clay-shadow">
               <LocalizedText source={"免费开始"} />
             </Button>
           </Link>
@@ -101,7 +110,7 @@ export function LandingPage() {
                 src={images.hero.src}
                 srcset={images.hero.srcset}
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw"
-                alt={ui("Labas Dashboard Preview")}
+                alt={ui("DUNCAN Logo")}
                 priority
                 className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-105 group-hover:-rotate-1 drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-10"
               />
@@ -153,16 +162,7 @@ export function LandingPage() {
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--ube-400)] via-[var(--matcha-300)] to-[var(--lemon-400)] rounded-[48px] transform rotate-1 group-hover:rotate-2 transition-transform duration-700 opacity-60 blur-xl"></div>
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--ube-400)] via-[var(--matcha-300)] to-[var(--lemon-400)] rounded-[48px] transform rotate-1 group-hover:rotate-2 transition-transform duration-700"></div>
                   <div className="relative rounded-[48px] overflow-hidden border-[6px] border-[var(--pure-white)] shadow-[0_30px_80px_rgba(0,0,0,0.2)] bg-[var(--oat-light)] transform transition-transform duration-700 group-hover:-translate-y-2">
-                    <video
-                      className="w-full aspect-video object-cover"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                    >
-                      <source src="/generate%20soal.mp4" type="video/mp4" />
-                      <LocalizedText source={"当前浏览器暂不支持播放此视频。"} />
-                    </video>
+                    <FeatureArtwork src={images.generateAi.src} />
                   </div>
 
                   {/* Floating badge 1 */}
@@ -194,16 +194,7 @@ export function LandingPage() {
                 <div className="flex-1 w-full lg:w-1/2 relative group">
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--matcha-400)] to-[var(--lemon-400)] rounded-[40px] transform -rotate-3 group-hover:-rotate-6 transition-transform duration-700"></div>
                   <div className="relative rounded-[40px] overflow-hidden border-4 border-[var(--pure-white)] shadow-[0_20px_60px_rgba(0,0,0,0.15)] transform transition-transform duration-700 group-hover:-translate-y-2 bg-[var(--oat-light)]">
-                    <video
-                      className="w-full aspect-video object-cover"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                    >
-                      <source src="/paket%20soal.mp4" type="video/mp4" />
-                      <LocalizedText source={"当前浏览器暂不支持播放此视频。"} />
-                    </video>
+                    <FeatureArtwork src={images.latihanSoal.src} />
                   </div>
 
                   {/* Floating badge */}
@@ -247,16 +238,7 @@ export function LandingPage() {
                 <div className="flex-1 w-full lg:w-1/2 relative group">
                   <div className="absolute inset-0 bg-gradient-to-tr from-[var(--slushie-500)] to-[var(--ube-400)] rounded-[40px] transform rotate-3 group-hover:rotate-6 transition-transform duration-700"></div>
                   <div className="relative rounded-[40px] overflow-hidden border-4 border-[var(--pure-white)] shadow-[0_20px_60px_rgba(0,0,0,0.15)] transform transition-transform duration-700 group-hover:-translate-y-2 bg-[var(--oat-light)]">
-                    <video
-                      className="w-full aspect-video object-cover"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                    >
-                      <source src="/attempt%20exam.mp4" type="video/mp4" />
-                      <LocalizedText source={"当前浏览器暂不支持播放此视频。"} />
-                    </video>
+                    <FeatureArtwork src={images.mocktest.src} />
                   </div>
 
                   {/* Floating badge */}
@@ -421,8 +403,8 @@ export function LandingPage() {
             <div className="bg-[var(--ube-900)]/40 backdrop-blur-sm border-2 border-[var(--ube-300)]/30 rounded-[32px] p-8 md:p-12 shadow-2xl">
               <FaqItem
                 isDark
-                question={ui("Labas 是什么？")}
-                answer={ui("Labas 是一个外语考试练习平台，提供模拟考试、交互式题库和学习分析。")}
+                question={ui("DUNCAN 是什么？")}
+                answer={ui("DUNCAN 是一个外语考试练习平台，提供模拟考试、交互式题库和学习分析。")}
               />
               <FaqItem
                 isDark
@@ -431,7 +413,7 @@ export function LandingPage() {
               />
               <FaqItem
                 isDark
-                question={ui("Labas 完全免费吗？")}
+                question={ui("DUNCAN 完全免费吗？")}
                 answer={ui("基础功能与 AI 生成功能的可用范围以实际部署配置为准。使用 AI 功能前，请先在设置中配置兼容的服务密钥。")}
               />
               <FaqItem
@@ -466,7 +448,7 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="w-full bg-[var(--pure-white)] py-12 border-t-2 border-[var(--oat-border)] text-center relative z-30">
         <p className="text-[var(--warm-charcoal)] font-semibold text-lg">
-          &copy; {new Date().getFullYear()} <LocalizedText source={"Labas · 外语考试练习"} />
+          &copy; {new Date().getFullYear()} <LocalizedText source={"DUNCAN · 外语考试练习"} />
         </p>
       </footer>
     </div>

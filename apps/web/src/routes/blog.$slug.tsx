@@ -19,9 +19,9 @@ export const Route = createFileRoute("/blog/$slug")({
   },
   head: () => ({
     meta: [
-      { title: uiMessage("Blog — Labas") },
+      { title: uiMessage("Blog — DUNCAN") },
       ...buildSocialMeta({
-        title: uiMessage("Blog — Labas"),
+        title: uiMessage("Blog — DUNCAN"),
         description: uiMessage("Baca artikel seputar tips dan trik ujian bahasa."),
         url: `${SITE_URL}/blog`,
       }),

@@ -33,7 +33,7 @@ const LS_GLOBAL = "labas-tour-completed";
 const TRIGGER_GLOBAL = "labas-tour-trigger";
 
 const globalSteps: Step[] = [
-  { target: "body", placement: "center", title: "Selamat Datang di Labas!", content: "Platform latihan ujian bahasa berbasis AI. Yuk, kita lihat fitur-fitur utamanya!", hideOverlay: true },
+  { target: "body", placement: "center", title: "Selamat Datang di DUNCAN!", content: "Platform latihan ujian bahasa berbasis AI. Yuk, kita lihat fitur-fitur utamanya!", hideOverlay: true },
   { target: "[data-tour='dashboard-stats']", title: "Ringkasan Aktivitas", content: "Pantau jumlah latihan, waktu belajar, soal terjawab, dan akurasi kamu di sini.", spotlightPadding: 8 },
   { target: "[data-tour='nav-generate']", title: "AI Lab — Generate Soal", content: "Buat soal latihan sendiri pakai AI. Pilih jenis ujian, section, format, dan topik.", spotlightPadding: 4 },
   { target: "[data-tour='nav-bank']", title: "Bank Soal — Buat Paket", content: "Atur soal-soal kamu jadi paket latihan dari bank soal.", spotlightPadding: 4 },
@@ -43,7 +43,7 @@ const globalSteps: Step[] = [
 ];
 
 const globalStepsZh: Step[] = [
-  { target: "body", placement: "center", title: "欢迎使用 Labas！", content: "这是一个 AI 语言考试练习平台。我们来看看主要功能。", hideOverlay: true },
+  { target: "body", placement: "center", title: "欢迎使用 DUNCAN！", content: "这是一个 AI 语言考试练习平台。我们来看看主要功能。", hideOverlay: true },
   { target: "[data-tour='dashboard-stats']", title: "学习概览", content: "这里显示练习次数、学习时长、答题数量和正确率。", spotlightPadding: 8 },
   { target: "[data-tour='nav-generate']", title: "AI 出题", content: "选择考试、科目、题型和主题，生成练习题。", spotlightPadding: 4 },
   { target: "[data-tour='nav-bank']", title: "题库与套题", content: "从题库中选择题目，组合成练习套题。", spotlightPadding: 4 },
@@ -52,7 +52,7 @@ const globalStepsZh: Step[] = [
   { target: "body", placement: "center", title: "准备好了吗？", content: "每个页面右上角的问号按钮都可以打开页面指南。", hideOverlay: true },
 ];
 const globalStepsEn: Step[] = [
-  { target: "body", placement: "center", title: "Welcome to Labas!", content: "Explore the main tools in this AI powered language exam practice platform.", hideOverlay: true },
+  { target: "body", placement: "center", title: "Welcome to DUNCAN!", content: "Explore the main tools in this AI powered language exam practice platform.", hideOverlay: true },
   { target: "[data-tour='dashboard-stats']", title: "Activity Summary", content: "Track practice sessions, study time, answered questions, and accuracy here.", spotlightPadding: 8 },
   { target: "[data-tour='nav-generate']", title: "AI Question Generator", content: "Choose an exam, section, format, and topic to generate practice questions.", spotlightPadding: 4 },
   { target: "[data-tour='nav-bank']", title: "Question Bank", content: "Organize questions into practice sets.", spotlightPadding: 4 },

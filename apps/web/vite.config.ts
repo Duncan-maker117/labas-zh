@@ -3,6 +3,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
+import { BRAND } from "./src/lib/brand";
 
 const previewUrl = process.env.LABAS_PREVIEW_URL;
 const previewHost = previewUrl ? new URL(previewUrl).hostname : undefined;
@@ -46,11 +47,11 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "labas",
-        short_name: "labas",
+        name: BRAND.name,
+        short_name: BRAND.name,
         description: "面向中文用户的外语考试练习平台",
         lang: "zh-CN",
-        theme_color: "#0c0c0c",
+        theme_color: BRAND.navy,
       },
       pwaAssets: { disabled: false, config: true },
       devOptions: { enabled: false },

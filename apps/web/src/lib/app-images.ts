@@ -13,10 +13,10 @@ export const images: Record<string, OptimizedImageData> = {
     height: 1024,
   },
   logo: {
-    src: "/logo-200.webp",
-    srcset: "/logo-100.webp 100w, /logo-200.webp 200w, /logo-400.webp 400w",
-    width: 408,
-    height: 525,
+    src: "/duncan-logo.png",
+    srcset: "/logo-100.webp 100w, /logo-200.webp 200w, /logo-400.webp 400w, /duncan-logo.png 2736w",
+    width: 2736,
+    height: 912,
   },
   generateAi: {
     src: "/generateai-400.webp",

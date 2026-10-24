@@ -1,20 +1,16 @@
-import { useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@labas/ui/components/button";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { env } from "@labas/env/web";
-import { images } from "@/lib/app-images";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export function PublicNavbar() {
-  const { ui } = useLocale();
-
   return (
     <>
       <nav className="w-full px-6 py-4 md:px-12 lg:px-16 flex items-center justify-between max-w-7xl mx-auto z-50 sticky top-0 bg-[var(--warm-cream)] border-b-2 border-[var(--oat-border)]">
         <Link to="/" className="flex items-center gap-3">
-          <img src={images.logo.src} alt={ui("Labas Logo")} className="h-10 w-auto object-contain" />
-          <span className="font-headline font-semibold text-2xl tracking-[-0.64px] text-[var(--clay-black)] hidden sm:block"><LocalizedText source={"Labas"} /></span>
+          <BrandLogo responsive className="size-11 sm:h-[60px] sm:w-[180px]" />
         </Link>
         <div className="flex items-center gap-2 sm:gap-4">
           {env.VITE_BLOG_ENABLED && (

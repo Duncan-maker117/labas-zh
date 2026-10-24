@@ -15,13 +15,13 @@ const transporter = nodemailer.createTransport({
 });
 
 const subjects: Record<string, string> = {
-  "email-verification": "Verifikasi Email Labas",
-  "forget-password": "Reset Password Labas",
+  "email-verification": "DUNCAN 邮箱验证",
+  "forget-password": "DUNCAN 重置密码",
 };
 
 const messages: Record<string, string> = {
-  "email-verification": "Gunakan kode berikut untuk memverifikasi email Anda:",
-  "forget-password": "Gunakan kode berikut untuk mereset password Anda:",
+  "email-verification": "请使用以下验证码验证你的邮箱：",
+  "forget-password": "请使用以下验证码重置密码：",
 };
 
 type SendOtpEmailProps = {
@@ -31,22 +31,22 @@ type SendOtpEmailProps = {
 };
 
 export async function sendOtpEmail({ to, otp, type }: SendOtpEmailProps) {
-  const subject = subjects[type] || "Kode Verifikasi Labas";
-  const message = messages[type] || "Kode verifikasi Anda:";
+  const subject = subjects[type] || "DUNCAN 验证码";
+  const message = messages[type] || "你的验证码：";
 
   try {
     await transporter.sendMail({
-      from: env.SMTP_FROM,
+      from: { name: "DUNCAN", address: env.SMTP_FROM.match(/<([^>]+)>/)?.[1] ?? env.SMTP_FROM },
       to,
       subject,
       html: `
         <div style="font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #16a34a;">Labas</h2>
+          <h2 style="color: #14095b; border-bottom: 3px solid #00c9e5; padding-bottom: 12px;">DUNCAN</h2>
           <p>${message}</p>
           <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
             <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #111827;">${otp}</span>
           </div>
-          <p style="color: #6b7280; font-size: 14px;">Kode berlaku selama 5 menit. Jangan bagikan kode ini kepada siapapun.</p>
+          <p style="color: #6b7280; font-size: 14px;">验证码有效期为 5 分钟，请勿向他人透露。</p>
         </div>
       `,
     });

@@ -1,0 +1,118 @@
+{
+  "login": {
+    "path": "/login",
+    "title": "DUNCAN — 外语考试练习平台",
+    "overflow": false,
+    "oldBrand": false,
+    "logos": [
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 240
+      }
+    ]
+  },
+  "home": {
+    "path": "/",
+    "title": "DUNCAN — 外语考试练习平台",
+    "overflow": false,
+    "oldBrand": false,
+    "logos": [
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 180
+      },
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 120
+      },
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 120
+      },
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 120
+      }
+    ]
+  },
+  "mobileHome": {
+    "path": "/",
+    "title": "DUNCAN — 外语考试练习平台",
+    "overflow": false,
+    "oldBrand": false,
+    "logos": [
+      {
+        "src": "http://127.0.0.1:3001/duncan-icon.png",
+        "loaded": true,
+        "width": 44
+      },
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 120
+      },
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 120
+      },
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 120
+      }
+    ]
+  },
+  "mobileLogin": {
+    "path": "/login",
+    "title": "DUNCAN — 外语考试练习平台",
+    "overflow": false,
+    "oldBrand": false,
+    "logos": [
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 240
+      }
+    ]
+  },
+  "notFound": {
+    "path": "/brand-preview-missing",
+    "title": "DUNCAN — 外语考试练习平台",
+    "overflow": false,
+    "oldBrand": false,
+    "logos": []
+  },
+  "dashboard": {
+    "path": "/dashboard",
+    "title": "DUNCAN — 外语考试练习平台",
+    "overflow": false,
+    "oldBrand": false,
+    "logos": [
+      {
+        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "loaded": true,
+        "width": 180
+      }
+    ]
+  },
+  "mobileDashboard": {
+    "path": "/dashboard",
+    "title": "DUNCAN — 外语考试练习平台",
+    "overflow": false,
+    "oldBrand": false,
+    "logos": [
+      {
+        "src": "http://127.0.0.1:3001/duncan-icon.png",
+        "loaded": true,
+        "width": 0
+      }
+    ]
+  },
+  "errors": []
+}

@@ -10,9 +10,9 @@ export const Route = createFileRoute("/blog")({
   staticData: routeShell.public,
   head: () => ({
     meta: [
-      { title: uiMessage("Blog — Labas") },
+      { title: uiMessage("Blog — DUNCAN") },
       ...buildSocialMeta({
-        title: uiMessage("Blog — Labas"),
+        title: uiMessage("Blog — DUNCAN"),
         description: uiMessage("Artikel dan tips seputar persiapan ujian bahasa, IELTS, TOEFL, JLPT, TOPIK, dan lainnya."),
         url: `${SITE_URL}/blog`,
       }),
@@ -39,7 +39,7 @@ function BlogLayout() {
       </main>
       <footer className="w-full bg-[var(--pure-white)] py-8 border-t-2 border-[var(--oat-border)] text-center">
         <p className="text-sm text-[var(--warm-charcoal)]">
-          &copy; {new Date().getFullYear()} <LocalizedText source={"Labas"} />
+          &copy; {new Date().getFullYear()} <LocalizedText source={"DUNCAN"} />
         </p>
       </footer>
     </div>

@@ -7,7 +7,7 @@ import { trpc } from "@/utils/trpc";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { useLocale } from "@/lib/locale";
 import { triggerGlobalTour } from "@/components/TourGuide";
-import { images } from "@/lib/app-images";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
   Sheet,
   SheetContent,
@@ -127,14 +127,7 @@ export function Sidebar() {
         }`}
       >
         <div className={`mb-8 ${collapsed ? "px-0 text-center" : "px-3"}`}>
-          <img
-            src={images.logo.src}
-            alt={ui("Labas")}
-            width={64}
-            height={64}
-            className="mt-2 size-16 object-contain select-none"
-            decoding="async"
-          />
+          <BrandLogo icon={collapsed} className={collapsed ? "mt-2 size-10" : "mt-2 h-[60px] w-[180px] max-w-full"} />
           {!collapsed && (
             <p className="text-xs text-[var(--warm-charcoal)] uppercase tracking-widest font-semibold mt-1">
               <LocalizedText source={"外语考试练习"} />

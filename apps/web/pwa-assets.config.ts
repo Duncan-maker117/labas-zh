@@ -5,5 +5,5 @@ export default defineConfig({
     preset: "2023",
   },
   preset,
-  images: ["public/labas_icon.png"],
+  images: ["public/duncan-icon.png"],
 });

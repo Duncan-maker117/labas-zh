@@ -1,5 +1,7 @@
+import { BRAND } from "./brand";
+
 export const SITE_URL = typeof window !== "undefined" ? window.location.origin : import.meta.env.VITE_SITE_URL;
-export const SITE_NAME = "Labas";
+export const SITE_NAME = BRAND.name;
 
 /** Keep social preview image paths local to the deployment. */
 export const OG_IMAGE_PATH = "/opengraph-image.png";
@@ -12,9 +14,9 @@ export const TWITTER_IMAGE_URL = `${SITE_URL}${TWITTER_IMAGE_PATH}`;
 export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;
 export const OG_IMAGE_ALT =
-  "Labas — 外语考试练习与 AI 出题平台";
+  `${BRAND.name} — 外语考试练习与 AI 出题平台`;
 
-export const DEFAULT_SITE_TITLE = "Labas — 外语考试练习平台";
+export const DEFAULT_SITE_TITLE = `${BRAND.name} — 外语考试练习平台`;
 export const DEFAULT_SITE_DESCRIPTION =
   "面向中文学习者的外语考试练习平台，支持题库练习、模拟考试和 AI 出题。";
 

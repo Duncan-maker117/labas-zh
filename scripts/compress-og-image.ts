@@ -1,5 +1,5 @@
 /**
- * Build social preview images for Labas (Open Graph + Twitter).
+ * Build social preview images for DUNCAN (Open Graph + Twitter).
  * Requires Bun >= 1.3.14 (Bun.Image API).
  *
  * Outputs truecolor PNG + JPEG — palette PNG breaks some Twitter/Threads crawlers.

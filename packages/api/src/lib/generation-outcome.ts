@@ -43,7 +43,7 @@ export function formatGenerationErrorMessage(input: {
     lower.includes("<thinking>") ||
     /<\/?think>/.test(lower)
   ) {
-    return `Model reasoning tidak kompatibel dengan parser Labas.${hint} Coba non-reasoning model, atau update server ke versi terbaru.`;
+    return `Model reasoning tidak kompatibel dengan parser DUNCAN.${hint} Coba non-reasoning model, atau update server ke versi terbaru.`;
   }
 
   if (

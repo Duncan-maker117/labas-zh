@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-utils";
 import { trpc } from "@/utils/trpc";
 import { routeShell } from "@/lib/route-shell";
-import { images } from "@/lib/app-images";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export const Route = createFileRoute("/forgot-password")({
   staticData: routeShell.public,
@@ -242,13 +242,12 @@ function StepReset({ email }: { email: string }) {
 }
 
 function RouteComponent() {
-  const { ui } = useLocale();
   const [email, setEmail] = useState<string | null>(null);
 
   if (!email) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-muted/30">
-        <img src={images.logo.src} alt={ui("Labas Logo")} className="h-20 w-auto mb-8 absolute top-8" />
+        <div className="absolute top-8"><BrandLogo className="h-20 w-60 max-w-full" /></div>
         <StepEmail onNext={setEmail} />
       </div>
     );
@@ -256,7 +255,7 @@ function RouteComponent() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-muted/30">
-      <img src={images.logo.src} alt={ui("Labas Logo")} className="h-20 w-auto mb-8 absolute top-8" />
+      <div className="absolute top-8"><BrandLogo className="h-20 w-60 max-w-full" /></div>
       <StepReset email={email} />
     </div>
   );

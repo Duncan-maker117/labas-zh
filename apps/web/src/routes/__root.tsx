@@ -11,6 +11,7 @@ import { useSidebar } from "@/hooks/use-sidebar";
 import { GlobalGenerationProgress } from "@/components/generate/GlobalGenerationProgress";
 import { AppModeProvider } from "@/lib/app-mode";
 import { LocaleProvider } from "@/lib/locale";
+import { BRAND } from "@/lib/brand";
 import { AnnouncementBanner } from "@/components/ui/AnnouncementBanner";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import type { RouteShell } from "@/lib/route-shell";
@@ -60,7 +61,8 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         { name: "robots", content: "index, follow" },
       ],
       links: [
-        { rel: "icon", href: "/labas_icon.png" },
+        { rel: "icon", type: "image/png", href: BRAND.icon },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon-180x180.png" },
         { rel: "canonical", href: `${SITE_URL}/` },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" as const },
@@ -73,7 +75,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            name: "Labas",
+            name: BRAND.name,
             url: SITE_URL,
             description: DEFAULT_SITE_DESCRIPTION,
             potentialAction: {

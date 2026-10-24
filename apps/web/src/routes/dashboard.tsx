@@ -77,7 +77,7 @@ function HomeComponent() {
                 </div>
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-1">{ui("Selamat Datang di Labas")}</h2>
+                <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-1">{ui("Selamat Datang di DUNCAN")}</h2>
                 <p className="text-sm text-[var(--warm-charcoal)] mb-4">{ui("Platform latihan ujian bahasa berbasis AI. Ikuti 3 langkah mudah untuk memulai:")}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Link to="/generate" className="flex items-center gap-3 p-3 rounded-[var(--radius-lg)] bg-[var(--pure-white)] border-2 border-[var(--oat-border)] hover:border-[var(--matcha-400)] transition-all group clay-hover">
