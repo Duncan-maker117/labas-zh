@@ -14,10 +14,12 @@ import { env } from "@labas/env/web";
 import { trackUmamiEvent, AnalyticsEvent } from "@/lib/umami";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useState } from "react";
+import { getLoginDestination } from "@/lib/login-destination";
 
 import Loader from "./loader";
 
-export default function SignInForm() {
+export default function SignInForm({ redirectTo }: { redirectTo?: string } = {}) {
+  const destination = getLoginDestination(redirectTo);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate({
     from: "/login",
@@ -33,7 +35,7 @@ export default function SignInForm() {
     onSubmit: async ({ value }) => {
       if (isSignUp) {
         await authClient.signUp.email({ name: value.name, email: value.email, password: value.password }, {
-          onSuccess: () => { navigate({ to: "/dashboard" }); toast.success(uiMessage("注册成功")); },
+          onSuccess: () => { navigate({ to: destination }); toast.success(uiMessage("注册成功")); },
           onError: (error) => { toast.error(uiMessage(error.error.message || "注册失败")); },
         });
         return;
@@ -46,7 +48,7 @@ export default function SignInForm() {
         {
           onSuccess: () => {
             trackUmamiEvent(AnalyticsEvent.SIGN_IN);
-            navigate({ to: "/dashboard" });
+            navigate({ to: destination });
             toast.success(uiMessage("登录成功"));
           },
           onError: (error) => {
@@ -69,7 +71,7 @@ export default function SignInForm() {
     await authClient.signIn.social(
       {
         provider: "google",
-        callbackURL: `${env.VITE_SITE_URL}/dashboard`,
+        callbackURL: `${env.VITE_SITE_URL}${destination}`,
       },
       {
         onSuccess: () => {

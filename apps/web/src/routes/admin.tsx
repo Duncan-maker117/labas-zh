@@ -9,10 +9,10 @@ import { routeShell } from "@/lib/route-shell";
 export const Route = createFileRoute("/admin")({
   staticData: routeShell.fullscreen,
   component: AdminLayout,
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const session = await authClient.getSession();
     if (!session.data) {
-      throw redirect({ to: "/login" });
+      throw redirect({ to: "/login", search: { redirect: location.pathname } });
     }
     return { session };
   },
