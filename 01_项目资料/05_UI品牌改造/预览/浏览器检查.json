@@ -6,7 +6,7 @@
     "oldBrand": false,
     "logos": [
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 240
       }
@@ -19,22 +19,22 @@
     "oldBrand": false,
     "logos": [
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 180
       },
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 120
       },
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 120
       },
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 120
       }
@@ -47,22 +47,22 @@
     "oldBrand": false,
     "logos": [
       {
-        "src": "http://127.0.0.1:3001/duncan-icon.png",
+        "src": "http://127.0.0.1:3001/duncan-icon-transparent.png",
         "loaded": true,
         "width": 44
       },
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 120
       },
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 120
       },
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 120
       }
@@ -75,7 +75,7 @@
     "oldBrand": false,
     "logos": [
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 240
       }
@@ -95,7 +95,7 @@
     "oldBrand": false,
     "logos": [
       {
-        "src": "http://127.0.0.1:3001/duncan-logo.png",
+        "src": "http://127.0.0.1:3001/duncan-logo-transparent.png",
         "loaded": true,
         "width": 180
       }
@@ -108,7 +108,7 @@
     "oldBrand": false,
     "logos": [
       {
-        "src": "http://127.0.0.1:3001/duncan-icon.png",
+        "src": "http://127.0.0.1:3001/duncan-icon-transparent.png",
         "loaded": true,
         "width": 0
       }

@@ -16,9 +16,9 @@ export function BrandLogo({
       <img
         src={icon ? BRAND.icon : BRAND.logo}
         alt={BRAND.name}
-        width={icon ? 512 : 2736}
-        height={icon ? 512 : 912}
-        className={`rounded-md bg-white object-contain select-none ${className}`}
+        width={icon ? 512 : 2172}
+        height={icon ? 512 : 724}
+        className={`object-contain select-none ${className}`}
         decoding="async"
       />
     </picture>

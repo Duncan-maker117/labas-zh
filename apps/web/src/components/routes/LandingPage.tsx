@@ -11,7 +11,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 
 function FeatureArtwork({ src }: { src: string }) {
   return (
-    <div className="relative flex aspect-video items-center justify-center bg-white p-8">
+    <div className="relative flex aspect-video items-center justify-center p-8">
       <div className="absolute left-5 top-4"><BrandLogo className="h-10 w-[120px]" /></div>
       <img src={src} alt="" loading="lazy" className="h-full max-h-[360px] w-auto max-w-full object-contain pt-8" />
     </div>
@@ -112,7 +112,7 @@ export function LandingPage() {
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw"
                 alt={ui("DUNCAN Logo")}
                 priority
-                className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-105 group-hover:-rotate-1 drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-10"
+                className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-105 group-hover:-rotate-1 relative z-10"
               />
               {/* Variatif Floating Elements */}
               <div className="absolute -top-8 -left-8 md:-top-12 md:-left-12 w-32 md:w-40 h-auto z-20 hidden sm:block">

@@ -7,16 +7,16 @@ export interface OptimizedImageData {
 
 export const images: Record<string, OptimizedImageData> = {
   hero: {
-    src: "/hero_img-1200.webp",
-    srcset: "/hero_img-400.webp 400w, /hero_img-800.webp 800w, /hero_img-1200.webp 1200w, /hero_img-1800.webp 1800w",
+    src: "/duncan-hero-1200.webp",
+    srcset: "/duncan-hero-400.webp 400w, /duncan-hero-800.webp 800w, /duncan-hero-1200.webp 1200w, /duncan-hero-1800.webp 1800w",
     width: 1536,
     height: 1024,
   },
   logo: {
-    src: "/duncan-logo.png",
-    srcset: "/logo-100.webp 100w, /logo-200.webp 200w, /logo-400.webp 400w, /duncan-logo.png 2736w",
-    width: 2736,
-    height: 912,
+    src: "/duncan-logo-transparent.png",
+    srcset: "/logo-100.webp 100w, /logo-200.webp 200w, /logo-400.webp 400w, /duncan-logo-transparent.png 2172w",
+    width: 2172,
+    height: 724,
   },
   generateAi: {
     src: "/generateai-400.webp",
@@ -55,8 +55,8 @@ export const images: Record<string, OptimizedImageData> = {
     height: 507,
   },
   notFound: {
-    src: "/not_found-800.webp",
-    srcset: "/not_found-400.webp 400w, /not_found-800.webp 800w",
+    src: "/duncan-not-found-800.webp",
+    srcset: "/duncan-not-found-400.webp 400w, /duncan-not-found-800.webp 800w",
     width: 1200,
     height: 762,
   },
