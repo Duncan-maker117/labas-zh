@@ -1,324 +1,67 @@
-## 中文版在线预览
+# Labas 中文外语学习网站
 
-**[点击打开 Labas 中文版网站](https://amongst-assurance-prices-earn.trycloudflare.com)**
+这是面向中文用户的外语考试练习项目，基于 Labas 上游源码继续改造。主线是：**登录 → 选题或 AI 出题 → 组成套题 → 计时作答 → 查看结果与学习分析**。
 
-这是当前版本的临时体验入口。提供服务的电脑、网站进程和 Cloudflare 隧道需要持续运行；停止或重启隧道后，地址可能失效或改变。GitHub 仓库保存源码及版本记录，上传代码不会让临时网站自动保持在线。
+**从这里开始：[网站功能地图](01_项目资料/02_当前功能/网站功能地图.md) · [国内版精简清单](01_项目资料/03_国内版精简/精简清单与回退.md) · [问题与建议](01_项目资料/04_检查与建议/问题清单与迭代建议.md) · [验收记录](01_项目资料/04_检查与建议/验收记录.md)**
 
----
+[本地网站入口](http://127.0.0.1:3001)（需要先启动服务；本次检查时未运行）。旧 Cloudflare 临时地址只保存在历史资料中，当前可达性未验证，不能作为正式演示交付。
 
-<p align="center">
-  <img src="./apps/web/public/logo.png" alt="Labas" width="200" />
-</p>
+## 当前能做什么
 
-<h1 align="center">Labas</h1>
+- 中文默认界面，保留界面语言切换；目标外语试题保持原文。
+- 8 类语言考试目录：IELTS、TOEFL、JLPT、TOPIK、Goethe、DELE、TOAFL、HSK；当前新出题主线是阅读与 20 种语言题型。
+- 登录与账户、公开/私有题库、套题与组卷、计时练习、答案与解析、历史、学习分析、排行榜。
+- 默认平台 AI，保留高级自带 Key；有后台生成队列、额度预留与结算、管理员配置及审核代码。
+- 印尼公考不进入国内新目录与默认推荐；海外社群、捐赠和原作者统计注入已移除。
 
-<p align="center">
-  <strong>AI-powered multi-language test practice platform</strong><br />
-  Generate authentic exam questions, run mock tests, and track your progress — all in one place.
-</p>
+这些是本地源码与隔离测试确认的能力范围。真实 PostgreSQL、Redis、SMTP、AI provider 尚未做本次完整联调；支付没有接入，不能购买会员。完整官方考试、听力/口语链路及真实题目质量也不在本次验证结论内。
 
-<p align="center">
-  <a href="#getting-started">Getting Started</a> ·
-  <a href="#features">Features</a> ·
-  <a href="#supported-exams">Exams</a> ·
-  <a href="#project-structure">Structure</a> ·
-  <a href="#support">Support</a> ·
-  <a href="#license">License</a>
-</p>
+## 文件夹导航
 
----
-
-## What is Labas?
-
-**Labas** is an open-source platform for practicing foreign-language proficiency exams. Users can generate reading (and writing) questions with AI, save them into question packages, take timed mock tests, and review results with explanations in **Bahasa Indonesia** (foreign script such as kanji, hanzi, hangul, or Arabic may appear when relevant).
-
-The project is a **Turborepo monorepo** managed with **Bun**. The web app talks to a **Hono + tRPC** backend backed by **PostgreSQL**, **Redis** (job queue), and **Better Auth**.
-
-## Features
-
-- **AI question generation** — Quick mode (single-pass) and Agentic mode (multi-step pipeline with passage validation and quality checks)
-- **8 exam types** — IELTS, TOEFL, JLPT, HSK, Goethe, TOPIK, TOAFL, DELE
-- **20+ question formats** — Multiple choice, true/false/not given, fill-in-blank, kanji reading, matching, and more
-- **Question bank & packages** — Organize generated questions into shareable or private packages
-- **Mock tests & attempts** — Timed practice sessions with scoring and review
-- **Analytics & leaderboard** — Track performance over time
-- **User-managed AI keys** — Bring your own OpenAI-compatible API key via Settings (never hardcoded in server env)
-- **Credit system** — Token-based usage tracking for AI generation
-- **Admin panel** — User management, moderation, jobs, credits, and featured content
-- **PWA** — Installable progressive web app
-- **Accessible UI** — Shared shadcn/ui components with skip links, proper ARIA, and focus management
-
-## Demo
-
-▶ [AI Question Generation](./apps/web/public/generate%20soal.mp4) — Watch AI generate exam questions with quick and agentic modes.
-
-▶ [Creating Practice Packages](./apps/web/public/paket%20soal.mp4) — Browse, filter, and organize questions into packages.
-
-▶ [Taking a Mock Test](./apps/web/public/attempt%20exam.mp4) — Timed practice session with passage, questions, and navigation.
-
-## Supported Exams
-
-| Exam | Language | Notes |
-|------|----------|-------|
-| IELTS Academic | English | Reading & Writing sections |
-| TOEFL iBT | English | Reading & Writing sections |
-| JLPT | Japanese | Kanji annotations supported (`漢字(かんじ)`) |
-| HSK | Chinese | |
-| Goethe-Zertifikat | German | |
-| TOPIK | Korean | Particles, honorifics, speech levels |
-| TOAFL | Arabic | RTL text support |
-| DELE | Spanish | Verb conjugation focus |
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Runtime & package manager | [Bun](https://bun.sh) 1.3+ |
-| Frontend | React 19, Vite, [TanStack Router](https://tanstack.com/router) |
-| Backend | [Hono](https://hono.dev), [tRPC](https://trpc.io) |
-| Database | PostgreSQL + [Drizzle ORM](https://orm.drizzle.team) |
-| Queue | Redis + BullMQ (AI generation jobs) |
-| Auth | [Better Auth](https://www.better-auth.com) (email/password) |
-| UI | [shadcn/ui](https://ui.shadcn.com) in `packages/ui` |
-| AI | OpenAI-compatible API (`packages/ai`) |
-| Build | Turborepo + tsdown |
-
-## Prerequisites
-
-- **[Bun](https://bun.sh)** `1.3.11` or later (see `packageManager` in root `package.json`)
-- **PostgreSQL** 15+
-- **Redis** 7+ (required for background AI generation jobs)
-- **SMTP server** (required for email verification and password reset)
-
-> Use `bun` for all install and script commands. Do not use `pnpm`, `npm`, or `yarn` unless a global tool explicitly requires it.
-
-## Getting Started
-
-### 1. Clone and install
-
-```bash
-git clone https://github.com/<your-org>/labas.git
-cd labas
-bun install
+```text
+外语学习网站/
+├── README.md                 中文总入口
+├── AGENTS.md                 项目规则、安全与 Git 要求
+├── 01_项目资料/               人看的功能、历史、精简与问题记录
+│   ├── 01_历史拆解/           以前的源码审计、上游需求与设计原件
+│   ├── 02_当前功能/           页面功能与源码地图
+│   ├── 03_国内版精简/         删除、关闭、保留与回退说明
+│   └── 04_检查与建议/         问题优先级、验证结果与执行记录
+├── apps/
+│   ├── web/                  React/Vite 前端
+│   └── server/               Hono HTTP 服务
+├── packages/                 API、AI、数据库、认证、UI 与配置
+├── deploy/                   本地/部署配置
+└── scripts/                  本地环境及素材处理脚本
 ```
 
-### 2. Start PostgreSQL and Redis
+`apps/`、`packages/` 等保留工具要求的英文路径；这里只维护一份实际源码。上游产品说明和设计资料已归档到 [01_历史拆解](01_项目资料/01_历史拆解/README.md)，历史判断与当前状态分开。
 
-The repo includes a Docker Compose file for local development:
+## 本地运行与检查
 
-```bash
-bun run db:start
-```
+包管理器使用根 `package.json` 指定的 **Bun 1.3.14**。运行前配置独立开发库、Redis、SMTP 和后端密钥，参考 `apps/server/.env.example` 与 `apps/web/.env.example`；不要把真实密钥提交 Git。
 
-This starts PostgreSQL on port `5432` and Redis on port `6379`. See [`packages/db/docker-compose.yml`](./packages/db/docker-compose.yml) for defaults.
-
-Alternatively, point `DATABASE_URL` and `REDIS_URL` at your own instances.
-
-### 3. Configure environment
-
-Copy the example env files:
-
-```bash
-cp apps/server/.env.example apps/server/.env
-cp apps/web/.env.example apps/web/.env
-```
-
-Edit **`apps/server/.env`**:
-
-```env
-# PostgreSQL (matches docker-compose defaults)
-DATABASE_URL=postgresql://postgres:password@localhost:5432/labas
-
-# Redis (defaults to redis://localhost:6379 if omitted)
-REDIS_URL=redis://localhost:6379
-
-# Auth — generate random strings ≥ 32 characters
-BETTER_AUTH_SECRET=your-random-secret-at-least-32-chars
-BETTER_AUTH_URL=http://localhost:3000
-CORS_ORIGIN=http://localhost:3001
-
-# Encrypts user AI API keys at rest — ≥ 32 characters
-API_KEY_ENCRYPTION_KEY=your-encryption-key-at-least-32-chars
-
-# SMTP (required for sign-up verification & password reset)
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=your-smtp-user
-SMTP_PASS=your-smtp-password
-SMTP_FROM=noreply@example.com
-
-# Optional: platform-wide AI fallback (users normally set keys in Settings UI)
-# PLATFORM_AI_API_KEY=
-# PLATFORM_AI_BASE_URL=
-# PLATFORM_AI_MODEL=
-```
-
-Edit **`apps/web/.env`**:
-
-```env
-VITE_SERVER_URL=http://localhost:3000
-```
-
-### 4. Push database schema
-
-```bash
-bun run db:push
-```
-
-Optionally seed reference data (exam types, sections):
-
-```bash
-bun run db:seed
-```
-
-### 5. Run the dev servers
-
-```bash
+```powershell
+bun install --frozen-lockfile
 bun run dev
 ```
 
-| Service | URL |
-|---------|-----|
-| Web app | [http://localhost:3001](http://localhost:3001) |
-| API server | [http://localhost:3000](http://localhost:3000) |
+默认前端 `http://127.0.0.1:3001`，后端 `http://127.0.0.1:3000`。临时同域预览模式使用另一组端口，按 `apps/web/vite.config.ts` 和部署配置确认。
 
-Sign up, verify your email, then open **Settings** to add your OpenAI-compatible API key before generating questions.
-
-## AI Configuration
-
-AI provider keys are **not** stored in server `.env` by default. Each user configures their own key in the **Settings** page. The server encrypts keys with `API_KEY_ENCRYPTION_KEY`.
-
-Generation supports any **OpenAI-compatible** endpoint (OpenAI, OpenRouter, local LM Studio, etc.).
-
-Two generation modes are available:
-
-| Mode | Description |
-|------|-------------|
-| **Quick** | Single LLM call with schema validation and repair |
-| **Agentic** | Multi-step pipeline: plan → shared passage → parallel question shards → validation |
-
-AI logic lives in [`packages/ai/`](./packages/ai/).
-
-## Project Structure
-
-```
-labas/
-├── apps/
-│   ├── web/              # Frontend (React + TanStack Router) — port 3001
-│   └── server/           # Backend entry (Hono + tRPC) — port 3000
-├── packages/
-│   ├── ai/               # Prompts, schemas, quick & agentic pipelines
-│   ├── api/              # tRPC routers, queue workers, business logic
-│   ├── auth/             # Better Auth configuration
-│   ├── config/           # Shared TypeScript configs
-│   ├── db/               # Drizzle schema, migrations, docker-compose
-│   ├── env/              # Environment validation (Zod)
-│   └── ui/               # Shared shadcn/ui components & design tokens
-├── AGENTS.md             # Contributor guide for AI agents & developers
-└── turbo.json
+```powershell
+bun test ./apps/web/src/lib/__tests__
+bun run check-types --concurrency=1
+bun run build --concurrency=1
 ```
 
-Internal imports use the `@labas/*` workspace namespace. Apps should not import from each other directly — share code through `packages/*`.
+接口测试使用隔离 PGlite；涉及 `mock.module` 的集成文件建议逐个进程运行，避免全局 mock 相互污染。具体已验证结果见 [验收记录](01_项目资料/04_检查与建议/验收记录.md)。
 
-## Available Scripts
+`scripts/setup-local.ps1` 会创建隔离服务并运行开发库迁移/seed，只有确认其本地库目标后再执行；本次没有运行。`scripts/start-local.ps1` 用于已有隔离环境。部署配置可参考 [Coolify 原始技术说明](deploy/COOLIFY.md)，其中发布前提仍需按当前环境重新核对。
 
-Run from the **repository root**:
+## 数据、上线与版本
 
-| Command | Description |
-|---------|-------------|
-| `bun run dev` | Start web + server in development |
-| `bun run dev:web` | Start web app only |
-| `bun run dev:server` | Start server only |
-| `bun run build` | Build all packages |
-| `bun run check-types` | TypeScript check across the monorepo |
-| `bun test` | Run all tests via Turborepo |
-| `bun run db:push` | Push Drizzle schema to PostgreSQL |
-| `bun run db:generate` | Generate migration files |
-| `bun run db:migrate` | Run migrations |
-| `bun run db:seed` | Seed reference data (exam types, sections) |
-| `bun run db:studio` | Open Drizzle Studio |
-| `bun run db:start` | Start PostgreSQL + Redis (Docker Compose) |
-| `bun run db:stop` | Stop Docker Compose services |
+业务数据由 PostgreSQL 保存；Redis 负责后台队列。Git 只能回退源码，不能代替用户数据备份。部署前需分别验收前端、后端、数据库、Redis、邮件与 AI，不以页面能打开代替完整可用。
 
-## Deployment
+每项完整改动保存本地提交。回退优先 `git revert <提交号>`；用户自行部署，本地提交不会自动上传或发布。
 
-Production deploys use **two Coolify applications** from this repo (web + API server), plus **PostgreSQL** and **Redis**. The server does not serve the frontend build; the web app calls the API via `VITE_SERVER_URL`.
-
-See **[`deploy/COOLIFY.md`](./deploy/COOLIFY.md)** for step-by-step Coolify setup, environment variables, Nixpacks configs (`deploy/server.nixpacks.toml`, `deploy/web.nixpacks.toml`), and a first-deploy checklist.
-
-## Development
-
-### Type checking
-
-```bash
-bun run check-types
-```
-
-### Testing
-
-```bash
-bun test
-```
-
-Tests use **Bun's built-in test runner**. Unit tests live in `src/__tests__/` within each package. Integration tests in `packages/api` use PGlite (in-memory PostgreSQL).
-
-### Adding shadcn/ui components
-
-From the project root:
-
-```bash
-npx shadcn@latest add accordion dialog -c packages/ui
-```
-
-Import shared components:
-
-```tsx
-import { Button } from "@labas/ui/components/button";
-```
-
-Design tokens and global styles: [`packages/ui/src/styles/globals.css`](./packages/ui/src/styles/globals.css).
-
-### PWA assets
-
-```bash
-cd apps/web && bun run generate-pwa-assets
-```
-
-## Contributing
-
-Contributions are welcome! Before opening a PR:
-
-1. Read [`AGENTS.md`](./AGENTS.md) for architecture, conventions, and common pitfalls.
-2. Run `bun run check-types` and `bun test`.
-3. Keep changes focused and match existing code style.
-
-For AI-related changes, see the **AI Generation Context** section in `AGENTS.md` — adding a new question format touches schemas, prompts, attempt normalization, and frontend constants.
-
-## Support
-
-If you find Labas helpful and want to support its ongoing development, consider buying the creator a coffee! Your support helps cover API and hosting costs. ☕
-
-- **[Saweria](https://saweria.co/rogasper)** (Indonesian supporters)
-- **[Ko-fi](https://ko-fi.com/rogasper)** (International)
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=rogasper%2Flabas-bahasa&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=rogasper/labas-bahasa&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=rogasper/labas-bahasa&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=rogasper/labas-bahasa&type=date&legend=top-left" />
- </picture>
-</a>
-
-## License
-
-This project is licensed under the **[GNU Affero General Public License v3.0 (AGPL-3.0)](./LICENSE)**.
-
-If you run a modified version as a network service, you must make the corresponding source code available to users of that service.
-
----
-
-<p align="center">
-  Built with Bun, React, Hono, and tRPC.
-</p>
+上游项目为 `rogasper/labas-bahasa`，许可证见 [LICENSE](LICENSE)。当前项目保留原许可与来源；付费/会员另行定义套餐、支付渠道和服务端权益后实现。

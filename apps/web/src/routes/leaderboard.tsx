@@ -1,5 +1,5 @@
 /* Hallmark · redesign: leaderboard · genre: modern-minimal · macrostructure: Leaderboard
- * design-system: DESIGN.md · theme: Clay (warm-cream · oat · swatch palette)
+ * design-system: 01_项目资料/01_历史拆解/上游设计说明.md · theme: Clay (warm-cream · oat · swatch palette)
  */
 import { useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
