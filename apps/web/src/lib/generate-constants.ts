@@ -9,19 +9,15 @@ export const EXAM_TYPES = [
   { id: "TOPIK", name: "TOPIK", code: "kr" },
   { id: "TOAFL", name: "TOAFL", code: "sa" },
   { id: "DELE", name: "DELE", code: "es" },
-  { id: "CPNS", name: "CPNS SKD", code: "id" },
 ];
 
 export const SECTIONS = [
   { id: "READING", name: "Reading", icon: "menu_book", allowedExams: ALL_EXAMS },
-  { id: "TIU", name: "TIU", icon: "psychology", allowedExams: ["CPNS"] },
-  { id: "TWK", name: "TWK", icon: "gavel", allowedExams: ["CPNS"] },
-  { id: "TKP", name: "TKP", icon: "diversity_3", allowedExams: ["CPNS"] },
 ];
 
 export const FORMATS = [
-  { id: "multiple_choice", name: "Multiple Choice", allowedExams: [...ALL_EXAMS, "CPNS"] },
-  { id: "true_false_not_given", name: "True / False / Not Given", allowedExams: [...ALL_EXAMS, "CPNS"] },
+  { id: "multiple_choice", name: "Multiple Choice", allowedExams: ALL_EXAMS },
+  { id: "true_false_not_given", name: "True / False / Not Given", allowedExams: ALL_EXAMS },
   { id: "fill_blank", name: "Fill in Blank", allowedExams: [...ALL_EXAMS] },
   { id: "synonym", name: "Synonym / Vocabulary", allowedExams: [...ALL_EXAMS] },
   { id: "grammar_in_context", name: "Grammar in Context", allowedExams: [...ALL_EXAMS] },
@@ -40,19 +36,12 @@ export const FORMATS = [
   { id: "article_case", name: "Article / Gender / Agreement", allowedExams: ["GOETHE", "TOAFL", "DELE"] },
   { id: "character_reading", name: "Character Reading", allowedExams: ["HSK", "TOPIK"] },
   { id: "sentence_arrangement", name: "Sentence Arrangement", allowedExams: ["HSK", "TOPIK", "DELE", "TOAFL"] },
-  { id: "situational_judgment", name: "Situational Judgment (TKP)", allowedExams: ["CPNS"] },
 ];
 
 export const TOPICS = [
   "Science & Tech", "Business", "Sociology", "Arts", "History", "Environment", "Health", "Education",
   "Daily Interaction", "Social Etiquette", "Workplace",
 ];
-
-export const CPNS_TOPICS = {
-  TIU: ["Sinonim & Antonim", "Analogi", "Deret Angka", "Aritmatika", "Perbandingan", "Silogisme", "Logika Posisi", "Diagram Venn"],
-  TWK: ["Pancasila", "UUD 1945", "NKRI", "Bhinneka Tunggal Ika", "Sejarah Indonesia", "Sistem Pemerintahan", "HAM"],
-  TKP: ["Pelayanan Publik", "Jejaring Kerja", "Sosial Budaya", "Profesionalisme", "Anti-Radikalisme", "Teknologi Informasi"],
-};
 
 export const DIFFICULTIES = ["Beginner", "Elementary", "Intermediate", "Advanced", "Expert"];
 

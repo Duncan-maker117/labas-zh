@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, desc, sql, inArray } from "drizzle-orm";
+import { eq, ne, and, desc, sql, inArray } from "drizzle-orm";
 import { router, protectedProcedure, publicProcedure } from "../index";
 import { db } from "@labas/db";
 import {
@@ -388,6 +388,8 @@ export const comboRouter = router({
 
       if (input?.examTypeId) {
         pkgConditions.push(eq(testPackage.examTypeId, input.examTypeId));
+      } else {
+        pkgConditions.push(ne(testPackage.examTypeId, "CPNS"));
       }
 
       const pkgWhere = pkgConditions.length > 0 ? and(...pkgConditions) : undefined;

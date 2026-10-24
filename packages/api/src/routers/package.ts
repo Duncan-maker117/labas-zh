@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, desc, sql, inArray } from "drizzle-orm";
+import { eq, ne, and, desc, sql, inArray } from "drizzle-orm";
 import { router, protectedProcedure, publicProcedure } from "../index";
 import { db } from "@labas/db";
 import {
@@ -33,7 +33,9 @@ export const packageRouter = router({
       const { limit, offset } = paginateDefaults(input);
       const conditions = [];
 
-      if (input?.examTypeId) conditions.push(eq(testPackage.examTypeId, input.examTypeId));
+      conditions.push(input?.examTypeId
+        ? eq(testPackage.examTypeId, input.examTypeId)
+        : ne(testPackage.examTypeId, "CPNS"));
 
       if (input?.search) {
         conditions.push(
@@ -107,6 +109,8 @@ export const packageRouter = router({
       }
       if (input?.examTypeId) {
         conditions.push(eq(testPackage.examTypeId, input.examTypeId));
+      } else {
+        conditions.push(ne(testPackage.examTypeId, "CPNS"));
       }
       if (input?.isPublic !== undefined) {
         conditions.push(eq(testPackage.isPublic, input.isPublic));
@@ -555,7 +559,7 @@ export const packageRouter = router({
         .from(testPackage)
         .leftJoin(examType, eq(testPackage.examTypeId, examType.id))
         .where(
-          and(eq(testPackage.isFeatured, true), eq(testPackage.isPublic, true)),
+          and(eq(testPackage.isFeatured, true), eq(testPackage.isPublic, true), ne(testPackage.examTypeId, "CPNS")),
         )
         .orderBy(desc(testPackage.createdAt))
         .limit(6);
@@ -582,7 +586,7 @@ export const packageRouter = router({
         })
         .from(testPackage)
         .leftJoin(examType, eq(testPackage.examTypeId, examType.id))
-        .where(eq(testPackage.isPublic, true))
+        .where(and(eq(testPackage.isPublic, true), ne(testPackage.examTypeId, "CPNS")))
         .orderBy(desc(testPackage.usageCount))
         .limit(6);
 

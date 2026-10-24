@@ -93,4 +93,23 @@ describe("question router", () => {
     expect(result).toHaveProperty("id");
     expect(result.format).toBe("fill_blank");
   });
+
+  it("hides CPNS from default discovery while preserving historical access", async () => {
+    const testDb = drizzle(await getTestPGlite(), { schema });
+    await testDb.insert(schema.examType).values({
+      id: "CPNS", name: "CPNS", language: "Indonesian",
+    });
+    const historicalQuestion = await protectedCaller.create({
+      examTypeId: "CPNS", sectionTypeId: "READING", format: "multiple_choice",
+      passageText: "Historical CPNS material", questionText: "Historical question?",
+      correctAnswer: "A", difficulty: 2, isCaseSensitive: false, skillTags: [], isPublic: true,
+    });
+
+    const discovery = await caller.list();
+    expect(discovery.questions.map((q: { id: string }) => q.id)).not.toContain(historicalQuestion.id);
+    expect(discovery.total).toBe(1);
+    const historical = await caller.list({ examTypeId: "CPNS" });
+    expect(historical.questions.map((q: { id: string }) => q.id)).toContain(historicalQuestion.id);
+    expect(await protectedCaller.getById({ id: historicalQuestion.id })).not.toBeNull();
+  });
 });

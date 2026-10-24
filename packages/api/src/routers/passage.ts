@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, desc, like, and, sql } from "drizzle-orm";
+import { eq, ne, desc, like, and, sql } from "drizzle-orm";
 import { router, protectedProcedure, publicProcedure } from "../index";
 import { db } from "@labas/db";
 import { passage, question, examType, sectionType, user } from "@labas/db";
@@ -53,6 +53,8 @@ export const passageRouter = router({
       }
       if (input?.examTypeId) {
         conditions.push(eq(passage.examTypeId, input.examTypeId));
+      } else {
+        conditions.push(ne(passage.examTypeId, "CPNS"));
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;

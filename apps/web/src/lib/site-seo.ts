@@ -12,7 +12,7 @@ export const TWITTER_IMAGE_URL = `${SITE_URL}${TWITTER_IMAGE_PATH}`;
 export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;
 export const OG_IMAGE_ALT =
-  "Labas — platform latihan ujian bahasa dengan AI Generator dan simulasi tes";
+  "Labas — 外语考试练习与 AI 出题平台";
 
 export const DEFAULT_SITE_TITLE = "Labas — 外语考试练习平台";
 export const DEFAULT_SITE_DESCRIPTION =

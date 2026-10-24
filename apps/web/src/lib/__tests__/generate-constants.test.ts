@@ -9,8 +9,10 @@ import {
 } from "../generate-constants";
 
 describe("EXAM_TYPES", () => {
-  it("has 9 exam types", () => {
-    expect(EXAM_TYPES).toHaveLength(9);
+  it("offers language exams without Indonesian civil-service exams", () => {
+    expect(EXAM_TYPES.map((exam) => exam.id)).toEqual([
+      "IELTS", "TOEFL", "JLPT", "HSK", "GOETHE", "TOPIK", "TOAFL", "DELE",
+    ]);
   });
 
   it("each entry has id, name, and code", () => {
@@ -28,8 +30,8 @@ describe("EXAM_TYPES", () => {
 });
 
 describe("SECTIONS", () => {
-  it("has 4 sections with id, name, icon, and allowedExams", () => {
-    expect(SECTIONS).toHaveLength(4);
+  it("offers reading practice with section metadata", () => {
+    expect(SECTIONS.map((section) => section.id)).toEqual(["READING"]);
     for (const s of SECTIONS) {
       expect(s).toHaveProperty("id");
       expect(s).toHaveProperty("name");
@@ -44,19 +46,14 @@ describe("SECTIONS", () => {
     const reading = SECTIONS.find((s) => s.id === "READING");
     expect(reading?.allowedExams).toEqual(langExams);
   });
-
-  it("TIU, TWK, TKP are allowed only for CPNS", () => {
-    for (const s of SECTIONS) {
-      if (s.id === "TIU" || s.id === "TWK" || s.id === "TKP") {
-        expect(s.allowedExams).toEqual(["CPNS"]);
-      }
-    }
-  });
 });
 
 describe("FORMATS", () => {
-  it("has 21 question formats", () => {
-    expect(FORMATS).toHaveLength(21);
+  it("excludes Indonesian situational judgment from language practice", () => {
+    expect(FORMATS.map((format) => format.id)).not.toContain("situational_judgment");
+    for (const format of FORMATS) {
+      expect(format.allowedExams).not.toContain("CPNS");
+    }
   });
 
   it("each format has id, name, and allowedExams", () => {

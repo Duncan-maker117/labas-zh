@@ -80,7 +80,7 @@ app.post("/api/webhooks/email-bounce", async (c) => {
 });
 
 app.get("/sitemap.xml", (c) => {
-  const baseUrl = "https://labas.rogasper.com";
+  const baseUrl = new URL(env.CORS_ORIGIN).origin;
   const urls = [
     { loc: `${baseUrl}/`, changefreq: "weekly", priority: "1.0" },
   ];

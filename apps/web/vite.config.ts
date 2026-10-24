@@ -37,16 +37,6 @@ export default defineConfig({
     },
   },
   plugins: [
-    {
-      name: "inject-umami",
-      transformIndexHtml(html) {
-        return html.replace(
-          "</head>",
-          '<script defer src="https://umami-analytic.rogasper.com/script.js" data-website-id="67a18412-12c8-44ef-9cd3-e04238d37e9a"></script></head>',
-        );
-      },
-      apply: "build",
-    },
     tailwindcss(),
     tanstackRouter({
       target: "react",
@@ -58,7 +48,8 @@ export default defineConfig({
       manifest: {
         name: "labas",
         short_name: "labas",
-        description: "AI-powered multi-language test practice platform",
+        description: "面向中文用户的外语考试练习平台",
+        lang: "zh-CN",
         theme_color: "#0c0c0c",
       },
       pwaAssets: { disabled: false, config: true },

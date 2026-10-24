@@ -28,7 +28,7 @@ export const env = createEnv({
     DEFAULT_SIGNUP_CREDIT_TOKENS: z.coerce.number().positive().default(50_000),
     CLOUDFLARE_TURNSTILE_SECRET_KEY: z.string().optional(),
     TURNSTILE_DISABLED: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
-    BLOG_API_URL: z.string().url().default("https://api.rogasper.com"),
+    BLOG_API_URL: z.url().optional(),
     BLOG_PROJECT_SLUG: z.string().optional(),
     BLOG_API_KEY: z.string().optional(),
   },

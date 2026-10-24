@@ -226,4 +226,26 @@ describe("package router", () => {
     const fetched = await caller.getById({ id: pkgId });
     expect(fetched).toBeNull();
   });
+
+  it("excludes CPNS from discovery and recommendations but retains owned history", async () => {
+    await testDb.insert(schema.examType).values({
+      id: "CPNS", name: "CPNS", language: "Indonesian",
+    });
+    const languagePack = await protectedCaller.create({ title: "Language practice", examTypeId: "IELTS", isPublic: true });
+    const historicalPack = await protectedCaller.create({ title: "Historical CPNS", examTypeId: "CPNS", isPublic: true });
+    await testDb.update(schema.testPackage).set({ isFeatured: true, usageCount: 100 }).where(eq(schema.testPackage.id, historicalPack.id));
+
+    const discovery = await caller.list();
+    expect(discovery.packages.map((p: { id: string }) => p.id)).toEqual([languagePack.id]);
+    expect(discovery.total).toBe(1);
+    const owned = await protectedCaller.myPackages();
+    expect(owned.packages.map((p: { id: string }) => p.id)).not.toContain(historicalPack.id);
+    expect(owned.total).toBe(1);
+    expect((await caller.featured()).map((p: { id: string }) => p.id)).not.toContain(historicalPack.id);
+    expect((await caller.trending()).map((p: { id: string }) => p.id)).not.toContain(historicalPack.id);
+
+    const historical = await protectedCaller.myPackages({ examTypeId: "CPNS" });
+    expect(historical.packages.map((p: { id: string }) => p.id)).toContain(historicalPack.id);
+    expect(await protectedCaller.getById({ id: historicalPack.id })).not.toBeNull();
+  });
 });

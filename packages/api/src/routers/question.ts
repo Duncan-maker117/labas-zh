@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, desc, sql, like, or, inArray } from "drizzle-orm";
+import { eq, ne, and, desc, sql, like, or, inArray } from "drizzle-orm";
 import { router, protectedProcedure, publicProcedure } from "../index";
 import { db } from "@labas/db";
 import { question, examType, sectionType, user } from "@labas/db";
@@ -76,7 +76,10 @@ export const questionRouter = router({
       const userId = ctx.session?.user.id;
       const conditions = [];
 
-      if (input?.examTypeId) conditions.push(eq(question.examTypeId, input.examTypeId));
+      // Keep explicit historical queries available while excluding CPNS from discovery.
+      conditions.push(input?.examTypeId
+        ? eq(question.examTypeId, input.examTypeId)
+        : ne(question.examTypeId, "CPNS"));
       if (input?.sectionTypeId) conditions.push(eq(question.sectionTypeId, input.sectionTypeId));
       if (input?.format) conditions.push(eq(question.format, input.format));
       if (input?.difficulty) conditions.push(eq(question.difficulty, input.difficulty));

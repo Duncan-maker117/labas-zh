@@ -3,10 +3,12 @@ import { uiMessage } from "@/lib/locale";
 import { routeShell } from "@/lib/route-shell";
 import { buildSocialMeta, SITE_URL } from "@/lib/site-seo";
 import { trpc } from "@/utils/trpc";
+import { env } from "@labas/env/web";
 
 export const Route = createFileRoute("/blog/$slug")({
   staticData: routeShell.public,
   beforeLoad: async ({ params, context }) => {
+    if (!env.VITE_BLOG_ENABLED) return;
     try {
       await context.queryClient.fetchQuery(
         trpc.blog.postBySlug.queryOptions({ slug: params.slug }),
