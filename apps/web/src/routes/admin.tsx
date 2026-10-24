@@ -5,6 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { routeShell } from "@/lib/route-shell";
+import { AdminAccessNotice } from "@/components/admin/AdminAccessNotice";
 
 export const Route = createFileRoute("/admin")({
   staticData: routeShell.fullscreen,
@@ -31,8 +32,9 @@ const adminNavItems = [
 
 function AdminLayout() {
   const location = useLocation();
+  const { session } = Route.useRouteContext();
 
-  const { data: isAdminData, isLoading } = useQuery(
+  const { data: isAdminData, isLoading, isError, refetch } = useQuery(
     trpc.admin.isAdmin.queryOptions(),
   );
 
@@ -44,14 +46,14 @@ function AdminLayout() {
     );
   }
 
-  if (!isAdminData?.isAdmin) {
+  if (isError || !isAdminData?.isAdmin) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--warm-cream)] gap-4">
-        <MaterialIcon name="gpp_bad" className="text-6xl text-[var(--clay-red)]" />
-        <h1 className="text-2xl font-headline font-bold text-[var(--clay-black)]"><LocalizedText source={"Access Denied"} /></h1>
-        <p className="text-[var(--warm-charcoal)]"><LocalizedText source={"Only admins can access this page."} /></p>
-        <Link to="/dashboard" className="text-[var(--matcha-700)] underline"><LocalizedText source={"Back to Dashboard"} /></Link>
-      </div>
+      <AdminAccessNotice
+        email={session.data?.user.email}
+        connectionError={isError}
+        showLocalSetup={import.meta.env.DEV && ["127.0.0.1", "localhost"].includes(window.location.hostname) && isAdminData?.hasAdministrator === false}
+        onRetry={() => { void refetch(); }}
+      />
     );
   }
 

@@ -41,7 +41,7 @@ export const protectedProcedure = baseProcedure.use(({ ctx, next }) => {
 
 export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   const [u] = await db.select().from(user).where(eq(user.id, ctx.session.user.id)).limit(1);
-  if (!u || u.role !== "admin") {
+  if (!u || u.role !== "admin" || u.suspended) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
   }
   return next({ ctx: { ...ctx, adminUser: u } });

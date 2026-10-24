@@ -21,8 +21,9 @@ function audit(adminUserId: string, action: string, targetUserId: string | null,
 
 export const adminRouter = router({
   isAdmin: protectedProcedure.query(async ({ ctx }) => {
-    const [u] = await db.select({ role: schema.user.role }).from(schema.user).where(eq(schema.user.id, ctx.session.user.id)).limit(1);
-    return { isAdmin: u?.role === "admin" };
+    const [u] = await db.select({ role: schema.user.role, suspended: schema.user.suspended }).from(schema.user).where(eq(schema.user.id, ctx.session.user.id)).limit(1);
+    const [administrator] = await db.select({ id: schema.user.id }).from(schema.user).where(eq(schema.user.role, "admin")).limit(1);
+    return { isAdmin: u?.role === "admin" && !u.suspended, hasAdministrator: !!administrator };
   }),
 
   getMyCredit: protectedProcedure.query(async ({ ctx }) => {
