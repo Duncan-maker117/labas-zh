@@ -18,6 +18,5 @@ export function ExamScope({ examType, profile, onProfileChange, sections }: { ex
       <a className="underline underline-offset-4" href={spec.sources[0]} target="_blank" rel="noreferrer">{ui("官方考试说明")}</a>
     </div>
     <details className="text-muted-foreground"><summary className="cursor-pointer">{ui("查看考试内容与练习范围")}</summary><div className="mt-3 flex flex-col gap-2">{skills.map((item) => <p key={item.id}><span className="font-medium text-foreground">{ui(item.name)}：</span>{ui(item.content)}</p>)}</div></details>
-    <p className="text-xs text-muted-foreground">{ui("下列为本站支持的对应练习题型，不代表完整官方试卷；级别与分卷用于限定科目和题型。")}</p>
   </div>;
 }
