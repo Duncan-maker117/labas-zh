@@ -62,7 +62,7 @@ export function QuestionDetailModal({
         </span>
       )}
       <span className="px-3 py-1.5 rounded-full bg-[var(--lemon-400)]/30 text-[var(--lemon-800)] text-sm font-semibold">
-        {formatLabel(question.format ?? "", ui)}
+        {formatLabel(question.format ?? "", ui, { examType: question.examTypeId, section: question.sectionTypeId })}
       </span>
       {question.difficulty && (
         <span className="px-3 py-1.5 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-sm font-semibold">
@@ -160,7 +160,7 @@ export function QuestionDetailModal({
                     <span className="font-semibold text-[var(--clay-black)]">
                       <LocalizedText source={"Jenis soal:"} />{" "}
                     </span>
-                    {formatLabel(question.format ?? "", ui)}
+                    {formatLabel(question.format ?? "", ui, { examType: question.examTypeId, section: question.sectionTypeId })}
                   </div>
                 )}
               </CardContent>

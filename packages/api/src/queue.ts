@@ -856,7 +856,7 @@ export const generationWorker = new Worker<FastJobData>(
           const passageInput: GenerationInput = {
             ...input,
             section: split.section as GenerationInput["section"],
-            formats: formatsForSection(split.section, input.formats) as GenerationInput["formats"],
+            formats: formatsForSection(split.section, input.formats, input.examType, input.examProfile) as GenerationInput["formats"],
             questionCount: split.count,
           };
           const passageResult = await generatePassageForInput(passageInput, tokenCounter);
@@ -894,7 +894,7 @@ export const generationWorker = new Worker<FastJobData>(
         const subInput: GenerationInput = {
           ...input,
           section: shard.section as any,
-          formats: formatsForSection(shard.section, input.formats) as GenerationInput["formats"],
+          formats: formatsForSection(shard.section, input.formats, input.examType, input.examProfile) as GenerationInput["formats"],
           questionCount: shard.count,
           ...(accumulatedTopics.length > 0 ? { avoidTopics: [...accumulatedTopics] } : {}),
         };
@@ -1293,7 +1293,7 @@ export const generationQualityWorker = new Worker<QualityJobData>(
             const sectionInput: GenerationInput = {
               ...input,
               section: split.section as any,
-              formats: formatsForSection(split.section, input.formats) as GenerationInput["formats"],
+              formats: formatsForSection(split.section, input.formats, input.examType, input.examProfile) as GenerationInput["formats"],
               questionCount: split.count,
               mode: "agentic",
             };

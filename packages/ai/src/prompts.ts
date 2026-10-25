@@ -1,3 +1,4 @@
+import { examGenerationInstruction } from "./exam-catalog";
 import type { GenerationInput } from "./schemas";
 import { getQuestionJsonSchemaDescription } from "./schema-to-prompt";
 import { buildContentLanguageRules, buildExplanationLanguageRule } from "./language-rules";
@@ -33,6 +34,7 @@ DIVERSITY RULES:
 ${avoidContext}
 EXAM: ${examType}
 SECTION: ${section}
+${examGenerationInstruction(examType, section, input.examProfile)}
 MATERIAL AND RESPONSE RULE: ${sectionMaterialInstruction(section)}
 DIFFICULTY: ${difficulty}/5
 TOPICS: ${topics.join(", ")}

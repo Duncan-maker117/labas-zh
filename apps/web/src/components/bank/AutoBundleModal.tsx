@@ -1,184 +1,65 @@
 import { useLocale } from "@/lib/locale";
-import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@labas/ui/components/input";
 import { Button } from "@labas/ui/components/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@labas/ui/components/dialog";
-import { MaterialIcon } from "@/components/ui/MaterialIcon";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@labas/ui/components/dialog";
 
-export function AutoBundleModal({
-  availableCount,
-  examTypeName,
-  sectionTypeName,
-  onClose,
-  onCreate,
-  isPending,
-}: {
+type BundleInput = { title: string; description: string; isPublic: boolean; count: number; sortOrder: "random" | "difficulty" };
+interface Props {
   availableCount: number;
   examTypeName: string;
   sectionTypeName: string;
+  scopeDescription?: string;
   onClose: () => void;
-  onCreate: (data: {
-    title: string;
-    description: string;
-    isPublic: boolean;
-    count: number;
-    sortOrder: "random" | "difficulty";
-  }) => void;
+  onCreate: (data: BundleInput) => void;
+  onGenerate?: () => void;
+  onRelaxFilters?: () => void;
+  onShowMine?: () => void;
   isPending: boolean;
-}) {
-  const { ui } = useLocale();
-  const dateStr = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
+export function AutoBundleModal({ availableCount, examTypeName, sectionTypeName, scopeDescription, onClose, onCreate, onGenerate, onRelaxFilters, onShowMine, isPending, isLoading, isError }: Props) {
+  const { ui, locale } = useLocale();
   const [count, setCount] = useState(Math.min(availableCount, 10));
-  const [title, setTitle] = useState(`${examTypeName} ${sectionTypeName} Bundle — ${dateStr}`);
+  const [title, setTitle] = useState(() => `${examTypeName} ${sectionTypeName} ${ui("练习套题")} · ${new Date().toLocaleDateString(locale)}`);
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [sortOrder, setSortOrder] = useState<"random" | "difficulty">("random");
-
-  return (
-    <Dialog open onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-headline font-bold text-[var(--clay-black)]">
-            <LocalizedText source={"Auto Bundle"} />
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex items-center gap-2 mb-4">
-          <span className="px-3 py-1 rounded-full bg-[var(--matcha-300)] text-[var(--matcha-800)] text-sm font-semibold">
-            {examTypeName}
-          </span>
-          {sectionTypeName && (
-            <span className="px-3 py-1 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] text-sm font-semibold">
-              {sectionTypeName}
-            </span>
-          )}
-          <span className="text-sm text-[var(--warm-charcoal)]">
-            {availableCount} <LocalizedText source={"soal tersedia"} />
-          </span>
+  useEffect(() => { setCount((previous) => availableCount > 0 ? (previous > 0 ? Math.min(previous, availableCount) : Math.min(availableCount, 10)) : 0); }, [availableCount]);
+  const ready = !isLoading && !isError && availableCount > 0;
+  return <Dialog open onOpenChange={(open) => { if (!open && !isPending) onClose(); }}>
+    <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{ui("自动组卷")}</DialogTitle>
+        <DialogDescription>{ui("从已有题库选题创建练习套题，不会生成新题目。")}</DialogDescription>
+      </DialogHeader>
+      <div className="flex flex-col gap-2 text-sm">
+        <p className="font-medium">{examTypeName} · {sectionTypeName}</p>
+        <p className="text-muted-foreground">{scopeDescription}</p>
+        <p role="status">{isLoading ? ui("正在统计可用题目…") : isError ? ui("题目数量读取失败，请关闭后重试。") : `${availableCount} ${ui("道可用题目")}`}</p>
+      </div>
+      {!isLoading && !isError && availableCount === 0 && <section aria-label={ui("暂无可用题目")} className="flex flex-col gap-3">
+        <p>{ui("当前条件下没有可组卷的已有题目。请先生成题目，或调整筛选范围。")}</p>
+        {onShowMine && <p className="text-sm text-muted-foreground">{ui("AI 生成的题目默认在“我的题目”中，未公开前不会出现在公开题库。")}</p>}
+        <div className="flex flex-wrap gap-2">
+          {onGenerate && <Button size="xl" onClick={onGenerate}>{ui("去生成题目")}</Button>}
+          {onRelaxFilters && <Button size="xl" variant="outline" onClick={onRelaxFilters}>{ui("放宽筛选")}</Button>}
+          {onShowMine && <Button size="xl" variant="outline" onClick={onShowMine}>{ui("查看我的题目")}</Button>}
         </div>
-
-        {availableCount < 5 && (
-          <div className="mb-4 p-3 rounded-[var(--radius-md)] bg-[var(--lemon-400)]/20 border-2 border-[var(--lemon-500)]/30 text-sm text-[var(--lemon-800)] flex items-start gap-2">
-            <MaterialIcon name="info" className="text-sm mt-0.5 shrink-0" />
-            <span>
-              <LocalizedText source={"Soal yang tersedia sedikit ("} />{availableCount} <LocalizedText source={"soal). Paket tetap bisa dibuat, tapi disarankan untuk menambah soal."} />
-            </span>
-          </div>
-        )}
-
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              <LocalizedText source={"Judul Paket"} />
-            </label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={ui("e.g. IELTS Reading Bundle")}
-              className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              <LocalizedText source={"Deskripsi"} />
-            </label>
-            <Input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={ui("Deskripsi singkat...")}
-              className="rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)]"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              <LocalizedText source={"Jumlah Soal:"} /> {count}
-            </label>
-            <input
-              type="range"
-              min={1}
-              max={availableCount}
-              value={count}
-              onChange={(e) => setCount(Number(e.target.value))}
-              className="w-full h-2 bg-[var(--warm-silver)] rounded-full appearance-none cursor-pointer accent-[var(--clay-black)]"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-[var(--clay-black)] block mb-1">
-              <LocalizedText source={"Urutan Soal"} />
-            </label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setSortOrder("random")}
-                className={`flex-1 py-2 px-3 rounded-[var(--radius-md)] text-sm font-semibold transition-all ${
-                  sortOrder === "random"
-                    ? "bg-[var(--clay-black)] text-[var(--pure-white)] clay-shadow"
-                    : "bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)]"
-                }`}
-              >
-                <MaterialIcon name="shuffle" className="text-sm mr-1" />
-                <LocalizedText source={"Acak"} />
-              </button>
-              <button
-                onClick={() => setSortOrder("difficulty")}
-                className={`flex-1 py-2 px-3 rounded-[var(--radius-md)] text-sm font-semibold transition-all ${
-                  sortOrder === "difficulty"
-                    ? "bg-[var(--clay-black)] text-[var(--pure-white)] clay-shadow"
-                    : "bg-[var(--pure-white)] text-[var(--warm-charcoal)] border-2 border-[var(--oat-border)] hover:bg-[var(--oat-light)]"
-                }`}
-              >
-                <MaterialIcon name="trending_up" className="text-sm mr-1" />
-                <LocalizedText source={"Difficulty"} />
-              </button>
-            </div>
-          </div>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isPublic}
-              onChange={(e) => setIsPublic(e.target.checked)}
-              className="w-4 h-4 rounded border-[var(--oat-border)]"
-            />
-            <span className="text-sm text-[var(--warm-charcoal)]">
-              <LocalizedText source={"Publikasikan ke Bank Soal"} />
-            </span>
-          </label>
-        </div>
-
-        <div className="mt-6 flex gap-3">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] clay-hover"
-          >
-            <LocalizedText source={"Batal"} />
-          </Button>
-          <Button
-            onClick={() =>
-              onCreate({
-                title,
-                description,
-                isPublic,
-                count,
-                sortOrder,
-              })
-            }
-            disabled={!title || isPending || count < 1}
-            className="flex-1 bg-[var(--clay-black)] text-[var(--pure-white)] hover:bg-[var(--warm-charcoal)] clay-hover rounded-[var(--radius-lg)]"
-          >
-            <LocalizedValue value={isPending ? "Membuat..." : "Buat Paket"} />
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+      </section>}
+      {ready && <div className="flex flex-col gap-4">
+        <label className="flex flex-col gap-2" htmlFor="auto-bundle-title">{ui("Judul Paket")}<Input id="auto-bundle-title" value={title} onChange={(event) => setTitle(event.target.value)} /></label>
+        <label className="flex flex-col gap-2" htmlFor="auto-bundle-description">{ui("Deskripsi")}<Input id="auto-bundle-description" value={description} onChange={(event) => setDescription(event.target.value)} /></label>
+        <label className="flex flex-col gap-2" htmlFor="auto-bundle-count">{ui("题目数量")}<Input id="auto-bundle-count" type="number" min={1} max={availableCount} value={count} onChange={(event) => setCount(Number(event.target.value))} /></label>
+        <label className="flex flex-col gap-2" htmlFor="auto-bundle-order">{ui("Urutan Soal")}<select id="auto-bundle-order" className="min-h-11 rounded-lg border bg-background px-3" value={sortOrder} onChange={(event) => setSortOrder(event.target.value as "random" | "difficulty")}><option value="random">{ui("Acak")}</option><option value="difficulty">{ui("Difficulty")}</option></select></label>
+        <label className="flex items-center gap-2"><input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} />{ui("Publikasikan ke Bank Soal")}</label>
+      </div>}
+      <div className="flex gap-3">
+        <Button size="xl" variant="outline" onClick={onClose} disabled={isPending}>{ui("Batal")}</Button>
+        {ready && <Button size="xl" disabled={!title.trim() || isPending || !Number.isInteger(count) || count < 1 || count > availableCount} onClick={() => onCreate({ title, description, isPublic, count, sortOrder })}>{ui(isPending ? "Membuat..." : "Buat Paket")}</Button>}
+      </div>
+    </DialogContent>
+  </Dialog>;
 }

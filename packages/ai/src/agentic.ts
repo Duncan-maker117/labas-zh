@@ -1,3 +1,4 @@
+import { examGenerationInstruction } from "./exam-catalog";
 import { OpenAICompatibleClient } from "./client";
 import { sectionMaterialInstruction } from "./practice-policy";
 import { GenerationError } from "./errors";
@@ -81,6 +82,7 @@ async function step1GeneratePassage(
   const schema = getPassageJsonSchemaDescription();
   const prompt = `Generate authentic, high-quality material for ${input.examType} ${input.section.toLowerCase()} section at difficulty level ${input.difficulty}/5.
 ${sectionMaterialInstruction(input.section)}
+${examGenerationInstruction(input.examType, input.section, input.examProfile)}
 
 Requirements:
 - Language: ${getTargetLanguage(input.examType)}
@@ -180,6 +182,7 @@ async function step3GenerateQuestions(
 
   const prompt = `Using the following material, generate ${count} ${input.section.toLowerCase()} practice questions for ${input.examType} exam.
 ${sectionMaterialInstruction(input.section)}
+${examGenerationInstruction(input.examType, input.section, input.examProfile)}
 
 Passage:
 """
@@ -429,7 +432,7 @@ async function runAgenticQuestionPipeline(ctx: {
     }
 
     let { valid, invalid, repairLog } = repairAndParseQuestions(rawQuestions, passage, {
-      examType: input.examType, section: input.section, allowedFormats: input.formats,
+      examType: input.examType, section: input.section, allowedFormats: input.formats, examProfile: input.examProfile,
       strictExplanation: strategy === "full",
     });
 
@@ -450,7 +453,7 @@ async function runAgenticQuestionPipeline(ctx: {
       accumulatedTokens += regen.tokensUsed;
 
       const regenResult = repairAndParseQuestions(regen.questions, passage, {
-        examType: input.examType, section: input.section, allowedFormats: input.formats,
+        examType: input.examType, section: input.section, allowedFormats: input.formats, examProfile: input.examProfile,
         strictExplanation: strategy === "full",
       });
       validQuestions.push(...regenResult.valid);
@@ -473,7 +476,7 @@ async function runAgenticQuestionPipeline(ctx: {
       );
       accumulatedTokens += extra.tokensUsed;
       const extraResult = repairAndParseQuestions(extra.questions, passage, {
-        examType: input.examType, section: input.section, allowedFormats: input.formats,
+        examType: input.examType, section: input.section, allowedFormats: input.formats, examProfile: input.examProfile,
         strictExplanation: strategy === "full",
       });
       validQuestions.push(...extraResult.valid);

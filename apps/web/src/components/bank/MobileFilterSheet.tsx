@@ -1,3 +1,4 @@
+import { getExamFormats, getExamSections } from "@labas/ai/exam-catalog";
 import { useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import {
@@ -29,6 +30,8 @@ interface FilterChip {
 interface MobileFilterSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  examType?: string;
+  examProfile?: string;
   section: string;
   format: string;
   difficulty: number | undefined;
@@ -42,6 +45,8 @@ interface MobileFilterSheetProps {
 export function MobileFilterSheet({
   open,
   onOpenChange,
+  examType = "",
+  examProfile,
   section,
   format,
   difficulty,
@@ -52,6 +57,9 @@ export function MobileFilterSheet({
   onClearFilters,
 }: MobileFilterSheetProps) {
   const { ui } = useLocale();
+  const context = { examType, examProfile, section };
+  const sections = examType ? getExamSections(examType, examProfile) : SECTIONS;
+  const formats = examType ? getExamFormats(examType, section, examProfile) : FORMATS;
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -70,13 +78,13 @@ export function MobileFilterSheet({
             <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase"><LocalizedText source={"Section"} /></label>
             <Select value={section} onValueChange={(v: string | null) => onSetSection(v ?? "")}>
               <SelectTrigger aria-label={ui("Section")} className="w-full rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-                <SelectValue>{section ? sectionLabel(section, ui) : ui("Semua Section")}</SelectValue>
+                <SelectValue>{section ? sectionLabel(section, ui, context) : ui("Semua Section")}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value=""><LocalizedText source={"Semua Section"} /></SelectItem>
-                  {SECTIONS.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>{sectionLabel(s.id, ui)}</SelectItem>
+                  {sections.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{sectionLabel(s.id, ui, context)}</SelectItem>
                   ))}
                 </SelectGroup>
               </SelectContent>
@@ -86,13 +94,13 @@ export function MobileFilterSheet({
             <label className="block text-xs font-bold text-[var(--warm-charcoal)] mb-1.5 uppercase"><LocalizedText source={"Format"} /></label>
             <Select value={format} onValueChange={(v: string | null) => onSetFormat(v ?? "")}>
               <SelectTrigger aria-label={ui("Format")} className="w-full rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-                <SelectValue>{format ? formatLabel(format, ui) : ui("Semua Format")}</SelectValue>
+                <SelectValue>{format ? formatLabel(format, ui, context) : ui("Semua Format")}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value=""><LocalizedText source={"Semua Format"} /></SelectItem>
-                  {FORMATS.map((f) => (
-                    <SelectItem key={f} value={f}>{formatLabel(f, ui)}</SelectItem>
+                  {formats.map((f) => (
+                    <SelectItem key={f} value={f}>{formatLabel(f, ui, context)}</SelectItem>
                   ))}
                 </SelectGroup>
               </SelectContent>

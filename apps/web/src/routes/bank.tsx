@@ -8,6 +8,7 @@ export const Route = createFileRoute("/bank")({
     tab: z.enum(["mine", "public"]).optional(),
     search: z.string().optional(),
     examType: z.string().optional(),
+    examProfile: z.string().optional(),
     section: z.string().optional(),
     format: z.string().optional(),
     difficulty: z.coerce.number().optional(),

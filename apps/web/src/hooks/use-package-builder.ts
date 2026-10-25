@@ -1,4 +1,6 @@
-import { uiMessage } from "@/lib/locale";
+import { groupBundleQuestions, selectBundleQuestions, type BundleQuestion } from "@/lib/package-selection";
+import { sectionLabel } from "@/lib/format";
+import { uiMessage, useLocale } from "@/lib/locale";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { trpc } from "@/utils/trpc";
@@ -7,6 +9,7 @@ import { getErrorMessage } from "@/lib/error-utils";
 
 export function usePackageBuilder() {
   const navigate = useNavigate();
+  const { ui } = useLocale();
 
   const createPackage = useMutation(trpc.package.create.mutationOptions());
   const addSection = useMutation(trpc.package.addSection.mutationOptions());
@@ -36,20 +39,10 @@ export function usePackageBuilder() {
         estimatedDurationMin: params.selectedIds.size * 2,
       });
 
-      const sec = await addSection.mutateAsync({
-        packageId: pkg.id,
-        sectionTypeId: firstQ?.sectionTypeId ?? "READING",
-        title: `${firstQ?.sectionTypeName ?? "Reading"} Section`,
-        orderIndex: 0,
-      });
-
-      const ids = Array.from(params.selectedIds);
-      for (let i = 0; i < ids.length; i++) {
-        await addQuestion.mutateAsync({
-          sectionId: sec.id,
-          questionId: ids[i],
-          orderIndex: i,
-        });
+      const selected = params.questions.filter((q) => params.selectedIds.has(q.id) && q.examTypeId === examTypeId);
+      for (const [index, group] of groupBundleQuestions(selected).entries()) {
+        const sec = await addSection.mutateAsync({ packageId: pkg.id, sectionTypeId: group.sectionTypeId, title: sectionLabel(group.sectionTypeId, ui, { examType: examTypeId }), orderIndex: index });
+        for (const [orderIndex, q] of group.questions.entries()) await addQuestion.mutateAsync({ sectionId: sec.id, questionId: q.id, orderIndex });
       }
 
       navigate({ to: "/package/$id", params: { id: pkg.id } });
@@ -63,24 +56,16 @@ export function usePackageBuilder() {
     description: string;
     isPublic: boolean;
     examTypeId: string;
-    sectionTypeId: string;
+    sectionTypeId?: string;
     count: number;
     sortOrder: "random" | "difficulty";
-    allQuestions: Array<{ id: string; examTypeId: string; difficulty: number }>;
+    allQuestions: BundleQuestion[];
   }) => {
-    const available = params.allQuestions.filter((q) => q.examTypeId === params.examTypeId);
-
-    let picked: typeof available;
-    if (params.sortOrder === "random") {
-      picked = [...available].sort(() => Math.random() - 0.5);
-    } else {
-      picked = [...available].sort((a, b) => a.difficulty - b.difficulty);
-    }
-    picked = picked.slice(0, params.count);
+    const picked = selectBundleQuestions(params.allQuestions, params.examTypeId, params.sectionTypeId, params.count, params.sortOrder);
 
     if (picked.length === 0) {
       toast.error(uiMessage("Tidak ada soal tersedia untuk ujian ini."));
-      return;
+      return false;
     }
 
     try {
@@ -92,24 +77,16 @@ export function usePackageBuilder() {
         estimatedDurationMin: picked.length * 2,
       });
 
-      const sec = await addSection.mutateAsync({
-        packageId: pkg.id,
-        sectionTypeId: params.sectionTypeId,
-        title: `${params.sectionTypeId} Section`,
-        orderIndex: 0,
-      });
-
-      for (let i = 0; i < picked.length; i++) {
-        await addQuestion.mutateAsync({
-          sectionId: sec.id,
-          questionId: picked[i].id,
-          orderIndex: i,
-        });
+      for (const [index, group] of groupBundleQuestions(picked).entries()) {
+        const sec = await addSection.mutateAsync({ packageId: pkg.id, sectionTypeId: group.sectionTypeId, title: sectionLabel(group.sectionTypeId, ui, { examType: params.examTypeId }), orderIndex: index });
+        for (const [orderIndex, q] of group.questions.entries()) await addQuestion.mutateAsync({ sectionId: sec.id, questionId: q.id, orderIndex });
       }
 
       navigate({ to: "/package/$id", params: { id: pkg.id } });
+      return true;
     } catch (err: unknown) {
       toast.error(uiMessage("Gagal membuat paket"), { description: getErrorMessage(err) });
+      return false;
     }
   };
 

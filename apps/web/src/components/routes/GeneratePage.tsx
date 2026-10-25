@@ -1,3 +1,6 @@
+import { getExamProfile, getExamSections } from "@labas/ai/exam-catalog";
+import { ExamScope } from "@/components/exam/ExamScope";
+import { formatLabel } from "@/lib/format";
 import { defaultSectionFormat, supportsSectionFormat } from "@labas/ai/practice-policy";
 import { AiServiceCard } from "@/components/generate/AiServiceCard";
 import { aiServiceCopy, aiServiceError } from "@/lib/ai-service-copy";
@@ -24,7 +27,6 @@ import {
   DIFFICULTIES,
   QUESTION_COUNT_PRESETS,
 } from "@/lib/generate-constants";
-import { getDifficultyLabel } from "@/lib/difficulty-mapping";
 import "flag-icons/css/flag-icons.min.css";
 import type { Step } from "react-joyride";
 import { useLocale } from "@/lib/locale";
@@ -104,11 +106,13 @@ export function RouteComponent() {
   const defaultExamType = EXAM_TYPES.some((exam) => exam.id === requestedExamType && exam.id !== "CPNS")
     ? requestedExamType
     : "IELTS";
-  const defaultSection = "READING";
+  const defaultProfile = getExamProfile(defaultExamType, routeSearch.examProfile as string | undefined)?.id;
+  const defaultSection = getExamSections(defaultExamType, defaultProfile).some((item) => item.id === routeSearch.section) ? routeSearch.section as string : getExamSections(defaultExamType, defaultProfile)[0]?.id ?? "READING";
 
   const [examType, setExamType] = useState(defaultExamType);
+  const [examProfile, setExamProfile] = useState(defaultProfile);
   const [selectedSections, setSelectedSections] = useState<string[]>([defaultSection]);
-  const [selectedFormats, setSelectedFormats] = useState<string[]>(["multiple_choice"]);
+  const [selectedFormats, setSelectedFormats] = useState<string[]>([defaultSectionFormat(defaultSection, defaultExamType, defaultProfile)]);
   const [difficulty, setDifficulty] = useState(2);
   const [selectedTopics, setSelectedTopics] = useState<string[]>(["Science & Tech"]);
   const [questionCount, setQuestionCount] = useState(5);
@@ -118,15 +122,24 @@ export function RouteComponent() {
   useEffect(() => {
     setSelectedFormats((prev) => {
       const valid = prev.filter((f) =>
-        FORMATS.find((fmt) => fmt.id === f)?.allowedExams.includes(examType) && selectedSections.some((section) => supportsSectionFormat(section, f)),
+        FORMATS.find((fmt) => fmt.id === f)?.allowedExams.includes(examType) && selectedSections.some((section) => supportsSectionFormat(section, f, examType, examProfile)),
       );
       for (const section of selectedSections) {
-        if (!valid.some((format) => supportsSectionFormat(section, format))) valid.push(defaultSectionFormat(section));
+        if (!valid.some((format) => supportsSectionFormat(section, format, examType, examProfile))) valid.push(defaultSectionFormat(section, examType, examProfile));
       }
       return valid;
     });
     setQuestionCount((count) => Math.max(count, selectedSections.length));
-  }, [examType, selectedSections]);
+  }, [examType, examProfile, selectedSections]);
+
+  const changeExam = (nextExam: string, nextProfile = getExamProfile(nextExam)?.id) => {
+    const allowed = getExamSections(nextExam, nextProfile);
+    setExamType(nextExam); setExamProfile(nextProfile);
+    setSelectedSections((previous) => {
+      const valid = previous.filter((id) => allowed.some((item) => item.id === id));
+      return valid.length ? valid : [allowed[0]?.id ?? "READING"];
+    });
+  };
 
   const generate = useMutation({
     ...trpc.ai.generate.mutationOptions(),
@@ -188,7 +201,7 @@ export function RouteComponent() {
       return;
     }
 
-    if (questionCount < selectedSections.length || selectedSections.some((section) => !selectedFormats.some((format) => supportsSectionFormat(section, format)))) {
+    if (questionCount < selectedSections.length || selectedSections.some((section) => !selectedFormats.some((format) => supportsSectionFormat(section, format, examType, examProfile)))) {
       setError(ui("请为每个科目选择对应题型，并保证题量不少于科目数。"));
       return;
     }
@@ -217,6 +230,7 @@ export function RouteComponent() {
     type GenerateMutateInput = Parameters<typeof generate.mutate>[0];
     generate.mutate({
       examType,
+      examProfile,
       section: selectedSections[0],
       selectedSections,
       formats: selectedFormats,
@@ -287,7 +301,7 @@ export function RouteComponent() {
               {EXAM_TYPES.filter((t) => t.id !== "CPNS").map((t) => (
                 <button
                   key={t.id}
-                  onClick={() => setExamType(t.id)}
+                  onClick={() => changeExam(t.id)}
                   className={`flex items-center gap-3 py-4 px-4 rounded-[var(--radius-lg)] border-2 transition-all text-sm font-semibold clay-hover min-h-[56px] ${
                     examType === t.id
                       ? "bg-[var(--clay-black)] text-[var(--pure-white)] clay-shadow border-[var(--clay-black)]"
@@ -301,6 +315,8 @@ export function RouteComponent() {
             </div>
           </div>
 
+          <ExamScope examType={examType} profile={examProfile} onProfileChange={(profile) => changeExam(examType, profile)} sections={selectedSections} />
+
           {/* Section Selection — Multi-select */}
           <div data-tour="generate-section" className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
@@ -310,7 +326,7 @@ export function RouteComponent() {
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
-              {SECTIONS.filter((s) => s.allowedExams.includes(examType)).map((s) => {
+              {getExamSections(examType, examProfile).map((s) => {
                 const isSelected = selectedSections.includes(s.id);
                 return (
                   <button
@@ -323,7 +339,7 @@ export function RouteComponent() {
                     }`}
                   >
                     <MaterialIcon
-                      name={isSelected ? "check_circle" : s.icon}
+                      name={isSelected ? "check_circle" : SECTIONS.find((item) => item.id === s.id)?.icon ?? "menu_book"}
                       className={`text-base shrink-0 ${isSelected ? "text-[var(--matcha-400)]" : ""}`}
                     />
                     {ui(s.name)}
@@ -388,13 +404,13 @@ export function RouteComponent() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {sectionSplits.map((s) => {
-                    const sec = SECTIONS.find((sec) => sec.id === s.section);
+                    const sec = getExamSections(examType, examProfile).find((sec) => sec.id === s.section);
                     return (
                       <span
                         key={s.section}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--pure-white)] text-[var(--matcha-800)] text-xs font-medium border border-[var(--matcha-400)]"
                       >
-                        <MaterialIcon name={sec?.icon ?? "menu_book"} className="text-[10px]" />
+                        <MaterialIcon name={SECTIONS.find((item) => item.id === s.section)?.icon ?? "menu_book"} className="text-[10px]" />
                         {ui(sec?.name ?? s.section)}: {s.count} {ui("soal")}
                       </span>
                     );
@@ -418,12 +434,14 @@ export function RouteComponent() {
                       : "bg-[var(--pure-white)] text-[var(--warm-charcoal)] hover:bg-[var(--oat-light)] border-2 border-[var(--oat-border)]"
                   }`}
                 >
-                  <span>{getDifficultyLabel(examType, i + 1)}</span>
-                  <span className={`text-[10px] mt-0.5 ${difficulty === i ? "text-white/60" : "text-[var(--warm-silver)]"}`}>{ui(d)}</span>
+                  <span>{ui(d)}</span>
+                  <span className={`text-[10px] mt-0.5 ${difficulty === i ? "text-white/60" : "text-[var(--warm-silver)]"}`}>{i + 1} / 5</span>
                 </button>
               ))}
             </div>
           </div>
+
+          <p className="text-xs text-muted-foreground">{ui("用于调整所选级别内的练习难度，不是官方考试分数。")}</p>
 
           {/* Format Selection */}
           <div data-tour="generate-format" className="flex flex-col gap-4">
@@ -434,7 +452,7 @@ export function RouteComponent() {
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {FORMATS.filter((f) => f.allowedExams.includes(examType) && selectedSections.some((section) => supportsSectionFormat(section, f.id))).map((f) => (
+              {FORMATS.filter((f) => f.allowedExams.includes(examType) && selectedSections.some((section) => supportsSectionFormat(section, f.id, examType, examProfile))).map((f) => (
                 <button
                   key={f.id}
                   onClick={() => toggleFormat(f.id)}
@@ -444,7 +462,7 @@ export function RouteComponent() {
                       : "bg-[var(--oat-light)] text-[var(--warm-charcoal)] hover:bg-[var(--matcha-300)] hover:text-[var(--matcha-800)]"
                   }`}
                 >
-                  {ui(f.name)}
+                  {formatLabel(f.id, ui, { examType, examProfile, section: selectedSections.length === 1 ? selectedSections[0] : undefined })}
                   {selectedFormats.includes(f.id) && (
                     <MaterialIcon name="close" className="text-sm" />
                   )}
@@ -511,6 +529,7 @@ export function RouteComponent() {
           <TestBlueprintCard
             examType={examType}
             selectedSections={selectedSections}
+            examProfile={examProfile}
             selectedFormats={selectedFormats}
             questionCount={questionCount}
             weaknessAlign={weaknessAlign}

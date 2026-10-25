@@ -71,7 +71,7 @@ export async function evaluateSavedResponse(userId: string, input: { answerId: s
   const [cached] = await db.select().from(responseEvaluation).where(eq(responseEvaluation.answerId, row.answerId));
   if (cached?.status === "completed") return cached;
   if (cached?.status === "running") await releaseStaleAssessment(row.answerId, userId);
-  const resolved = await resolveGenerationInput({ examType: examTypeSchema.parse(row.exam), section: sectionTypeSchema.parse(row.section), formats: [questionFormatSchema.parse(row.format)], difficulty: 3, topics: ["response assessment"], questionCount: 1, mode: "quick", apiKeyConfig: input.apiKeyConfig }, userId);
+  const resolved = await resolveGenerationInput({ examType: examTypeSchema.parse(row.exam), section: sectionTypeSchema.parse(row.section), formats: [questionFormatSchema.parse(row.format)], difficulty: 3, topics: ["response assessment"], questionCount: 1, mode: "quick", apiKeyConfig: input.apiKeyConfig }, userId, { validateExam: false });
   const claimId = crypto.randomUUID();
   const budget = resolved._isPlatformGeneration ? 12000 : 0;
   if (budget) await ensureUserCreditRow(userId);

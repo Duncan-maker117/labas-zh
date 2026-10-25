@@ -95,7 +95,7 @@ const QuestionCard = memo(function QuestionCard({
             {globalIdx}
           </span>
           <h2 className="text-xl font-bold text-[var(--clay-black)] capitalize">
-            {formatLabel(q.format ?? "", ui)}
+            {formatLabel(q.format ?? "", ui, { examType: q.examTypeId, section: q.sectionTypeId })}
           </h2>
         </div>
         <button

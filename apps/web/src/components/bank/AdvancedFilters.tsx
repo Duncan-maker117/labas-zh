@@ -1,3 +1,4 @@
+import { getExamFormats, getExamSections } from "@labas/ai/exam-catalog";
 import { useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import {
@@ -12,6 +13,8 @@ import { SECTIONS, FORMATS, DIFFICULTIES } from "@/lib/exam-constants";
 import { difficultyLabel, formatLabel, sectionLabel } from "@/lib/format";
 
 interface AdvancedFiltersProps {
+  examType?: string;
+  examProfile?: string;
   section: string;
   format: string;
   difficulty: number | undefined;
@@ -21,6 +24,8 @@ interface AdvancedFiltersProps {
 }
 
 export function AdvancedFilters({
+  examType = "",
+  examProfile,
   section,
   format,
   difficulty,
@@ -29,30 +34,33 @@ export function AdvancedFilters({
   onSetDifficulty,
 }: AdvancedFiltersProps) {
   const { ui } = useLocale();
+  const context = { examType, examProfile, section };
+  const sections = examType ? getExamSections(examType, examProfile) : SECTIONS;
+  const formats = examType ? getExamFormats(examType, section, examProfile) : FORMATS;
   return (
     <>
       <Select value={section} onValueChange={(v: string | null) => onSetSection(v ?? "")}>
         <SelectTrigger aria-label={ui("Section")} className="w-full md:w-38 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue>{section ? sectionLabel(section, ui) : ui("Semua Section")}</SelectValue>
+          <SelectValue>{section ? sectionLabel(section, ui, context) : ui("Semua Section")}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem value=""><LocalizedText source={"Semua Section"} /></SelectItem>
-            {SECTIONS.map((s) => (
-              <SelectItem key={s.id} value={s.id}>{sectionLabel(s.id, ui)}</SelectItem>
+            {sections.map((s) => (
+              <SelectItem key={s.id} value={s.id}>{sectionLabel(s.id, ui, context)}</SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
       <Select value={format} onValueChange={(v: string | null) => onSetFormat(v ?? "")}>
         <SelectTrigger aria-label={ui("Format")} className="w-full md:w-56 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue>{format ? formatLabel(format, ui) : ui("Semua Format")}</SelectValue>
+          <SelectValue>{format ? formatLabel(format, ui, context) : ui("Semua Format")}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem value=""><LocalizedText source={"Semua Format"} /></SelectItem>
-            {FORMATS.map((f) => (
-              <SelectItem key={f} value={f}>{formatLabel(f, ui)}</SelectItem>
+            {formats.map((f) => (
+              <SelectItem key={f} value={f}>{formatLabel(f, ui, context)}</SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>

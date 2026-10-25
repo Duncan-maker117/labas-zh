@@ -1,3 +1,4 @@
+import { examGenerationInstruction } from "./exam-catalog";
 import { sectionMaterialInstruction } from "./practice-policy";
 import { OpenAICompatibleClient } from "./client";
 import { parseAiJsonResponse } from "./parse-response";
@@ -49,6 +50,7 @@ ${passage}
 
 Generate ${count} new ${input.section.toLowerCase()} practice questions for ${input.examType} exam.
 ${sectionMaterialInstruction(input.section)}
+${examGenerationInstruction(input.examType, input.section, input.examProfile)}
 Formats: ${input.formats.join(", ")}
 Difficulty: ${input.difficulty}/5
 

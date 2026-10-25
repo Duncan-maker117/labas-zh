@@ -1,11 +1,13 @@
+import { sectionLabel } from "@/lib/format";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
-import { EXAM_TYPES, SECTIONS } from "@/lib/generate-constants";
+import { EXAM_TYPES } from "@/lib/generate-constants";
 import { useLocale } from "@/lib/locale";
 
 interface TestBlueprintCardProps {
   examType: string;
+  examProfile?: string;
   selectedSections: string[];
   selectedFormats: string[];
   questionCount: number;
@@ -22,6 +24,7 @@ interface TestBlueprintCardProps {
 
 export function TestBlueprintCard({
   examType,
+  examProfile,
   selectedSections,
   selectedFormats,
   questionCount,
@@ -38,7 +41,7 @@ export function TestBlueprintCard({
 }: TestBlueprintCardProps & { onDismissError?: () => void }) {
   const { ui, locale } = useLocale();
   const sectionNames = selectedSections
-    .map((id) => ui(SECTIONS.find((s) => s.id === id)?.name ?? id))
+    .map((id) => sectionLabel(id, ui, { examType, examProfile }))
     .filter(Boolean);
 
   return (

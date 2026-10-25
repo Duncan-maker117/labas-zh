@@ -29,6 +29,9 @@
     },
     "./token-budget": {
       "default": "./src/token-budget.ts"
+    },
+    "./exam-catalog": {
+      "default": "./src/exam-catalog.ts"
     }
   },
   "dependencies": {

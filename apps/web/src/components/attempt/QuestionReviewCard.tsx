@@ -105,7 +105,7 @@ export function QuestionReviewCard({
           </p>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)]">
-              {formatLabel(q.format ?? "", ui)}
+              {formatLabel(q.format ?? "", ui, { examType: q.examTypeId, section: q.sectionTypeId })}
             </span>
             {ans?.timeSpentSec != null && (
               <span className="text-[10px] text-[var(--warm-silver)] flex items-center gap-0.5">

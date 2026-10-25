@@ -5,6 +5,7 @@ import { authClient } from "@/lib/auth-client";
 export const Route = createFileRoute("/generate")({
   validateSearch: z.object({
     examType: z.string().optional(),
+    examProfile: z.string().optional(),
     section: z.string().optional(),
   }).parse,
   beforeLoad: async () => {

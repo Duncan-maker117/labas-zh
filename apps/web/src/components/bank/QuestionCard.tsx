@@ -103,7 +103,7 @@ export function QuestionCard({
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--oat-border)]">
           <div className="flex gap-2">
             <span className="px-2 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-medium">
-              {formatLabel(q.format ?? "", ui)}
+              {formatLabel(q.format ?? "", ui, { examType: q.examTypeId, section: q.sectionTypeId })}
             </span>
             <span className="px-2 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-medium">
               <LocalizedText source={"Lv."} />{q.difficulty}

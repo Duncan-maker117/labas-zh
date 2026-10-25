@@ -340,7 +340,7 @@ export function tryParseQuestion(generic: GenericQuestion): Question | null {
 export function repairAndParseQuestions(
   rawQuestions: unknown[],
   fullPassage: string,
-  options?: { examType?: string; strictExplanation?: boolean; section?: string; allowedFormats?: string[] },
+  options?: { examType?: string; strictExplanation?: boolean; section?: string; allowedFormats?: string[]; examProfile?: string },
 ): {
   valid: Question[];
   invalid: { index: number; raw: unknown; errors: string[] }[];
@@ -367,7 +367,7 @@ export function repairAndParseQuestions(
       }
 
       const semanticErrors = [
-        ...(options?.section && !supportsSectionFormat(options.section, repaired.format) ? ["Question format does not match the selected section"] : []),
+        ...(options?.section && !supportsSectionFormat(options.section, repaired.format, options.examType, options.examProfile) ? ["Question format does not match the selected section"] : []),
         ...(options?.allowedFormats && !options.allowedFormats.includes(repaired.format) ? ["Question format was not requested"] : []),
         ...getQuestionSemanticErrors(repaired),
         ...(examType ? getQuestionLanguageErrors(repaired, examType) : []),

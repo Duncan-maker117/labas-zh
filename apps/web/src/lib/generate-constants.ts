@@ -1,3 +1,4 @@
+import { EXAM_CATALOG, getExamFormats, getExamSections } from "@labas/ai/exam-catalog";
 import { PRACTICE_SECTIONS } from "./subject-constants";
 
 const ALL_EXAMS = ["IELTS", "TOEFL", "JLPT", "HSK", "GOETHE", "TOPIK", "TOAFL", "DELE"];
@@ -15,9 +16,9 @@ export const EXAM_TYPES = [
 
 export const SECTIONS = PRACTICE_SECTIONS
   .filter((section) => section.supportsGeneration)
-  .map(({ id, name, icon }) => ({ id, name, icon, allowedExams: ALL_EXAMS }));
+  .map(({ id, name, icon }) => ({ id, name, icon, allowedExams: ALL_EXAMS.filter((exam) => EXAM_CATALOG[exam].profiles.some((profile) => getExamSections(exam, profile.id).some((s) => s.id === id))) }));
 
-export const FORMATS = [
+const FORMAT_METADATA = [
   { id: "essay", name: "Written Response", allowedExams: ALL_EXAMS },
   { id: "spoken_response", name: "Spoken Response", allowedExams: ALL_EXAMS },
   { id: "multiple_choice", name: "Multiple Choice", allowedExams: ALL_EXAMS },
@@ -41,6 +42,8 @@ export const FORMATS = [
   { id: "character_reading", name: "Character Reading", allowedExams: ["HSK", "TOPIK"] },
   { id: "sentence_arrangement", name: "Sentence Arrangement", allowedExams: ["HSK", "TOPIK", "DELE", "TOAFL"] },
 ];
+
+export const FORMATS = FORMAT_METADATA.map((format) => ({ ...format, allowedExams: ALL_EXAMS.filter((exam) => EXAM_CATALOG[exam].profiles.some((profile) => getExamFormats(exam, undefined, profile.id).includes(format.id))) }));
 
 export const TOPICS = [
   "Science & Tech", "Business", "Sociology", "Arts", "History", "Environment", "Health", "Education",

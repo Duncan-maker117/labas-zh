@@ -1,3 +1,6 @@
+import { groupBundleQuestions } from "@/lib/package-selection";
+import { getExamProfile, getExamSections, getExamFormats } from "@labas/ai/exam-catalog";
+import { ExamScope } from "@/components/exam/ExamScope";
 import { supportsSectionFormat } from "@labas/ai/practice-policy";
 import { useLocale, uiMessage } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
@@ -34,6 +37,7 @@ export const Route = createFileRoute("/bank")({
     tab: z.enum(["mine", "public"]).optional(),
     search: z.string().optional(),
     examType: z.string().optional(),
+    examProfile: z.string().optional(),
     section: z.string().optional(),
     format: z.string().optional(),
     difficulty: z.coerce.number().optional(),
@@ -62,7 +66,9 @@ export function BankComponent() {
   const tab: QuestionTab = search.tab ?? "public";
   const searchText = search.search ?? "";
   const examType = search.examType ?? "";
+  const examProfile = getExamProfile(examType, search.examProfile)?.id;
   const section = search.section ?? "";
+  const examContext = { examType, examProfile, section };
   const format = search.format ?? "";
   const difficulty = search.difficulty;
   const visibilityFilter = search.visibility ?? "all";
@@ -83,6 +89,7 @@ export function BankComponent() {
   // ── Modals ──
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [isAutoBundleOpen, setIsAutoBundleOpen] = useState(false);
+  const [collectingBundle, setCollectingBundle] = useState(false);
 
   // ── Filter UI State ──
   const [isAdvancedOpen, setIsAdvancedOpen] = useLocalStorageBoolean(FILTER_ADVANCED_KEY, false);
@@ -101,23 +108,12 @@ export function BankComponent() {
   );
   const totalPrivateCount = privateCountQuery.data?.total ?? 0;
 
-  const questionQuery = useQuery(
-    trpc.question.list.queryOptions(
-      {
-        search: searchText || undefined,
-        examTypeId: examType || undefined,
-        sectionTypeId: section || undefined,
-        format: format || undefined,
-        difficulty,
-        ...(tab === "mine" && userId
-          ? { creatorUserId: userId, ...visibilityFilterParam }
-          : { isPublic: true }),
-        limit,
-        offset,
-      },
-      { enabled: mode === "soal", meta: { handlesError: true } },
-    ),
-  );
+  const questionFilters = {
+    search: searchText || undefined, examTypeId: examType || undefined,
+    sectionTypeId: section || undefined, format: format || undefined, difficulty,
+    ...(tab === "mine" && userId ? { creatorUserId: userId, ...visibilityFilterParam } : { isPublic: true }),
+  };
+  const questionQuery = useQuery(trpc.question.list.queryOptions({ ...questionFilters, limit, offset }, { enabled: mode === "soal" && (tab === "public" || !!userId), meta: { handlesError: true } }));
 
   // Reset offset when filters change
   useEffect(() => {
@@ -229,6 +225,7 @@ export function BankComponent() {
         tab: newMode === "soal" ? "mine" : undefined,
         search: "",
         examType: "",
+        examProfile: undefined,
         section: "",
         format: "",
         difficulty: undefined,
@@ -242,10 +239,20 @@ export function BankComponent() {
     navigate({ search: (prev) => ({ ...prev, search: value }) });
 
   const setExamType = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, examType: value }) });
+    navigate({ search: (prev) => {
+      const profile = getExamProfile(value)?.id;
+      const nextSection = !value || getExamSections(value, profile).some((item) => item.id === prev.section) ? prev.section : undefined;
+      const nextFormat = !value || getExamFormats(value, nextSection, profile).includes(prev.format ?? "") ? prev.format : undefined;
+      return { ...prev, examType: value || undefined, examProfile: undefined, section: nextSection, format: nextFormat };
+    } });
+
+  const setExamProfile = (profile: string) => navigate({ search: (prev) => {
+    const nextSection = getExamSections(examType, profile).some((item) => item.id === prev.section) ? prev.section : undefined;
+    return { ...prev, examProfile: profile, section: nextSection, format: getExamFormats(examType, nextSection, profile).includes(prev.format ?? "") ? prev.format : undefined };
+  } });
 
   const setSection = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, section: value, format: value && prev.format && !supportsSectionFormat(value, prev.format) ? undefined : prev.format }) });
+    navigate({ search: (prev) => ({ ...prev, section: value, format: value && prev.format && !supportsSectionFormat(value, prev.format, examType || undefined, examProfile) ? undefined : prev.format }) });
 
   const setFormat = (value: string) =>
     navigate({ search: (prev) => ({ ...prev, format: value }) });
@@ -263,6 +270,7 @@ export function BankComponent() {
         tab: newTab,
         search: "",
         examType: "",
+        examProfile: undefined,
         section: "",
         format: "",
         difficulty: undefined,
@@ -276,6 +284,7 @@ export function BankComponent() {
         ...prev,
         search: "",
         examType: "",
+        examProfile: undefined,
         section: "",
         format: "",
         difficulty: undefined,
@@ -289,8 +298,8 @@ export function BankComponent() {
   // ── Active filter chips data ──
   const activeChips = [
     ...(examType ? [{ key: "examType", label: EXAM_TYPES.find((t) => t.id === examType)?.name ?? examType, onRemove: () => setExamType("") }] : []),
-    ...(section ? [{ key: "section", label: sectionLabel(section, ui), onRemove: () => setSection("") }] : []),
-    ...(format ? [{ key: "format", label: formatLabel(format, ui), onRemove: () => setFormat("") }] : []),
+    ...(section ? [{ key: "section", label: sectionLabel(section, ui, examContext), onRemove: () => setSection("") }] : []),
+    ...(format ? [{ key: "format", label: formatLabel(format, ui, examContext), onRemove: () => setFormat("") }] : []),
     ...(difficulty !== undefined ? [{ key: "difficulty", label: difficultyLabel(difficulty, ui), onRemove: () => setDifficulty(undefined) }] : []),
   ];
 
@@ -343,18 +352,10 @@ export function BankComponent() {
         isPublic: bundleIsPublic,
         estimatedDurationMin: bundleQuestions.length * 2,
       });
-      const sec = await addSection.mutateAsync({
-        packageId: pkg.id,
-        sectionTypeId: first?.sectionTypeId ?? "READING",
-        title: `${first?.sectionTypeName ?? "Reading"} Section`,
-        orderIndex: 0,
-      });
-      for (let i = 0; i < bundleQuestions.length; i++) {
-        await addQuestion.mutateAsync({
-          sectionId: sec.id,
-          questionId: bundleQuestions[i].id,
-          orderIndex: i,
-        });
+      const selected = bundleQuestions.map((q) => ({ id: q.id, examTypeId: q.examTypeId ?? first?.examTypeId ?? "", sectionTypeId: q.sectionTypeId ?? "READING" }));
+      for (const [index, group] of groupBundleQuestions(selected).entries()) {
+        const sec = await addSection.mutateAsync({ packageId: pkg.id, sectionTypeId: group.sectionTypeId, title: sectionLabel(group.sectionTypeId, ui, examContext), orderIndex: index });
+        for (const [orderIndex, q] of group.questions.entries()) await addQuestion.mutateAsync({ sectionId: sec.id, questionId: q.id, orderIndex });
       }
       setBundleQuestions([]);
       setBundleTitle("");
@@ -390,6 +391,17 @@ export function BankComponent() {
   const autoBundleExamType = examType || lockedExamType || null;
   const autoBundleSectionType = section || null;
 
+  const autoBundleFilters = { ...questionFilters, examTypeId: autoBundleExamType ?? undefined };
+  const bundleCountQuery = useQuery(trpc.question.list.queryOptions({ ...autoBundleFilters, limit: 1, offset: 0 }, { enabled: isAutoBundleOpen && !!autoBundleExamType && (tab === "public" || !!userId), staleTime: 0 }));
+  const relaxBundleFilters = () => {
+    setIsAutoBundleOpen(false);
+    void navigate({ search: (previous) => ({ ...previous, section: undefined, format: undefined, difficulty: undefined, search: undefined, visibility: undefined }) });
+  };
+  const generateForBundle = () => {
+    setIsAutoBundleOpen(false);
+    void navigate({ to: "/generate", search: { examType: autoBundleExamType ?? undefined, examProfile, section: section || undefined } });
+  };
+
   const onAutoBundle = async (data: {
     title: string;
     description: string;
@@ -397,36 +409,20 @@ export function BankComponent() {
     count: number;
     sortOrder: "random" | "difficulty";
   }) => {
-    const batchSize = 50;
-    const baseInput = {
-      search: searchText || undefined,
-      examTypeId: examType || undefined,
-      sectionTypeId: section || undefined,
-      format: format || undefined,
-      difficulty,
-      ...(tab === "mine" && userId
-        ? { creatorUserId: userId }
-        : { isPublic: true }),
-      limit: batchSize,
-    };
-    const firstPage = await queryClient.fetchQuery(
-      trpc.question.list.queryOptions({ ...baseInput, offset: 0 }),
-    );
-    const allQuestions = [...(firstPage.questions ?? [])];
-    const totalAvailable = firstPage.total ?? allQuestions.length;
-    for (let offset = batchSize; offset < totalAvailable; offset += batchSize) {
-      const pageData = await queryClient.fetchQuery(
-        trpc.question.list.queryOptions({ ...baseInput, offset }),
-      );
-      allQuestions.push(...(pageData.questions ?? []));
-    }
-    await handleAutoBundle({
-      ...data,
-      examTypeId: autoBundleExamType ?? "",
-      sectionTypeId: autoBundleSectionType ?? "READING",
-      allQuestions,
-    });
-    setIsAutoBundleOpen(false);
+    if (collectingBundle || isPackagePending || data.count < 1) return;
+    setCollectingBundle(true);
+    try {
+      const batchSize = 50;
+      const firstPage = await queryClient.fetchQuery(trpc.question.list.queryOptions({ ...autoBundleFilters, limit: batchSize, offset: 0 }));
+      const allQuestions = [...firstPage.questions];
+      for (let offset = batchSize; offset < firstPage.total; offset += batchSize) {
+        const page = await queryClient.fetchQuery(trpc.question.list.queryOptions({ ...autoBundleFilters, limit: batchSize, offset }));
+        allQuestions.push(...page.questions);
+      }
+      const created = await handleAutoBundle({ ...data, examTypeId: autoBundleExamType ?? "", sectionTypeId: section || undefined, allQuestions });
+      if (created) setIsAutoBundleOpen(false);
+    } catch (error) { toast.error(uiMessage("Gagal membuat paket"), { description: getErrorMessage(error) }); }
+    finally { setCollectingBundle(false); }
   };
 
   // ── Render helpers ──
@@ -469,6 +465,8 @@ export function BankComponent() {
         onOpenMobileSheet={() => setIsMobileSheetOpen(true)}
         advancedFilters={
           <AdvancedFilters
+            examType={examType}
+            examProfile={examProfile}
             section={section}
             format={format}
             difficulty={difficulty}
@@ -478,6 +476,7 @@ export function BankComponent() {
           />
         }
       />
+      {examType && <div className="mx-auto max-w-7xl px-6 pt-4 md:px-12 lg:px-16"><ExamScope examType={examType} profile={examProfile} onProfileChange={setExamProfile} sections={section ? [section] : undefined} /></div>}
 
       <div className="px-6 md:px-12 lg:px-16 max-w-7xl mx-auto pt-6">
         <section className="mb-8">
@@ -559,6 +558,8 @@ export function BankComponent() {
       </div>
 
       <MobileFilterSheet
+        examType={examType}
+        examProfile={examProfile}
         open={isMobileSheetOpen}
         onOpenChange={setIsMobileSheetOpen}
         section={section}
@@ -583,12 +584,18 @@ export function BankComponent() {
 
       {isAutoBundleOpen && autoBundleExamType && (
         <AutoBundleModal
-          availableCount={totalQuestions}
+          availableCount={bundleCountQuery.data?.total ?? 0}
           examTypeName={EXAM_TYPES.find((t) => t.id === autoBundleExamType)?.name ?? autoBundleExamType}
-          sectionTypeName={sectionLabel(autoBundleSectionType ?? "READING", ui)}
+          sectionTypeName={autoBundleSectionType ? sectionLabel(autoBundleSectionType, ui, examContext) : ui("Semua Section")}
+          scopeDescription={[ui(tab === "public" ? "公开题目" : "我的题目"), ...activeChips.filter((chip) => chip.key !== "examType" && chip.key !== "section").map((chip) => chip.label)].join(" · ")}
+          isLoading={bundleCountQuery.isPending || bundleCountQuery.isFetching}
+          isError={bundleCountQuery.isError}
+          onGenerate={generateForBundle}
+          onRelaxFilters={relaxBundleFilters}
+          onShowMine={tab === "public" ? () => { setIsAutoBundleOpen(false); void navigate({ search: (previous) => ({ ...previous, tab: "mine" }) }); } : undefined}
           onClose={() => setIsAutoBundleOpen(false)}
           onCreate={onAutoBundle}
-          isPending={isPackagePending}
+          isPending={isPackagePending || collectingBundle}
         />
       )}
 

@@ -50,6 +50,20 @@ beforeAll(async () => {
 afterAll(closeTestPGlite);
 
 describe("customer AI without API keys", () => {
+  it("rejects incompatible exam sections, profiles and formats before queueing", async () => {
+    const { caller } = await customer();
+    await expect(caller.generate({ ...input, examType: "JLPT", section: "SPEAKING", formats: ["spoken_response"] })).rejects.toThrow("Section is not part");
+    await expect(caller.generate({ ...input, examType: "TOEFL", formats: ["true_false_not_given"] })).rejects.toThrow("Question format is not part");
+    await expect(caller.generate({ ...input, examType: "TOPIK", examProfile: "topik_i", section: "WRITING", formats: ["essay"] })).rejects.toThrow("Section is not part");
+    await expect(caller.generate({ ...input, examProfile: "unknown" })).rejects.toThrow("Unknown exam profile");
+    const { jobId } = await caller.generate({ ...input, examType: "TOPIK", examProfile: "topik_ii", section: "WRITING", formats: ["essay"] });
+    expect(queued.get(jobId)!.input.examProfile).toBe("topik_ii");
+  });
+  it("infers a compatible paper for legacy writing jobs with no profile", async () => {
+    const { caller } = await customer();
+    const { jobId } = await caller.generate({ ...input, examType: "TOPIK", section: "WRITING", formats: ["essay"] });
+    expect(queued.get(jobId)!.input.examProfile).toBe("topik_ii");
+  });
   it("distributes a four-question request across four skills and persists their actual formats", async () => {
     const { id, caller } = await customer();
     await db.insert(schema.sectionType).values({ id: "SPEAKING", name: "Speaking" }).onConflictDoNothing();
