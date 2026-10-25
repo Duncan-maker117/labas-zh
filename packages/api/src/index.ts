@@ -5,7 +5,20 @@ import type { Context } from "./context";
 import { db } from "@labas/db";
 import { user } from "@labas/db";
 
-export const t = initTRPC.context<Context>().create();
+export const t = initTRPC.context<Context>().create({
+  errorFormatter({ shape, error }) {
+    // This is a transport boundary: development responses must be safe too.
+    return {
+      message: error.code === "INTERNAL_SERVER_ERROR" ? "Internal server error" : shape.message,
+      code: shape.code,
+      data: {
+        code: shape.data.code,
+        httpStatus: shape.data.httpStatus,
+        path: shape.data.path,
+      },
+    };
+  },
+});
 
 export const router = t.router;
 
@@ -13,7 +26,21 @@ export const router = t.router;
 const baseProcedure = t.procedure.use(({ ctx, path, type, next }) => {
   const start = Date.now();
   logger.info(`${type.toUpperCase()} ${path}`, { userId: ctx.session?.user.id });
-  return next().finally(() => {
+  return next().then((result) => {
+    if (!result.ok && result.error.code === "INTERNAL_SERVER_ERROR") {
+      // Record diagnostics without copying SQL, parameters, or credentials into logs.
+      let cause: unknown = result.error.cause;
+      let databaseCode: string | undefined;
+      for (let depth = 0; depth < 5 && cause instanceof Error; depth++) {
+        if ("code" in cause && typeof cause.code === "string" && /^[0-9A-Z]{5}$/.test(cause.code)) {
+          databaseCode = cause.code;
+        }
+        cause = cause.cause;
+      }
+      logger.error("Procedure failed", { path, type, code: result.error.code, databaseCode });
+    }
+    return result;
+  }).finally(() => {
     logger.info(`${type.toUpperCase()} ${path} completed`, {
       userId: ctx.session?.user.id,
       durationMs: Date.now() - start,

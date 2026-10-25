@@ -1,4 +1,5 @@
 import { uiMessage } from "@/lib/locale";
+import { getErrorMessage } from "@/lib/error-utils";
 import type { AppRouter } from "@labas/api/routers/index";
 import { env } from "@labas/env/web";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
@@ -16,10 +17,11 @@ export const queryClient = new QueryClient({
       ) {
         return;
       }
-      toast.error(uiMessage(error.message), {
+      if (query.meta?.handlesError) return;
+      toast.error(uiMessage(getErrorMessage(error)), {
         action: {
-          label: "retry",
-          onClick: query.invalidate,
+          label: uiMessage("Retry"),
+          onClick: () => { void queryClient.refetchQueries({ queryKey: query.queryKey, exact: true }); },
         },
       });
     },

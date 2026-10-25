@@ -6,9 +6,13 @@ import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { QuestionCard } from "./QuestionCard";
 import { CalloutCard } from "./CalloutCard";
 import type { Question } from "@/lib/types";
+import { useLocale } from "@/lib/locale";
+import { queryFeedbackCopy } from "@/lib/query-feedback-copy";
 
 interface SoalBrowserProps {
   isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
   questions: Question[];
   hasMore: boolean;
   isFetchingNextPage: boolean;
@@ -31,6 +35,8 @@ interface SoalBrowserProps {
 
 export function SoalBrowser({
   isLoading,
+  isError,
+  onRetry,
   questions,
   hasMore,
   isFetchingNextPage,
@@ -50,6 +56,8 @@ export function SoalBrowser({
   onPublishAllPrivate,
   totalPrivateCount,
 }: SoalBrowserProps) {
+  const { locale } = useLocale();
+  const copy = queryFeedbackCopy(locale);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isLocked = (q: Question) => !!lockedExamType && q.examTypeId !== lockedExamType;
 
@@ -82,7 +90,7 @@ export function SoalBrowser({
 
   useEffect(() => {
     const el = sentinelRef.current;
-    if (!el || !hasMore || isFetchingNextPage) return;
+    if (!el || !hasMore || isFetchingNextPage || isError) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) onLoadMore();
@@ -91,7 +99,7 @@ export function SoalBrowser({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [hasMore, isFetchingNextPage, onLoadMore]);
+  }, [hasMore, isFetchingNextPage, isError, onLoadMore]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -116,10 +124,22 @@ export function SoalBrowser({
     }
   };
 
-  // ── Loading state ──
-  if (isLoading && questions.length === 0) {
+  if (isError) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div role="alert" className="flex flex-col items-center gap-3 py-16 text-center">
+        <h2 className="text-lg font-semibold">{copy.bankFailed}</h2>
+        <p className="text-muted-foreground">{copy.bankDescription}</p>
+        <Button variant="outline" onClick={onRetry} disabled={isFetchingNextPage}>
+          {isFetchingNextPage ? copy.loading : copy.retry}
+        </Button>
+      </div>
+    );
+  }
+
+  // ── Loading state ──
+  if (isLoading) {
+    return (
+      <div role="status" aria-label={copy.loading} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <Card key={i} className="h-48 bg-[var(--oat-light)] animate-pulse rounded-[var(--radius-xl)]" />
         ))}

@@ -113,13 +113,14 @@ export function BankComponent() {
         limit,
         offset,
       },
-      { enabled: mode === "soal" },
+      { enabled: mode === "soal", meta: { handlesError: true } },
     ),
   );
 
   // Reset offset when filters change
   useEffect(() => {
     setOffset(0);
+    setAllQuestions([]);
   }, [filterKey]);
 
   // Append / replace questions when query data arrives
@@ -501,6 +502,8 @@ export function BankComponent() {
             {mode === "soal" ? (
               <SoalBrowser
                 isLoading={questionQuery.isLoading}
+                isError={questionQuery.isError}
+                onRetry={() => { void questionQuery.refetch(); }}
                 questions={questions}
                 hasMore={hasMore}
                 isFetchingNextPage={questionQuery.isFetching}
