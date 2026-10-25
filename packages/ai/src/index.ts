@@ -1,4 +1,5 @@
 export { OpenAICompatibleClient } from "./client";
+export { isSubjectiveFormat, formatsForSection, supportsSectionFormat, defaultSectionFormat, sectionMaterialInstruction } from "./practice-policy";
 export { withTokenBudget, getTokenBudgetUsage } from "./token-budget";
 export { generateQuestionsQuick } from "./pipeline";
 export { generateQuestionsAgentic, generatePassageForInput, generateQuestionsAgenticFromPassage } from "./agentic";

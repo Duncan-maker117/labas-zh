@@ -43,9 +43,9 @@ describe("computeSectionSplit", () => {
     expect(result).toEqual([{ section: "READING", count: 10 }]);
   });
 
-  it("returns single section when count < 20 even with multiple sections", () => {
+  it("distributes small requests across every selected section", () => {
     const result = computeSectionSplit(["READING", "LISTENING"], 15);
-    expect(result).toEqual([{ section: "READING", count: 15 }]);
+    expect(result).toEqual([{ section: "READING", count: 8 }, { section: "LISTENING", count: 7 }]);
   });
 
   it("distributes evenly when count >= 20 and multiple sections", () => {

@@ -148,7 +148,7 @@ function QuestionsView() {
       ),
     },
     { id: "exam", header: "Exam", size: "w-[10%]", cell: ({ row }) => <span className="text-xs">{row.examTypeId}</span> },
-    { id: "format", header: "Format", size: "w-[10%]", cell: ({ row }) => <span className="text-xs">{formatLabel(row.format)}</span> },
+    { id: "format", header: "Format", size: "w-[10%]", cell: ({ row }) => <span className="text-xs">{formatLabel(row.format, ui)}</span> },
     {
       id: "source", header: "Source", size: "w-[12%]",
       cell: ({ row }) => {

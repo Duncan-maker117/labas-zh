@@ -11,6 +11,20 @@ export type PlatformGenerationInput = GenerationInput & {
 };
 const terminalStatuses = ["completed", "completed_partial", "failed", "cancelled"];
 
+export async function assertDailyAiBudget(tx: Parameters<Parameters<typeof db.transaction>[0]>[0], userId: string, budget: number) {
+  const since = new Date();
+  since.setUTCHours(0, 0, 0, 0);
+  const [usage] = await tx.select({
+    total: sql<number>`coalesce(sum(case when ${creditTransaction.type} = 'generation_reserve' and not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${creditTransaction.description}) then -${creditTransaction.amount} when ${creditTransaction.type} = 'generation_settlement' then ${creditTransaction.tokensUsed} else 0 end), 0)`,
+    personal: sql<number>`coalesce(sum(case when ${creditTransaction.userId} = ${userId} then case when ${creditTransaction.type} = 'generation_reserve' and not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${creditTransaction.description}) then -${creditTransaction.amount} when ${creditTransaction.type} = 'generation_settlement' then ${creditTransaction.tokensUsed} else 0 end else 0 end), 0)`,
+  }).from(creditTransaction).where(and(
+    inArray(creditTransaction.type, ["generation_reserve", "generation_settlement"]),
+    or(gte(creditTransaction.createdAt, since), sql`${creditTransaction.type} = 'generation_reserve' and not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${creditTransaction.description})`),
+  ));
+  if (Number(usage?.personal ?? 0) + budget > PLATFORM_USER_DAILY_LIMIT) throwBadRequest("Daily AI allowance reached. Try again tomorrow");
+  if (Number(usage?.total ?? 0) + budget > PLATFORM_DAILY_LIMIT) throwBadRequest("Platform AI daily allowance reached. Try again tomorrow");
+}
+
 export async function createGenerationJob(userId: string, input: PlatformGenerationInput) {
   return db.transaction(async (tx) => {
     // One short admission lock protects both account and platform daily budgets.
@@ -32,17 +46,7 @@ export async function createGenerationJob(userId: string, input: PlatformGenerat
       if (input.questionCount > PLATFORM_MAX_QUESTIONS) throwBadRequest("Platform AI supports at most 20 questions per task");
       // Settled jobs use recorded consumption; unfinished reservations retain their
       // full upper limit, including cancelled jobs still stopping upstream work.
-      const since = new Date();
-      since.setUTCHours(0, 0, 0, 0);
-      const [usage] = await tx.select({
-        total: sql<number>`coalesce(sum(case when ${creditTransaction.type} = 'generation_reserve' and not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${creditTransaction.description}) then -${creditTransaction.amount} when ${creditTransaction.type} = 'generation_settlement' then ${creditTransaction.tokensUsed} else 0 end), 0)`,
-        personal: sql<number>`coalesce(sum(case when ${creditTransaction.userId} = ${userId} then case when ${creditTransaction.type} = 'generation_reserve' and not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${creditTransaction.description}) then -${creditTransaction.amount} when ${creditTransaction.type} = 'generation_settlement' then ${creditTransaction.tokensUsed} else 0 end else 0 end), 0)`,
-      }).from(creditTransaction).where(and(
-        inArray(creditTransaction.type, ["generation_reserve", "generation_settlement"]),
-        or(gte(creditTransaction.createdAt, since), sql`${creditTransaction.type} = 'generation_reserve' and not exists (select 1 from credit_transaction settled where settled.type = 'generation_settlement' and settled.description = ${creditTransaction.description})`),
-      ));
-      if (Number(usage?.personal ?? 0) + budget > PLATFORM_USER_DAILY_LIMIT) throwBadRequest("Daily AI allowance reached. Try again tomorrow");
-      if (Number(usage?.total ?? 0) + budget > PLATFORM_DAILY_LIMIT) throwBadRequest("Platform AI daily allowance reached. Try again tomorrow");
+      await assertDailyAiBudget(tx, userId, budget);
       const [updated] = await tx.update(userCredit).set({ tokenBalance: sql`${userCredit.tokenBalance} - ${budget}` }).where(and(
         eq(userCredit.userId, userId), gte(userCredit.tokenBalance, budget),
       )).returning();

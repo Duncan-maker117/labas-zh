@@ -1,3 +1,4 @@
+import { isSubjectiveFormat, supportsSectionFormat } from "./practice-policy";
 import { z } from "zod";
 import {
   questionFormatSchema,
@@ -142,6 +143,8 @@ function ensureOptions(
 function coerceCorrectAnswer(q: GenericQuestion): string {
   const ans = String(q.correctAnswer).trim();
 
+  if (isSubjectiveFormat(q.format)) return ans;
+
   // Mapping formats: correctAnswer is serialized "key:value,key:value" — skip option-key coercion
   if (["matching_headings", "matching_information", "matching_pairs", "sentence_arrangement"].includes(q.format)) {
     return ans;
@@ -270,8 +273,8 @@ export function repairQuestion(
   if (explanationText.trim().length === 0) {
     notes.push("explanation missing, used fallback");
     wasRepaired = true;
-  } else if (strictExplanation && getExplanationLanguageErrors(explanationText).length > 0) {
-    notes.push("explanation not in Bahasa Indonesia, marked for regeneration");
+  } else if (strictExplanation && getExplanationLanguageErrors(explanationText, examType).length > 0) {
+    notes.push("explanation language does not match the learner language, marked for regeneration");
     wasRepaired = true;
   }
   if (!Array.isArray(r.skillTags) || r.skillTags.length === 0) {
@@ -337,7 +340,7 @@ export function tryParseQuestion(generic: GenericQuestion): Question | null {
 export function repairAndParseQuestions(
   rawQuestions: unknown[],
   fullPassage: string,
-  options?: { examType?: string; strictExplanation?: boolean },
+  options?: { examType?: string; strictExplanation?: boolean; section?: string; allowedFormats?: string[] },
 ): {
   valid: Question[];
   invalid: { index: number; raw: unknown; errors: string[] }[];
@@ -364,9 +367,11 @@ export function repairAndParseQuestions(
       }
 
       const semanticErrors = [
+        ...(options?.section && !supportsSectionFormat(options.section, repaired.format) ? ["Question format does not match the selected section"] : []),
+        ...(options?.allowedFormats && !options.allowedFormats.includes(repaired.format) ? ["Question format was not requested"] : []),
         ...getQuestionSemanticErrors(repaired),
         ...(examType ? getQuestionLanguageErrors(repaired, examType) : []),
-        ...(strictExplanation ? getExplanationLanguageErrors(repaired.explanation) : []),
+        ...(strictExplanation ? getExplanationLanguageErrors(repaired.explanation, examType) : []),
       ];
       if (semanticErrors.length > 0) {
         invalid.push({ index: i, raw, errors: semanticErrors });
@@ -412,29 +417,7 @@ export function getGenericQuestionJsonSchemaDescription(): string {
             properties: {
               format: {
                 type: "string",
-                enum: [
-                  "multiple_choice",
-                  "true_false_not_given",
-                  "matching_headings",
-                  "matching_information",
-                  "matching_pairs",
-                  "fill_blank",
-                  "synonym",
-                  "grammar_in_context",
-                  "sentence_completion",
-                  "summary_completion",
-                  "cloze",
-                  "reference",
-                  "author_view",
-                  "error_recognition",
-                  "text_insertion",
-                  "kanji_reading",
-                  "particle_choice",
-                  "article_case",
-                  "character_reading",
-                  "sentence_arrangement",
-                  "situational_judgment",
-                ],
+                enum: questionFormatSchema.options,
               },
               passageText: { type: "string", description: "Relevant excerpt from the passage (or full passage). For situational_judgment, this is the scenario/context." },
               questionText: { type: "string", description: "The question text" },
@@ -454,7 +437,7 @@ export function getGenericQuestionJsonSchemaDescription(): string {
                 type: "string",
                 description: "For true_false_not_given use TRUE/FALSE/NOT_GIVEN. For author_view use YES/NO/NOT_GIVEN. For multiple choice use the option key (e.g. A). For situational_judgment, key of the highest-weight option.",
               },
-              explanation: { type: "string", description: "Explanation in Bahasa Indonesia; may include exam-language terms/kanji when relevant" },
+              explanation: { type: "string", description: "Explanation in Simplified Chinese for language exams; Indonesian only for CPNS. May quote exam-language terms." },
               difficulty: { type: "integer", minimum: 1, maximum: 5 },
               skillTags: { type: "array", items: { type: "string" } },
               optionWeights: {

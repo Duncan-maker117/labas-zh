@@ -1,3 +1,4 @@
+import { sectionMaterialInstruction } from "./practice-policy";
 import { OpenAICompatibleClient } from "./client";
 import { parseAiJsonResponse } from "./parse-response";
 import { getGenericQuestionJsonSchemaDescription } from "./repair";
@@ -46,12 +47,13 @@ Passage:
 ${passage}
 """
 
-Generate ${count} new reading comprehension questions for ${input.examType} exam.
+Generate ${count} new ${input.section.toLowerCase()} practice questions for ${input.examType} exam.
+${sectionMaterialInstruction(input.section)}
 Formats: ${input.formats.join(", ")}
 Difficulty: ${input.difficulty}/5
 
 Rules:
-- Each question must be directly answerable from the passage
+- Reading/listening questions use the material. Writing/speaking questions ask for an original response to the assignment.
 - Use "passageText" field with relevant excerpt (or full passage)
 ${OPTION_QUALITY_RULES}
 ${buildContentLanguageRules(input.examType)}

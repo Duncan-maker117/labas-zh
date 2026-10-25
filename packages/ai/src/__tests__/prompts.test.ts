@@ -92,9 +92,9 @@ describe("buildQuickModePrompt", () => {
     expect(prompt).toContain("Spanish");
   });
 
-  it("includes instruction about explanation language (Bahasa Indonesia)", () => {
+  it("includes Chinese explanation instructions", () => {
     const prompt = buildQuickModePrompt(baseInput);
-    expect(prompt).toContain("Bahasa Indonesia");
+    expect(prompt).toContain("Simplified Chinese");
   });
 
   it("includes JSON schema in output", () => {

@@ -2,6 +2,7 @@ import type { GenerationInput } from "./schemas";
 import { getQuestionJsonSchemaDescription } from "./schema-to-prompt";
 import { buildContentLanguageRules, buildExplanationLanguageRule } from "./language-rules";
 import { buildCpnsQuickModePrompt } from "./prompts-cpns";
+import { sectionMaterialInstruction } from "./practice-policy";
 
 export const OPTION_QUALITY_RULES = `- Each option "text" must be meaningful content derived from the passage or question — NEVER use generic labels like "Option A", "Option B", "Pilihan A", "Choice B", or "Placeholder".
 - For multiple choice: always provide at least 4 real answer choices labeled A, B, C, D with plausible distractors.`;
@@ -22,16 +23,17 @@ export function buildQuickModePrompt(input: GenerationInput): string {
 
   return `You are an expert exam question writer for ${examType} ${section.toLowerCase()} section.
 
-Generate ${questionCount} authentic, high-quality reading comprehension questions.
+Generate ${questionCount} authentic, high-quality ${section.toLowerCase()} practice questions.
 
 DIVERSITY RULES:
 - Generate ${questionCount} questions covering DIFFERENT topics within the provided topic list.
-- Each question must test a DISTINCT concept — different vocabulary, grammar point, or reading skill.
+- Each question must test a DISTINCT concept — different vocabulary, grammar point, or skill in the selected section.
 - Do NOT repeat the same question pattern or structure.
 - For ${questionCount} questions, ensure ${questionCount} unique contexts.
 ${avoidContext}
 EXAM: ${examType}
 SECTION: ${section}
+MATERIAL AND RESPONSE RULE: ${sectionMaterialInstruction(section)}
 DIFFICULTY: ${difficulty}/5
 TOPICS: ${topics.join(", ")}
 FORMATS TO GENERATE: ${formats.join(", ")}
@@ -44,13 +46,13 @@ ${buildExplanationLanguageRule(examType)}
 - For Spanish (DELE): Focus on verb conjugation by subject and agreement.
 - Passage length should be appropriate for the exam type and difficulty.
 - Each question must have:
-  * a reading passage (passageText)
+  * a passage, listening script or assignment context (passageText)
    * a clear question prompt (questionText) — in exam language, NOT Bahasa Indonesia
    * a correct answer (correctAnswer)
-   * an explanation (explanation) — Bahasa Indonesia, boleh sisipkan istilah/kanji/kata ujian bila perlu
+   * an explanation (explanation) — Simplified Chinese reasoning or assessment criteria, with brief exam-language quotations if needed
   * difficulty level (${difficulty})
   * relevant skill tags (skillTags)
-- For JLPT/TOPIK kanji/hanja: Include reading annotations in format: 漢字(かんじ) for words that have readings.
+- For JLPT/TOPIK reading passages only: reading annotations may use 漢字(かんじ). Do not add annotations to listening scripts.
 - Questions should test real comprehension, not just surface-level recall.
 - For multiple choice: always provide 4 options labeled A, B, C, D.
 - Options must be plausible distractors — one clearly correct answer.

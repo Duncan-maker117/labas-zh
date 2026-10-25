@@ -43,14 +43,14 @@ describe("language-rules", () => {
     expect(getTargetLanguage("JLPT")).toBe("Japanese");
   });
 
-  it("accepts mixed Indonesian + Japanese in explanation", () => {
+  it("accepts Chinese explanations with Japanese quotations", () => {
     const errors = getExplanationLanguageErrors(
-      "Jawaban A benar karena kata 環境(かんきょう) di paragraf kedua merujuk pada lingkungan hidup.",
+      "选项 A 正确，因为第二段中的「環境」指的是生活环境。",
     );
     expect(errors).toHaveLength(0);
   });
 
-  it("rejects explanation with only Japanese and no Indonesian prose", () => {
+  it("rejects Japanese-only explanations", () => {
     const errors = getExplanationLanguageErrors(
       "この文章によると、正しい答えはAです。",
     );
@@ -61,6 +61,6 @@ describe("language-rules", () => {
     const errors = getExplanationLanguageErrors(
       "The correct answer is A because the passage clearly states the main idea.",
     );
-    expect(errors.some((e) => e.includes("Bahasa Indonesia"))).toBe(true);
+    expect(errors.some((e) => e.includes("Simplified Chinese"))).toBe(true);
   });
 });

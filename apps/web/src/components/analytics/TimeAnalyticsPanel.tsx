@@ -12,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { Link } from "@tanstack/react-router";
 import { formatTime } from "@/lib/time";
-import { formatLabel } from "@/lib/format";
+import { formatLabel, sectionLabel } from "@/lib/format";
 
 export interface SectionTimeItem {
   sectionTypeName: string;
@@ -67,7 +67,7 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
               {sectionTime.map((item) => (
                 <div key={item.sectionTypeName} className="flex items-center gap-4">
                   <div className="w-28 shrink-0 text-sm font-medium text-[var(--clay-black)]">
-                    {item.sectionTypeName}
+                    {sectionLabel(item.sectionTypeName, ui)}
                   </div>
                   <div className="flex-1">
                     <div className="w-full h-2.5 bg-[var(--oat-light)] rounded-full overflow-hidden">
@@ -103,7 +103,7 @@ export function TimeAnalyticsPanel({ sectionTime, formatTimeData, timeTrend }: T
               {formatTimeData.map((item) => (
                 <div key={item.format} className="flex items-center gap-4">
                   <div className="w-32 shrink-0 text-sm font-medium text-[var(--clay-black)] truncate">
-                    {formatLabel(item.format)}
+                    {formatLabel(item.format, ui)}
                   </div>
                   <div className="flex-1">
                     <div className="w-full h-2.5 bg-[var(--oat-light)] rounded-full overflow-hidden">

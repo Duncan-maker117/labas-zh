@@ -1,11 +1,12 @@
-import { uiMessage } from "@/lib/locale";
+import { supportsSectionFormat } from "@labas/ai/practice-policy";
+import { useLocale, uiMessage } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
 import { trpc, queryClient } from "@/utils/trpc";
 import { EXAM_TYPES, SECTIONS } from "@/lib/exam-constants";
-import { formatLabel } from "@/lib/format";
+import { difficultyLabel, formatLabel, sectionLabel } from "@/lib/format";
 import { usePackageBuilder } from "@/hooks/use-package-builder";
 import { useLocalStorageBoolean } from "@/hooks/use-local-storage-boolean";
 import { AutoBundleModal } from "@/components/bank/AutoBundleModal";
@@ -51,6 +52,7 @@ type QuestionTab = "mine" | "public";
 type Mode = "soal" | "section";
 
 export function BankComponent() {
+  const { ui } = useLocale();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: session } = authClient.useSession();
@@ -243,7 +245,7 @@ export function BankComponent() {
     navigate({ search: (prev) => ({ ...prev, examType: value }) });
 
   const setSection = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, section: value }) });
+    navigate({ search: (prev) => ({ ...prev, section: value, format: value && prev.format && !supportsSectionFormat(value, prev.format) ? undefined : prev.format }) });
 
   const setFormat = (value: string) =>
     navigate({ search: (prev) => ({ ...prev, format: value }) });
@@ -287,9 +289,9 @@ export function BankComponent() {
   // ── Active filter chips data ──
   const activeChips = [
     ...(examType ? [{ key: "examType", label: EXAM_TYPES.find((t) => t.id === examType)?.name ?? examType, onRemove: () => setExamType("") }] : []),
-    ...(section ? [{ key: "section", label: SECTIONS.find((s) => s.id === section)?.name ?? section, onRemove: () => setSection("") }] : []),
-    ...(format ? [{ key: "format", label: formatLabel(format), onRemove: () => setFormat("") }] : []),
-    ...(difficulty !== undefined ? [{ key: "difficulty", label: `Lv.${difficulty}`, onRemove: () => setDifficulty(undefined) }] : []),
+    ...(section ? [{ key: "section", label: sectionLabel(section, ui), onRemove: () => setSection("") }] : []),
+    ...(format ? [{ key: "format", label: formatLabel(format, ui), onRemove: () => setFormat("") }] : []),
+    ...(difficulty !== undefined ? [{ key: "difficulty", label: difficultyLabel(difficulty, ui), onRemove: () => setDifficulty(undefined) }] : []),
   ];
 
   // ── Bundle helpers ──
@@ -583,7 +585,7 @@ export function BankComponent() {
         <AutoBundleModal
           availableCount={totalQuestions}
           examTypeName={EXAM_TYPES.find((t) => t.id === autoBundleExamType)?.name ?? autoBundleExamType}
-          sectionTypeName={SECTIONS.find((s) => s.id === autoBundleSectionType)?.name ?? "Reading"}
+          sectionTypeName={sectionLabel(autoBundleSectionType ?? "READING", ui)}
           onClose={() => setIsAutoBundleOpen(false)}
           onCreate={onAutoBundle}
           isPending={isPackagePending}

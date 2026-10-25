@@ -1,3 +1,4 @@
+import { sectionLabel } from "@/lib/format";
 import { useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import {
@@ -153,7 +154,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
         <CardContent>
           {bySectionType && bySectionType.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={bySectionType} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+              <BarChart data={bySectionType.map((item) => ({ ...item, sectionTypeName: sectionLabel(item.sectionTypeName, ui) }))} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--oat-border)" />
                 <XAxis
                   dataKey="sectionTypeName"
@@ -212,7 +213,7 @@ export function BreakdownCharts({ byExamType, bySectionType, byFormat }: Breakdo
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-[var(--clay-black)]">
-                      {formatLabel(item.format)}
+                      {formatLabel(item.format, ui)}
                     </span>
                     <span className="text-xs text-[var(--warm-charcoal)]">
                       {item.totalQuestions} <LocalizedText source={"soal"} />

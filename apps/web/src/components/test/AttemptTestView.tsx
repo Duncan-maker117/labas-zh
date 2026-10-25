@@ -1,3 +1,5 @@
+import { ListeningPlayer } from "./ListeningPlayer";
+import { formatLabel, sectionLabel } from "@/lib/format";
 import { useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect, useRef, useCallback, memo } from "react";
@@ -17,6 +19,7 @@ import { FinishDialog } from "./attempt/FinishDialog";
 import { AbandonDialog } from "./attempt/AbandonDialog";
 
 interface AttemptTestViewProps {
+  error?: string | null;
   attemptId: string;
   pkg: Package & { sections: PackageSection[] };
   currentSectionIdx: number;
@@ -62,6 +65,7 @@ const QuestionCard = memo(function QuestionCard({
   onAnswerChange,
   toggleMarkQuestion,
 }: QuestionCardProps) {
+  const { ui } = useLocale();
   const handleChange = useCallback(
     (val: string) => {
       onAnswerChange(q.id, sectionResultId, val);
@@ -91,18 +95,18 @@ const QuestionCard = memo(function QuestionCard({
             {globalIdx}
           </span>
           <h2 className="text-xl font-bold text-[var(--clay-black)] capitalize">
-            {(q.format ?? "").replace(/_/g, " ")}
+            {formatLabel(q.format ?? "", ui)}
           </h2>
         </div>
         <button
           onClick={() => toggleMarkQuestion(q.id)}
-          aria-label={isMarked ? "Hapus tanda" : "Tandai untuk review"}
+          aria-label={ui(isMarked ? "Hapus tanda" : "Tandai untuk review")}
           className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-colors ${
             isMarked
               ? "bg-[var(--pomegranate-400)]/20 text-[var(--pomegranate-400)]"
               : "bg-[var(--oat-light)] text-[var(--warm-silver)] hover:text-[var(--pomegranate-400)]"
           }`}
-          title={isMarked ? "Hapus tanda" : "Tandai untuk review"}
+          title={ui(isMarked ? "Hapus tanda" : "Tandai untuk review")}
         >
           <MaterialIcon name={isMarked ? "bookmark" : "bookmark_border"} className="text-lg" />
         </button>
@@ -140,6 +144,7 @@ const QuestionCard = memo(function QuestionCard({
 });
 
 export function AttemptTestView({
+  error,
   attemptId,
   pkg,
   currentSectionIdx,
@@ -285,6 +290,7 @@ export function AttemptTestView({
 
   return (
     <>
+      {error && <p role="alert" className="fixed top-20 left-4 right-4 z-50 rounded-xl border bg-background p-4 text-destructive">{ui("保存或交卷失败，请重试；当前页面的答案仍保留。")}{ui(error)}</p>}
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -308,7 +314,7 @@ export function AttemptTestView({
       >
         <AttemptHeader
           pkgTitle={pkg.title ?? ""}
-          currentSectionTitle={currentSection.title ?? ""}
+          currentSectionTitle={sectionLabel(currentSection.title ?? currentSection.sectionTypeId ?? "", ui)}
           timeElapsed={timeElapsed}
           timeLimitSec={timeLimitSec}
           answeredCount={answeredCount}
@@ -327,14 +333,16 @@ export function AttemptTestView({
                 <article className="max-w-2xl mx-auto">
                   <header className="mb-8">
                     <h1 className="text-3xl font-extrabold text-[var(--clay-black)] mb-4 leading-tight">
-                      {currentSection.title}
+                      {sectionLabel(currentSection.title ?? currentSection.sectionTypeId ?? "", ui)}
                     </h1>
                     <div className="flex gap-4 text-sm text-[var(--warm-silver)] italic">
                       <span><LocalizedText source={"Section"} /> {currentSectionIdx + 1} <LocalizedText source={"dari"} /> {pkg.sections.length}</span>
                     </div>
                   </header>
                   <div className="space-y-6 text-lg leading-relaxed text-[var(--warm-charcoal)] font-body whitespace-pre-wrap" dir={isRtl ? "rtl" : undefined}>
-                    {useFurigana ? parseFurigana(passageToShow) : passageToShow}
+                    {currentSection.sectionTypeId === "LISTENING" && !isFinished
+                      ? <ListeningPlayer key={activeQuestion?.passageId ?? passageToShow} text={passageToShow} exam={examType} />
+                      : useFurigana ? parseFurigana(passageToShow) : passageToShow}
                   </div>
                 </article>
               </section>

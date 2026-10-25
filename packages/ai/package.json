@@ -17,6 +17,18 @@
     },
     "./client": {
       "default": "./src/client.ts"
+    },
+    "./practice-policy": {
+      "default": "./src/practice-policy.ts"
+    },
+    "./assessment": {
+      "default": "./src/assessment.ts"
+    },
+    "./assessment-schema": {
+      "default": "./src/assessment-schema.ts"
+    },
+    "./token-budget": {
+      "default": "./src/token-budget.ts"
     }
   },
   "dependencies": {

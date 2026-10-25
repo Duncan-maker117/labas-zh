@@ -1,3 +1,4 @@
+import { AnswerSaveQueue } from "@/lib/answer-save-queue";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -122,6 +123,25 @@ export function useTestSession(packageId: string, existingAttemptId?: string, ti
   const finishMutation = useMutation(trpc.attempt.finish.mutationOptions());
   const abandonMutation = useMutation(trpc.attempt.abandon.mutationOptions());
 
+  type SavedAnswer = Parameters<typeof submitMutation.mutateAsync>[0];
+  const submitRef = useRef(submitMutation.mutateAsync); submitRef.current = submitMutation.mutateAsync;
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [finishError, setFinishError] = useState<string | null>(null);
+  const finishingRef = useRef(false);
+  const saveQueue = useRef<AnswerSaveQueue<SavedAnswer> | null>(null);
+  if (!saveQueue.current) saveQueue.current = new AnswerSaveQueue(async (input) => {
+    setSubmittingQId(input.questionId);
+    try { await submitRef.current(input); setSaveError(null); }
+    finally { setSubmittingQId(null); }
+  }, (error) => setSaveError(getErrorMessage(error)));
+  useEffect(() => {
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (saveQueue.current?.hasPending) { event.preventDefault(); event.returnValue = ""; }
+    };
+    window.addEventListener("beforeunload", beforeUnload);
+    return () => { window.removeEventListener("beforeunload", beforeUnload); void saveQueue.current?.flush().catch(() => {}); };
+  }, []);
+
   // Restore attempt data when continuing an existing attempt
   const attemptQuery = useQuery(
     trpc.attempt.getById.queryOptions(
@@ -208,11 +228,9 @@ export function useTestSession(packageId: string, existingAttemptId?: string, ti
 
   const handleAnswerChange = useCallback(
     async (questionId: string, sectionResultId: string | undefined, value: string) => {
-      if (!attemptId || isFinished) return;
+      if (!attemptId || isFinished || finishingRef.current) return;
       setAnswers((prev) => ({ ...prev, [questionId]: value }));
       if (!sectionResultId) return;
-
-      setSubmittingQId(questionId);
 
       if (!questionStartTimes.current[questionId]) {
         questionStartTimes.current[questionId] = Date.now();
@@ -221,41 +239,37 @@ export function useTestSession(packageId: string, existingAttemptId?: string, ti
       const startTime = questionStartTimes.current[questionId];
       const timeSpentSec = startTime ? Math.round((Date.now() - startTime) / 1000) : undefined;
 
-      try {
-        await submitMutation.mutateAsync({
-          attemptId,
-          sectionResultId,
-          questionId,
-          userAnswer: value,
-          timeSpentSec,
-        });
-      } finally {
-        setSubmittingQId(null);
-      }
+      saveQueue.current!.enqueue(questionId, { attemptId, sectionResultId, questionId, userAnswer: value, timeSpentSec });
     },
     [attemptId, isFinished, submitMutation],
   );
 
   const handleFinish = useCallback(async () => {
-    if (!attemptId) return;
-    setIsFinished(true);
-    const result = await finishMutation.mutateAsync({ attemptId });
-    clearElapsedTime(attemptId);
-    clearMarkedQuestions(attemptId);
-    clearSectionIdx(attemptId);
-    clearActiveQuestionId(attemptId);
-    navigate({ to: "/attempt/$id", params: { id: attemptId } });
-    return result;
+    if (!attemptId || finishingRef.current) return;
+    finishingRef.current = true; setIsFinished(true); setFinishError(null);
+    try {
+      await saveQueue.current!.flush();
+      const result = await finishMutation.mutateAsync({ attemptId });
+      clearElapsedTime(attemptId); clearMarkedQuestions(attemptId);
+      clearSectionIdx(attemptId); clearActiveQuestionId(attemptId);
+      navigate({ to: "/attempt/$id", params: { id: attemptId } });
+      return result;
+    } catch (error) {
+      setFinishError(getErrorMessage(error)); setIsFinished(false);
+    } finally { finishingRef.current = false; }
   }, [attemptId, finishMutation, navigate]);
 
   const handleAbandon = useCallback(async () => {
-    if (!attemptId) return;
-    await abandonMutation.mutateAsync({ attemptId });
-    clearElapsedTime(attemptId);
-    clearMarkedQuestions(attemptId);
-    clearSectionIdx(attemptId);
-    clearActiveQuestionId(attemptId);
-    navigate({ to: abandonLink });
+    if (!attemptId || finishingRef.current) return;
+    finishingRef.current = true; setIsFinished(true);
+    try {
+      await saveQueue.current!.flush();
+      await abandonMutation.mutateAsync({ attemptId });
+      clearElapsedTime(attemptId); clearMarkedQuestions(attemptId);
+      clearSectionIdx(attemptId); clearActiveQuestionId(attemptId);
+      navigate({ to: abandonLink });
+    } catch (error) { setFinishError(getErrorMessage(error)); setIsFinished(false); }
+    finally { finishingRef.current = false; }
   }, [attemptId, abandonMutation, navigate, abandonLink]);
 
   const isTimeUp = timeLimitSec !== null && isStarted && !isFinished && timeElapsed >= timeLimitSec;
@@ -303,6 +317,8 @@ export function useTestSession(packageId: string, existingAttemptId?: string, ti
     markedQuestions,
     startPending: startMutation.isPending,
     startError,
+    saveError,
+    finishError,
     handleStart,
     handleAnswerChange,
     handleFinish,

@@ -1,4 +1,7 @@
+import { isSubjectiveFormat } from "@labas/ai/practice-policy";
 import { LocalizedText } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
+import { formatLabel } from "@/lib/format";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { trpc } from "@/utils/trpc";
@@ -30,8 +33,9 @@ export function QuestionReviewCard({
   onToggleExpand,
   hidePassage,
 }: QuestionReviewCardProps) {
+  const { ui } = useLocale();
   const isCorrect = ans?.isCorrect;
-  const userAnswer = ans?.userAnswer ?? "Tidak dijawab";
+  const userAnswer = ans?.userAnswer ?? ui("Tidak dijawab");
   const isOwner = q.creatorUserId === userId;
   const hasOptions = Array.isArray(q.options) && q.options.length > 0;
 
@@ -101,7 +105,7 @@ export function QuestionReviewCard({
           </p>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)]">
-              {(q.format ?? "").replace(/_/g, " ")}
+              {formatLabel(q.format ?? "", ui)}
             </span>
             {ans?.timeSpentSec != null && (
               <span className="text-[10px] text-[var(--warm-silver)] flex items-center gap-0.5">
@@ -223,7 +227,7 @@ export function QuestionReviewCard({
             )}
             {(isCorrect === false || isCorrect === null) && (
               <div>
-                <span className="text-[var(--warm-silver)]"><LocalizedText source={"Jawaban Benar:"} /></span>{" "}
+                <span className="text-[var(--warm-silver)]"><LocalizedText source={isSubjectiveFormat(q.format ?? "") ? "参考回答：" : "Jawaban Benar:"} /></span>{" "}
                 <span className="font-semibold text-[var(--matcha-700)]">
                   {q.correctAnswer}
                 </span>

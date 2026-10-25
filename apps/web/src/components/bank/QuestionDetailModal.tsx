@@ -1,4 +1,5 @@
 import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent } from "@labas/ui/components/card";
@@ -10,7 +11,7 @@ import {
 } from "@labas/ui/components/dialog";
 import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
-import { formatLabel } from "@/lib/format";
+import { formatLabel, sectionLabel } from "@/lib/format";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import type { Question } from "@/lib/types";
 
@@ -35,6 +36,7 @@ export function QuestionDetailModal({
   isPublic,
   onToggleVisibility,
 }: Props) {
+  const { ui } = useLocale();
   const { data: session } = authClient.useSession();
   const isOwner = question.creatorUserId === session?.user.id;
 
@@ -56,11 +58,11 @@ export function QuestionDetailModal({
       )}
       {question.sectionTypeName && (
         <span className="px-3 py-1.5 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] text-sm font-semibold">
-          {question.sectionTypeName}
+          {sectionLabel(question.sectionTypeName, ui)}
         </span>
       )}
       <span className="px-3 py-1.5 rounded-full bg-[var(--lemon-400)]/30 text-[var(--lemon-800)] text-sm font-semibold">
-        {formatLabel(question.format ?? "")}
+        {formatLabel(question.format ?? "", ui)}
       </span>
       {question.difficulty && (
         <span className="px-3 py-1.5 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-sm font-semibold">
@@ -158,7 +160,7 @@ export function QuestionDetailModal({
                     <span className="font-semibold text-[var(--clay-black)]">
                       <LocalizedText source={"Jenis soal:"} />{" "}
                     </span>
-                    {formatLabel(question.format ?? "")}
+                    {formatLabel(question.format ?? "", ui)}
                   </div>
                 )}
               </CardContent>

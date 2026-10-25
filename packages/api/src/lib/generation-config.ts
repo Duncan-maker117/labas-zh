@@ -1,3 +1,4 @@
+import { formatsForSection } from "@labas/ai/practice-policy";
 import type { GenerationInput } from "@labas/ai/schemas";
 import { env } from "@labas/env/server";
 import { getConfig, getPlatformAiConfig, getUserCredit, autoRefillIfEligible } from "./credit";
@@ -7,6 +8,11 @@ import type { PlatformGenerationInput } from "./platform-generation";
 
 /** Resolve credentials on the server for both new jobs and user-initiated retries. */
 export async function resolveGenerationInput(input: Omit<GenerationInput, "apiKeyConfig"> & { apiKeyConfig?: GenerationInput["apiKeyConfig"] }, userId: string): Promise<PlatformGenerationInput> {
+  const sections = input.selectedSections ?? [input.section];
+  if (input.questionCount < sections.length) throwBadRequest("Question count must cover every selected section");
+  for (const section of sections) {
+    if (!formatsForSection(section, input.formats).length) throwBadRequest("Choose a compatible question format for every selected section");
+  }
   if (input.apiKeyConfig?.apiKey) return input as GenerationInput;
   const enabled = await getConfig("free_credits_enabled", () => String(env.FREE_CREDITS_ENABLED));
   if (enabled !== "true") throwBadRequest("Platform AI is currently unavailable. Contact support");

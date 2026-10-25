@@ -1,4 +1,4 @@
-import { uiMessage } from "@/lib/locale";
+import { uiMessage, useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import { useAppMode } from "@/lib/app-mode";
 import { Button } from "@labas/ui/components/button";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
-import { formatLabel } from "@/lib/format";
+import { formatLabel, sectionLabel } from "@/lib/format";
 import { EditPackageModal } from "@/components/package/EditPackageModal";
 import { toast } from "sonner";
 
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/package/$id/")({
 });
 
 function PackageDetailComponent() {
+  const { ui } = useLocale();
   const { id } = Route.useParams();
   const { data: session } = authClient.useSession();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -191,7 +192,7 @@ function PackageDetailComponent() {
                   {section.title}
                 </h2>
                 <span className="px-2 py-0.5 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-semibold ml-auto">
-                  {section.sectionTypeName}
+                  {sectionLabel(section.sectionTypeName ?? section.sectionTypeId, ui)}
                 </span>
               </div>
 
@@ -214,7 +215,7 @@ function PackageDetailComponent() {
                           </p>
                           <div className="flex gap-2 mt-2">
                             <span className="px-2 py-0.5 rounded bg-[var(--pure-white)] text-[var(--warm-charcoal)] text-xs">
-                              {formatLabel(q.format)}
+                              {formatLabel(q.format, ui)}
                             </span>
                             <span className="px-2 py-0.5 rounded bg-[var(--pure-white)] text-[var(--warm-charcoal)] text-xs">
                               <LocalizedText source={"Lv."} />{q.difficulty}

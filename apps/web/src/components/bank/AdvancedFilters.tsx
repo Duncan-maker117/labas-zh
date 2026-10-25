@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@labas/ui/components/select";
 import { SECTIONS, FORMATS, DIFFICULTIES } from "@/lib/exam-constants";
-import { formatLabel } from "@/lib/format";
+import { difficultyLabel, formatLabel, sectionLabel } from "@/lib/format";
 
 interface AdvancedFiltersProps {
   section: string;
@@ -32,27 +32,27 @@ export function AdvancedFilters({
   return (
     <>
       <Select value={section} onValueChange={(v: string | null) => onSetSection(v ?? "")}>
-        <SelectTrigger className="w-full md:w-38 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue placeholder={ui("Section")} />
+        <SelectTrigger aria-label={ui("Section")} className="w-full md:w-38 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
+          <SelectValue>{section ? sectionLabel(section, ui) : ui("Semua Section")}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem value=""><LocalizedText source={"Semua Section"} /></SelectItem>
             {SECTIONS.map((s) => (
-              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+              <SelectItem key={s.id} value={s.id}>{sectionLabel(s.id, ui)}</SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
       <Select value={format} onValueChange={(v: string | null) => onSetFormat(v ?? "")}>
-        <SelectTrigger className="w-full md:w-40 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue placeholder={ui("Format")} />
+        <SelectTrigger aria-label={ui("Format")} className="w-full md:w-56 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
+          <SelectValue>{format ? formatLabel(format, ui) : ui("Semua Format")}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem value=""><LocalizedText source={"Semua Format"} /></SelectItem>
             {FORMATS.map((f) => (
-              <SelectItem key={f} value={f}>{formatLabel(f)}</SelectItem>
+              <SelectItem key={f} value={f}>{formatLabel(f, ui)}</SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
@@ -61,14 +61,14 @@ export function AdvancedFilters({
         value={difficulty !== undefined ? String(difficulty) : ""}
         onValueChange={(v: string | null) => onSetDifficulty(v ? Number(v) : undefined)}
       >
-        <SelectTrigger className="w-full md:w-36 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
-          <SelectValue placeholder={ui("Level")} />
+        <SelectTrigger aria-label={ui("Level")} className="w-full md:w-36 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11 cursor-pointer">
+          <SelectValue>{difficulty !== undefined ? difficultyLabel(difficulty, ui) : ui("Semua Level")}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem value=""><LocalizedText source={"Semua Level"} /></SelectItem>
             {DIFFICULTIES.map((d) => (
-              <SelectItem key={d.value} value={String(d.value)}>{d.label}</SelectItem>
+              <SelectItem key={d.value} value={String(d.value)}>{difficultyLabel(d.value, ui)}</SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>

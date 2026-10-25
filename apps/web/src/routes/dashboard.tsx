@@ -326,14 +326,14 @@ function HomeComponent() {
                         {pct != null && (
                           <div className="text-right">
                             <div className="text-lg font-headline font-bold text-[var(--clay-black)]">
-                              {pct}%
+                              {a.status === "awaiting_review" ? ui("待批改") : `${pct}%`}
                             </div>
                             <div className="text-xs text-[var(--warm-charcoal)]">
                               {a.totalScore}/{a.maxScore}
                             </div>
                           </div>
                         )}
-                        {a.status === "completed" && (
+                        {["completed", "awaiting_review"].includes(a.status) && (
                           <Link to="/attempt/$id" params={{ id: a.id }}>
                             <Button
                               variant="outline"

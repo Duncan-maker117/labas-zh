@@ -122,7 +122,7 @@ export async function generateQuestionsQuick(
   let { valid: validQuestions, invalid: pendingInvalid, repairLog } = repairAndParseQuestions(
     raw.questions,
     fallbackPassage,
-    { examType: input.examType, strictExplanation: false },
+    { examType: input.examType, section: input.section, allowedFormats: input.formats, strictExplanation: false },
   );
 
   let accumulatedTokens = tokensUsed ?? 0;
@@ -145,7 +145,7 @@ export async function generateQuestionsQuick(
     accumulatedTokens += regen.tokensUsed ?? 0;
 
     const regenResult = repairAndParseQuestions(regen.questions, fallbackPassage, {
-      examType: input.examType,
+      examType: input.examType, section: input.section, allowedFormats: input.formats,
       strictExplanation: false,
     });
     validQuestions = [...validQuestions, ...regenResult.valid];

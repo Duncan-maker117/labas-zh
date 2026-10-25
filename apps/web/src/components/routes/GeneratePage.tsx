@@ -1,3 +1,4 @@
+import { defaultSectionFormat, supportsSectionFormat } from "@labas/ai/practice-policy";
 import { AiServiceCard } from "@/components/generate/AiServiceCard";
 import { aiServiceCopy, aiServiceError } from "@/lib/ai-service-copy";
 import { generationTokenBudget, PLATFORM_MAX_QUESTIONS } from "@labas/api/lib/generation-policy";
@@ -117,14 +118,15 @@ export function RouteComponent() {
   useEffect(() => {
     setSelectedFormats((prev) => {
       const valid = prev.filter((f) =>
-        FORMATS.find((fmt) => fmt.id === f)?.allowedExams.includes(examType),
+        FORMATS.find((fmt) => fmt.id === f)?.allowedExams.includes(examType) && selectedSections.some((section) => supportsSectionFormat(section, f)),
       );
-      if (valid.length === 0) {
-        return ["multiple_choice"];
+      for (const section of selectedSections) {
+        if (!valid.some((format) => supportsSectionFormat(section, format))) valid.push(defaultSectionFormat(section));
       }
       return valid;
     });
-  }, [examType]);
+    setQuestionCount((count) => Math.max(count, selectedSections.length));
+  }, [examType, selectedSections]);
 
   const generate = useMutation({
     ...trpc.ai.generate.mutationOptions(),
@@ -134,7 +136,7 @@ export function RouteComponent() {
       setError(null);
     },
     onError: (err) => {
-      setError(aiServiceError(err.message, locale));
+      setError(ui(aiServiceError(err.message, locale)));
     },
   });
 
@@ -186,6 +188,11 @@ export function RouteComponent() {
       return;
     }
 
+    if (questionCount < selectedSections.length || selectedSections.some((section) => !selectedFormats.some((format) => supportsSectionFormat(section, format)))) {
+      setError(ui("请为每个科目选择对应题型，并保证题量不少于科目数。"));
+      return;
+    }
+
     const apiKeyConfig = useFreeCredits
       ? undefined
       : {
@@ -222,7 +229,7 @@ export function RouteComponent() {
   };
 
   const sectionSplits = (() => {
-    if (mode !== "agentic" || questionCount < 20 || selectedSections.length <= 1) return null;
+    if (selectedSections.length <= 1) return null;
     const base = Math.floor(questionCount / selectedSections.length);
     const rem = questionCount % selectedSections.length;
     return selectedSections.map((s, i) => ({ section: s, count: base + (i < rem ? 1 : 0) }));
@@ -327,7 +334,7 @@ export function RouteComponent() {
             {selectedSections.length > 1 && (
               <p className="text-xs text-[var(--matcha-800)] bg-[var(--matcha-300)]/30 px-3 py-2 rounded-[var(--radius-md)]">
                 <MaterialIcon name="tips_and_updates" className="text-xs mr-1 inline" />
-                {locale === "zh-CN" ? `已选择 ${selectedSections.length} 个科目。分步生成模式在题量达到 20 题时会自动分配到所选科目。` : locale === "en-US" ? `${selectedSections.length} sections selected. With 20 or more questions, step by step mode distributes them across sections.` : `Kamu memilih ${selectedSections.length} section. Mode Agentic dengan ≥20 soal akan otomatis membagi soal ke section yang dipilih.`}
+                {locale === "zh-CN" ? `已选择 ${selectedSections.length} 个科目，题目会分配到每个所选科目。` : locale === "en-US" ? `${selectedSections.length} sections selected. Questions are distributed across every selected section.` : `${selectedSections.length} section dipilih. Soal dibagi ke setiap section.`}
               </p>
             )}
           </div>
@@ -362,7 +369,7 @@ export function RouteComponent() {
               <span className="text-xs font-medium text-[var(--warm-charcoal)] whitespace-nowrap">{ui("Custom:")}</span>
               <input
                 type="range"
-                min={1}
+                min={selectedSections.length}
                 max={40}
                 value={questionCount}
                 onChange={(e) => setQuestionCount(Number(e.target.value))}
@@ -427,7 +434,7 @@ export function RouteComponent() {
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {FORMATS.filter((f) => f.allowedExams.includes(examType)).map((f) => (
+              {FORMATS.filter((f) => f.allowedExams.includes(examType) && selectedSections.some((section) => supportsSectionFormat(section, f.id))).map((f) => (
                 <button
                   key={f.id}
                   onClick={() => toggleFormat(f.id)}
@@ -641,7 +648,7 @@ const generatePageSteps: Step[] = [
   {
     target: "[data-tour='generate-section']",
     title: "Section",
-    content: "Pilih section yang ingin digenerate. Bisa pilih lebih dari satu. Mode Agentic dengan ≥20 soal otomatis membagi soal ke setiap section.",
+    content: "Pilih section latihan. Setiap section yang dipilih mendapat soal dengan format yang sesuai.",
     spotlightPadding: 8,
   },
   {
@@ -686,7 +693,7 @@ const generatePageStepsZh: Step[] = generatePageSteps.map((step, index) => ({
   title: ["考试类型", "科目", "题目数量", "难度", "题型", "主题", "智能侧重", "出题方案与生成"][index],
   content: [
     "选择要练习的考试，包括 IELTS、TOEFL、JLPT、HSK、Goethe、TOPIK、TOAFL 和 DELE。",
-    "选择一个或多个科目。分步生成模式在题量达到 20 题时会自动分配题目。",
+    "选择一个或多个科目，每个所选科目都会获得对应题型的练习。",
     "通过预设选项或滑块设置题量，每次最多生成 40 题。",
     "选择难度；部分考试会显示对应的级别或分数。",
     "选择题型，可选项取决于考试类型。",

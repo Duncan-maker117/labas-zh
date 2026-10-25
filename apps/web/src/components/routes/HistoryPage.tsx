@@ -37,10 +37,10 @@ export const Route = createFileRoute("/history")({
   },
 });
 
-function formatDate(dateStr: string | Date | null) {
+function formatDate(dateStr: string | Date | null, locale: string) {
   if (!dateStr) return "-";
   const d = new Date(dateStr);
-  return d.toLocaleDateString("id-ID", {
+  return d.toLocaleDateString(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -58,6 +58,8 @@ function getStatusBadge(status: string) {
           <LocalizedText source={"Selesai"} />
         </span>
       );
+    case "awaiting_review":
+      return <span className="text-xs font-semibold"><LocalizedText source="待批改" /></span>;
     case "abandoned":
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-semibold">
@@ -76,7 +78,7 @@ function getStatusBadge(status: string) {
 }
 
 export function HistoryComponent() {
-  const { ui } = useLocale();
+  const { ui, locale } = useLocale();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const page = search.page ?? 1;
@@ -221,18 +223,18 @@ export function HistoryComponent() {
                         </div>
 
                         <h2 className="font-headline text-lg font-bold text-[var(--clay-black)] truncate">
-                          {attempt.packageTitle ?? "Paket tidak diketahui"}
+                          {attempt.packageTitle ?? ui("Paket tidak diketahui")}
                         </h2>
 
                         <div className="flex items-center gap-4 mt-1 text-xs text-[var(--warm-charcoal)]">
                           <span className="flex items-center gap-1">
                             <MaterialIcon name="event" className="text-xs" />
-                            {formatDate(attempt.startedAt)}
+                            {formatDate(attempt.startedAt, locale)}
                           </span>
                           {attempt.finishedAt && (
                             <span className="flex items-center gap-1">
                               <MaterialIcon name="check" className="text-xs" />
-                              {formatDate(attempt.finishedAt)}
+                              {formatDate(attempt.finishedAt, locale)}
                             </span>
                           )}
                         </div>
@@ -242,7 +244,7 @@ export function HistoryComponent() {
                         {pct != null && (
                           <div className="text-center">
                             <div className="text-2xl font-headline font-extrabold text-[var(--clay-black)]">
-                              {pct}%
+                              {attempt.status === "awaiting_review" ? ui("待批改") : `${pct}%`}
                             </div>
                             <div className="text-xs text-[var(--warm-charcoal)]">
                               {attempt.totalScore}/{attempt.maxScore}
@@ -251,7 +253,7 @@ export function HistoryComponent() {
                         )}
 
                         <div className="flex gap-2">
-                          {attempt.status === "completed" && (
+                          {["completed", "awaiting_review"].includes(attempt.status) && (
                             <Link to="/attempt/$id" params={{ id: attempt.id }}>
                               <Button
                                 variant="outline"

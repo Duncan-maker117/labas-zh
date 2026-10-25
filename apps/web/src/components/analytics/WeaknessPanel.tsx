@@ -1,4 +1,5 @@
 import { LocalizedText } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@labas/ui/components/card";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
 import { Link } from "@tanstack/react-router";
@@ -51,6 +52,7 @@ function getSeverityLabel(pct: number) {
 }
 
 export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProps) {
+  const { ui } = useLocale();
   const hasData = weaknesses && weaknesses.length > 0;
 
   return (
@@ -83,7 +85,7 @@ export function WeaknessPanel({ weaknesses, recommendations }: WeaknessPanelProp
                       </span>
                     </div>
                     <div className="text-sm font-semibold text-[var(--clay-black)] truncate">
-                      {formatLabel(w.name)}
+                      {formatLabel(w.name, ui)}
                     </div>
                     <div className="text-xs text-[var(--warm-charcoal)] mt-0.5">
                       {w.totalQuestions} <LocalizedText source={"soal ·"} /> {w.accuracyPct}<LocalizedText source={"% benar"} />

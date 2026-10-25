@@ -1,3 +1,4 @@
+import { OpenResponseInput } from "./OpenResponseInput";
 import { useLocale } from "@/lib/locale";
 import { LocalizedText } from "@/components/ui/LocalizedText";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
@@ -134,6 +135,10 @@ export function QuestionInput({
   const { ui } = useLocale();
   const format = question.format;
   const options = question.options as Array<{ key: string; text: string }> | undefined;
+
+  if (format === "essay" || format === "spoken_response") {
+    return <OpenResponseInput spoken={format === "spoken_response"} exam={question._examType ?? question.examTypeId ?? "TOEFL"} value={value} onChange={onChange} disabled={disabled} />;
+  }
 
   if (format === "matching_pairs") {
     if (!options || options.length === 0) {

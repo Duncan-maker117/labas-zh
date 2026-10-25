@@ -3,7 +3,7 @@ import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import { Input } from "@labas/ui/components/input";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
-import { formatLabel } from "@/lib/format";
+import { formatLabel, sectionLabel } from "@/lib/format";
 
 interface BundleItem {
   id: string;
@@ -101,8 +101,8 @@ export function BundleSidebar({
                     </h4>
                     <p className="text-xs text-[var(--warm-charcoal)]">
                       {isQ
-                        ? `${item.examTypeName} \u00B7 ${formatLabel(item.format ?? "")}`
-                        : `${item.examTypeName} \u00B7 ${item.sectionTypeName}`}
+                        ? `${item.examTypeName} \u00B7 ${formatLabel(item.format ?? "", ui)}`
+                        : `${item.examTypeName} \u00B7 ${sectionLabel(item.sectionTypeName ?? "", ui)}`}
                     </p>
                   </div>
                   <button

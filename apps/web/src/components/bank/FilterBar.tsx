@@ -163,10 +163,10 @@ export function FilterBar({
           <div className="relative flex-1">
             <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--warm-charcoal)]" />
             <Input
-              placeholder={mode === "soal" ? "Cari soal..." : "Cari section..."}
+              placeholder={ui(mode === "soal" ? "Cari soal..." : "Cari section...")}
               value={searchText}
               onChange={(e) => onSetSearch(e.target.value)}
-              aria-label={mode === "soal" ? "Cari soal" : "Cari section"}
+              aria-label={ui(mode === "soal" ? "Cari soal" : "Cari section")}
               className="pl-10 rounded-[var(--radius-lg)] border-2 border-[var(--oat-border)] bg-[var(--pure-white)] h-11"
             />
           </div>

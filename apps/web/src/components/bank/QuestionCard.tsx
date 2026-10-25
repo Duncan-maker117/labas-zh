@@ -2,7 +2,7 @@ import { useLocale } from "@/lib/locale";
 import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Button } from "@labas/ui/components/button";
 import { MaterialIcon } from "@/components/ui/MaterialIcon";
-import { formatLabel } from "@/lib/format";
+import { formatLabel, sectionLabel } from "@/lib/format";
 import type { Question } from "@/lib/types";
 
 interface QuestionCardProps {
@@ -67,7 +67,7 @@ export function QuestionCard({
               {q.examTypeName}
             </span>
             <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] text-xs font-semibold leading-none whitespace-nowrap">
-              {q.sectionTypeName}
+              {sectionLabel(q.sectionTypeName ?? q.sectionTypeId ?? "", ui)}
             </span>
             {disabled && (
               <span className="px-2 py-1 rounded-full bg-[var(--warm-silver)]/30 text-[var(--warm-charcoal)] text-[10px] font-semibold flex items-center gap-1">
@@ -103,7 +103,7 @@ export function QuestionCard({
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--oat-border)]">
           <div className="flex gap-2">
             <span className="px-2 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-medium">
-              {formatLabel(q.format ?? "")}
+              {formatLabel(q.format ?? "", ui)}
             </span>
             <span className="px-2 py-0.5 rounded bg-[var(--oat-light)] text-[var(--warm-charcoal)] text-xs font-medium">
               <LocalizedText source={"Lv."} />{q.difficulty}

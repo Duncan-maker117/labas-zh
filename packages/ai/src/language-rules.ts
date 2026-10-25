@@ -73,12 +73,13 @@ export function buildContentLanguageRules(examType: string): string {
   return `- LANGUAGE RULE (critical):
   * passageText, questionText, and every option "text" MUST be written in ${target} — the authentic exam language.
   * NEVER write questionText or options in Bahasa Indonesia for ${examType}.
-  * explanation: tulis dalam Bahasa Indonesia; boleh sisipkan istilah/kanji/kata ${target} bila perlu (mis. 「環境」 atau kutipan singkat dari teks).`;
+  * explanation: explain in Simplified Chinese for Chinese-speaking learners; preserve brief exam-language quotations when needed.`;
 }
 
 export function buildExplanationLanguageRule(examType?: string): string {
   const target = examType ? getTargetLanguage(examType) : "bahasa ujian";
-  return `- explanation — WAJIB ditulis dalam Bahasa Indonesia sebagai penjelasan utama. Boleh menyertakan istilah, kanji, atau kutipan singkat dalam ${target} jika relevan (mis. arti kanji, padanan kata). Jangan tulis seluruh explanation hanya dalam ${target} atau Inggris.`;
+  if (examType === "CPNS") return "- explanation: explain in Bahasa Indonesia.";
+  return `- explanation: explain the reasoning and assessment criteria in Simplified Chinese. Short terms or quotations in ${target} may be included, but do not write the main explanation in Indonesian or the target language.`;
 }
 
 export function getQuestionLanguageErrors(
@@ -117,9 +118,16 @@ export function getQuestionLanguageErrors(
   return errors;
 }
 
-export function getExplanationLanguageErrors(explanation: string): string[] {
+export function getExplanationLanguageErrors(explanation: string, examType?: string): string[] {
   const t = explanation.trim();
   if (!t) return [];
+
+  if (examType !== "CPNS") {
+    const prose = t.replace(/「[^」]*」|『[^』]*』|“[^”]*”|\([^)]*\)/g, "");
+    const han = prose.match(/[\u3400-\u9fff]/g)?.length ?? 0;
+    const kana = prose.match(/[\u3040-\u30ff]/g)?.length ?? 0;
+    return han >= 4 && kana <= han / 3 ? [] : ["explanation must include Simplified Chinese prose"];
+  }
 
   const latinPart = stripExamScriptForAnalysis(t);
 

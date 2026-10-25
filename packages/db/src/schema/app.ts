@@ -250,7 +250,7 @@ export const testAttempt = pgTable(
     finishedAt: timestamp("finished_at"),
     totalScore: integer("total_score"),
     maxScore: integer("max_score"),
-    status: text("status").notNull().default("in_progress"), // "in_progress" | "completed" | "abandoned"
+    status: text("status").notNull().default("in_progress"), // "in_progress" | "awaiting_review" | "completed" | "abandoned"
     isOvertime: boolean("is_overtime").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -304,6 +304,19 @@ export const answer = pgTable(
 );
 
 // ── Question Ratings ───────────────────────────────────────
+export const responseEvaluation = pgTable("response_evaluation", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  answerId: uuid("answer_id").notNull().references(() => answer.id, { onDelete: "cascade" }),
+  status: text("status").notNull(),
+  claimId: text("claim_id").notNull(),
+  score: integer("score"),
+  feedback: jsonb("feedback"),
+  model: text("model"),
+  tokensUsed: integer("tokens_used"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [unique("responseEvaluation_answer_unique").on(table.answerId)]);
+
 
 export const questionRating = pgTable(
   "question_rating",

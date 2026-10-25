@@ -19,7 +19,7 @@ const baseRaw = {
     { key: "D", text: "Fourth option" },
   ],
   correctAnswer: "A",
-  explanation: "Jawaban A benar karena pilihan ini sesuai dengan isi teks.",
+  explanation: "选项 A 正确，因为内容与原文中的信息一致。",
   difficulty: 3,
   skillTags: ["comprehension"],
 };

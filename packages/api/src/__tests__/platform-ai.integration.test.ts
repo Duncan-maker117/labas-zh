@@ -50,6 +50,24 @@ beforeAll(async () => {
 afterAll(closeTestPGlite);
 
 describe("customer AI without API keys", () => {
+  it("distributes a four-question request across four skills and persists their actual formats", async () => {
+    const { id, caller } = await customer();
+    await db.insert(schema.sectionType).values({ id: "SPEAKING", name: "Speaking" }).onConflictDoNothing();
+    const { jobId } = await caller.generate({ ...input, selectedSections: ["READING", "LISTENING", "WRITING", "SPEAKING"], formats: ["multiple_choice", "essay", "spoken_response"], questionCount: 4 });
+    const transport = spyOn(globalThis, "fetch").mockImplementation(async (_url, options) => {
+      const prompt = JSON.parse(String(options?.body)).messages.at(-1).content as string;
+      const section = prompt.match(/SECTION: (\w+)/)![1]!;
+      const format = section === "WRITING" ? "essay" : section === "SPEAKING" ? "spoken_response" : "multiple_choice";
+      const question = { format, passageText: `Material for ${section}: a natural educational experience with enough detail to answer the practice task.`, questionText: `Describe an educational experience for the ${section.toLowerCase()} task.`, correctAnswer: format === "multiple_choice" ? "A" : "A complete model response for the assignment.", explanation: "应根据材料和任务要求提供具体例子。", difficulty: 3, skillTags: [section.toLowerCase()], ...(format === "multiple_choice" ? { options: [{ key: "A", text: "The student learned new skills" }, { key: "B", text: "The lesson was cancelled" }, { key: "C", text: "The room was closed" }, { key: "D", text: "The teacher retired" }] } : {}) };
+      return new Response(`data: ${JSON.stringify({ choices: [{ delta: { content: JSON.stringify({ questions: [question] }) } }], usage: { total_tokens: 300 } })}\n\ndata: [DONE]\n\n`, { headers: { "content-type": "text/event-stream" } });
+    });
+    try { await processors.get("generation-fast")!({ data: structuredClone(queued.get(jobId)!), updateProgress: async () => {} }); }
+    finally { transport.mockRestore(); }
+    const saved = await db.select().from(schema.question).where(eq(schema.question.creatorUserId, id));
+    expect(saved).toHaveLength(4);
+    expect(Object.fromEntries(saved.map((q) => [q.sectionTypeId, q.format]))).toEqual({ READING: "multiple_choice", LISTENING: "multiple_choice", WRITING: "essay", SPEAKING: "spoken_response" });
+    expect((await caller.getJobStatus({ jobId }))!.status).toBe("completed");
+  });
   it("generates, saves, settles real reported usage, and never returns the platform key", async () => {
     const { id, caller } = await customer();
     const { jobId } = await caller.generate(input);

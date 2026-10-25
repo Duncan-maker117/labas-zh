@@ -48,6 +48,8 @@ function ContinueAttemptComponent() {
     isFinished,
     isTimeUp,
     submittingQId,
+    saveError,
+    finishError,
     markedQuestions,
     activeQuestionId,
     setActiveQuestionId,
@@ -123,6 +125,7 @@ function ContinueAttemptComponent() {
 
   return (
     <AttemptTestView
+      error={finishError ?? saveError}
       attemptId={attemptId}
       pkg={pkg}
       currentSectionIdx={currentSectionIdx}

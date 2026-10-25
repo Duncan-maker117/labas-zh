@@ -1,3 +1,5 @@
+import { PRACTICE_SECTIONS } from "./subject-constants";
+
 const ALL_EXAMS = ["IELTS", "TOEFL", "JLPT", "HSK", "GOETHE", "TOPIK", "TOAFL", "DELE"];
 
 export const EXAM_TYPES = [
@@ -11,11 +13,13 @@ export const EXAM_TYPES = [
   { id: "DELE", name: "DELE", code: "es" },
 ];
 
-export const SECTIONS = [
-  { id: "READING", name: "Reading", icon: "menu_book", allowedExams: ALL_EXAMS },
-];
+export const SECTIONS = PRACTICE_SECTIONS
+  .filter((section) => section.supportsGeneration)
+  .map(({ id, name, icon }) => ({ id, name, icon, allowedExams: ALL_EXAMS }));
 
 export const FORMATS = [
+  { id: "essay", name: "Written Response", allowedExams: ALL_EXAMS },
+  { id: "spoken_response", name: "Spoken Response", allowedExams: ALL_EXAMS },
   { id: "multiple_choice", name: "Multiple Choice", allowedExams: ALL_EXAMS },
   { id: "true_false_not_given", name: "True / False / Not Given", allowedExams: ALL_EXAMS },
   { id: "fill_blank", name: "Fill in Blank", allowedExams: [...ALL_EXAMS] },

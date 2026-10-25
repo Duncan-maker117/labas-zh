@@ -3,9 +3,11 @@ import { z } from "zod";
 // ── Shared Schemas ─────────────────────────────────────────
 
 export const examTypeSchema = z.enum(["IELTS", "TOEFL", "JLPT", "HSK", "GOETHE", "TOPIK", "TOAFL", "DELE", "CPNS"]);
-export const sectionTypeSchema = z.enum(["READING", "LISTENING", "SPEAKING", "TIU", "TWK", "TKP"]);
+export const sectionTypeSchema = z.enum(["READING", "WRITING", "LISTENING", "SPEAKING", "TIU", "TWK", "TKP"]);
 
 export const questionFormatSchema = z.enum([
+  "essay",
+  "spoken_response",
   "multiple_choice",
   "true_false_not_given",
   "matching_headings",
@@ -195,6 +197,8 @@ export const situationalJudgmentQuestionSchema = baseQuestionSchema.extend({
 // ── Unified Question Schema ────────────────────────────────
 
 export const questionSchema = z.discriminatedUnion("format", [
+  baseQuestionSchema.extend({ format: z.literal("essay") }),
+  baseQuestionSchema.extend({ format: z.literal("spoken_response") }),
   multipleChoiceQuestionSchema,
   trueFalseQuestionSchema,
   matchingHeadingsQuestionSchema,

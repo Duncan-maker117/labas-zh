@@ -1,4 +1,5 @@
 import { OpenAICompatibleClient } from "./client";
+import { sectionMaterialInstruction } from "./practice-policy";
 import { GenerationError } from "./errors";
 import { parseAiJsonResponse } from "./parse-response";
 import {
@@ -78,7 +79,8 @@ async function step1GeneratePassage(
   onToken?: (token: string) => void,
 ): Promise<{ passage: string; title: string; tokensUsed: number; reasoning?: string }> {
   const schema = getPassageJsonSchemaDescription();
-  const prompt = `Generate an authentic, high-quality reading passage for ${input.examType} ${input.section.toLowerCase()} section at difficulty level ${input.difficulty}/5.
+  const prompt = `Generate authentic, high-quality material for ${input.examType} ${input.section.toLowerCase()} section at difficulty level ${input.difficulty}/5.
+${sectionMaterialInstruction(input.section)}
 
 Requirements:
 - Language: ${getTargetLanguage(input.examType)}
@@ -123,7 +125,7 @@ async function step2ValidatePassage(
   onToken?: (token: string) => void,
 ): Promise<{ isValid: boolean; feedback: string; tokensUsed: number; reasoning?: string }> {
   const schema = getValidationJsonSchemaDescription();
-  const prompt = `Validate this reading passage for a ${input.examType} exam at difficulty ${input.difficulty}/5.
+  const prompt = `Validate this ${input.section.toLowerCase()} material for a ${input.examType} exam at difficulty ${input.difficulty}/5.
 
 Passage:
 """
@@ -176,7 +178,8 @@ async function step3GenerateQuestions(
     ? `\nThe following topics are ALREADY covered by other questions. Generate questions about DIFFERENT parts of the passage:\n${input.avoidTopics.map(t => `  - "${t}"`).join("\n")}\n`
     : "";
 
-  const prompt = `Using the following passage, generate ${count} reading comprehension questions for ${input.examType} exam.
+  const prompt = `Using the following material, generate ${count} ${input.section.toLowerCase()} practice questions for ${input.examType} exam.
+${sectionMaterialInstruction(input.section)}
 
 Passage:
 """
@@ -193,7 +196,7 @@ DIVERSITY RULES — CRITICAL:
 - Every question must be unique in intent, not just wording.
 ${avoidContext}
 Rules:
-- Each question must be directly answerable from the passage
+- For reading/listening, each question must be answerable from the material. For writing/speaking, ask the learner to produce an original response to the assignment.
 - Use "passageText" field with the relevant excerpt from the passage (or full passage if needed)
 - Questions should test real comprehension, not surface recall
 - For multiple choice: always provide 4 options (A, B, C, D) with one clearly correct answer
@@ -426,7 +429,7 @@ async function runAgenticQuestionPipeline(ctx: {
     }
 
     let { valid, invalid, repairLog } = repairAndParseQuestions(rawQuestions, passage, {
-      examType: input.examType,
+      examType: input.examType, section: input.section, allowedFormats: input.formats,
       strictExplanation: strategy === "full",
     });
 
@@ -447,7 +450,7 @@ async function runAgenticQuestionPipeline(ctx: {
       accumulatedTokens += regen.tokensUsed;
 
       const regenResult = repairAndParseQuestions(regen.questions, passage, {
-        examType: input.examType,
+        examType: input.examType, section: input.section, allowedFormats: input.formats,
         strictExplanation: strategy === "full",
       });
       validQuestions.push(...regenResult.valid);
@@ -470,7 +473,7 @@ async function runAgenticQuestionPipeline(ctx: {
       );
       accumulatedTokens += extra.tokensUsed;
       const extraResult = repairAndParseQuestions(extra.questions, passage, {
-        examType: input.examType,
+        examType: input.examType, section: input.section, allowedFormats: input.formats,
         strictExplanation: strategy === "full",
       });
       validQuestions.push(...extraResult.valid);

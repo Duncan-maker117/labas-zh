@@ -1,4 +1,8 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { aiKeyConfigSchema } from "@labas/ai/schemas";
+import { isSubjectiveFormat } from "@labas/ai/practice-policy";
+import { evaluateSavedResponse, listResponseEvaluations, recalculateSubjectiveAttempt } from "../lib/response-evaluation";
 import { eq, and, desc, sql, inArray, ilike } from "drizzle-orm";
 import { router, protectedProcedure } from "../index";
 import { db } from "@labas/db";
@@ -149,6 +153,14 @@ function checkRateLimit(key: string, windowMs: number) {
 }
 
 export const attemptRouter = router({
+  evaluations: protectedProcedure.input(z.object({ attemptId: z.string().uuid() })).query(({ ctx, input }) => listResponseEvaluations(ctx.session.user.id, input.attemptId)),
+  evaluateResponse: protectedProcedure.input(z.object({ answerId: z.string().uuid(), apiKeyConfig: aiKeyConfigSchema.optional() })).mutation(async ({ ctx, input }) => {
+    try { return await evaluateSavedResponse(ctx.session.user.id, input); }
+    catch (error) {
+      if (error instanceof TRPCError) throw error;
+      throwBadRequest("Assessment failed. Check AI configuration and retry; your response is saved");
+    }
+  }),
   start: protectedProcedure
     .input(z.object({ packageId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
@@ -430,6 +442,14 @@ export const attemptRouter = router({
 
       if (!q) throwNotFound("Question");
 
+      const ownedSections = await db.select({ id: sectionResult.id }).from(sectionResult).where(eq(sectionResult.attemptId, input.attemptId)).orderBy(sectionResult.createdAt);
+      const sourceSections = await db.select({ id: packageSection.id }).from(packageSection).where(eq(packageSection.packageId, attempt.packageId!)).orderBy(packageSection.orderIndex);
+      const sectionIndex = ownedSections.findIndex((section) => section.id === input.sectionResultId);
+      if (sectionIndex < 0 || !sourceSections[sectionIndex]) throwForbidden();
+      const [member] = await db.select({ id: sectionQuestion.id }).from(sectionQuestion).where(and(eq(sectionQuestion.sectionId, sourceSections[sectionIndex]!.id), eq(sectionQuestion.questionId, input.questionId))).limit(1);
+      if (!member) throwForbidden();
+      if (isSubjectiveFormat(q.format) && input.userAnswer.length > 12000) throwBadRequest("Response exceeds 12000 characters");
+
       const [existing] = await db
         .select()
         .from(answer)
@@ -551,12 +571,14 @@ export const attemptRouter = router({
         for (const a of secAnswers) {
           if (!a.userAnswer) continue;
 
-          let isCorrect = false;
+          let isCorrect: boolean | null = false;
           let partialScore: number | null = null;
           let effectiveScore = 0;
 
           // TKP (situational_judgment) uses weighted scoring
-          if (a.questionFormat === "situational_judgment") {
+          if (isSubjectiveFormat(a.questionFormat)) {
+            isCorrect = null;
+          } else if (a.questionFormat === "situational_judgment") {
             const weights = a.questionOptionWeights ? (a.questionOptionWeights as number[]) : null;
             const options = a.questionOptions ? (a.questionOptions as Array<{ key: string }>) : null;
             effectiveScore = calculateWeightedScore(a.userAnswer, weights, options);
@@ -630,6 +652,9 @@ export const attemptRouter = router({
           isOvertime,
         })
         .where(eq(testAttempt.id, input.attemptId));
+
+      const [subjectiveResponse] = await db.select({ id: answer.id }).from(answer).innerJoin(sectionResult, eq(answer.sectionResultId, sectionResult.id)).innerJoin(question, eq(answer.questionId, question.id)).where(and(eq(sectionResult.attemptId, input.attemptId), inArray(question.format, ["essay", "spoken_response"])));
+      if (subjectiveResponse) return recalculateSubjectiveAttempt(db, input.attemptId);
 
       return {
         totalScore,

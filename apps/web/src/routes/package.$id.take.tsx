@@ -69,6 +69,8 @@ function TakeTestComponent() {
     isFinished,
     isTimeUp,
     submittingQId,
+    saveError,
+    finishError,
     markedQuestions,
     activeQuestionId,
     setActiveQuestionId,
@@ -235,6 +237,7 @@ function TakeTestComponent() {
 
   return (
     <AttemptTestView
+      error={finishError ?? saveError}
       attemptId={attemptId}
       pkg={pkg}
       currentSectionIdx={currentSectionIdx}

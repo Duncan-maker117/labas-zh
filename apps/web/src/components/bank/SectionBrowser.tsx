@@ -1,3 +1,5 @@
+import { useLocale } from "@/lib/locale";
+import { sectionLabel } from "@/lib/format";
 import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
 import { Card, CardContent } from "@labas/ui/components/card";
 import { Button } from "@labas/ui/components/button";
@@ -17,6 +19,7 @@ export function SectionBrowser({
   isSectionInBundle,
   onToggleSection,
 }: SectionBrowserProps) {
+  const { ui } = useLocale();
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -61,7 +64,7 @@ export function SectionBrowser({
                         <p className="text-sm font-medium text-[var(--clay-black)]">{s.title}</p>
                         <div className="flex gap-2 mt-2 flex-wrap">
                           <span className="px-2 py-0.5 rounded-full bg-[var(--slushie-500)]/20 text-[var(--slushie-800)] text-xs font-semibold">
-                            {s.sectionTypeName}
+                            {sectionLabel(s.sectionTypeName ?? s.sectionTypeId ?? "", ui)}
                           </span>
                         </div>
                       </div>

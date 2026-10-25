@@ -1,4 +1,8 @@
+import { sectionLabel } from "@/lib/format";
 import { LocalizedText, LocalizedValue } from "@/components/ui/LocalizedText";
+import { useLocale } from "@/lib/locale";
+import { isSubjectiveFormat } from "@labas/ai/practice-policy";
+import { SubjectiveAssessmentPanel } from "@/components/attempt/SubjectiveAssessmentPanel";
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
@@ -17,6 +21,7 @@ import { SkillBreakdown } from "@/components/attempt/SkillBreakdown";
 type FilterStatus = "all" | "wrong" | "correct" | "marked";
 
 interface AnswerItem {
+  id?: string;
   questionId: string;
   userAnswer?: string;
   answer?: string;
@@ -44,6 +49,7 @@ export const Route = createFileRoute("/attempt/$id")({
 });
 
 function AttemptResultComponent() {
+  const { ui } = useLocale();
   const { id: attemptId } = Route.useParams();
   const { data: session } = authClient.useSession();
   const { setMode } = useAppMode();
@@ -90,11 +96,12 @@ function AttemptResultComponent() {
     const total = allQuestions.length;
     const correct = allQuestions.filter(({ ans }) => ans?.isCorrect === true).length;
     const wrong = allQuestions.filter(({ ans }) => ans?.isCorrect === false).length;
-    return { total, correct, wrong };
+    const subjective = allQuestions.filter(({ q }) => isSubjectiveFormat(q.format ?? "")).length;
+    return { total, correct, wrong, subjective, objective: total - subjective };
   }, [allQuestions]);
 
-  const percentage = questionStats.total > 0
-    ? Math.round((questionStats.correct / questionStats.total) * 100)
+  const percentage = (attempt?.maxScore ?? 0) > 0
+    ? Math.round((attempt!.totalScore ?? 0) / attempt!.maxScore! * 100)
     : 0;
 
   // ── Filtered questions ──
@@ -226,14 +233,14 @@ function AttemptResultComponent() {
                     ? "border-[var(--lemon-500)] bg-[var(--lemon-100)] text-[var(--lemon-800)]"
                     : "border-[var(--pomegranate-400)] bg-[var(--pomegranate-50)] text-[var(--pomegranate-700)]"
               }`}>
-                {percentage}%
+                {attempt.status === "awaiting_review" ? ui("待批改") : `${percentage}%`}
               </div>
               <div>
                 <h1 className="text-lg font-headline font-extrabold text-[var(--clay-black)] leading-tight">
                   <LocalizedText source={"Hasil Latihan"} />
                 </h1>
                 <p className="text-xs text-[var(--warm-charcoal)]">
-                  {questionStats.correct}/{questionStats.total} <LocalizedText source={"benar ·"} /> {formatTime(durationSec)}
+                  {questionStats.subjective ? `${attempt.totalScore ?? 0}/${attempt.maxScore ?? 0} ${ui("得分")} ·` : <>{questionStats.correct}/{questionStats.total} <LocalizedText source={"benar ·"} /></>} {formatTime(durationSec)}
                 </p>
               </div>
             </div>
@@ -261,6 +268,8 @@ function AttemptResultComponent() {
       </div>
 
       <div className="px-6 md:px-12 lg:px-16 max-w-4xl mx-auto pt-8">
+        {attempt.status === "awaiting_review" && <p role="status" className="mb-6 rounded-xl border p-4">{ui("练习已提交，主观题待 AI 批改，当前总分尚未完整。")}</p>}
+        {allQuestions.some(({ q, ans }) => isSubjectiveFormat(q.format ?? "") && ans?.id && ans.userAnswer?.trim()) && <SubjectiveAssessmentPanel attemptId={attemptId} responses={allQuestions.flatMap(({ q, ans }) => isSubjectiveFormat(q.format ?? "") && ans?.id && ans.userAnswer?.trim() ? [{ id: ans.id, text: ans.userAnswer, questionText: q.questionText ?? "" }] : [])} onChanged={() => { void attemptQuery.refetch(); }} />}
         {/* Score Card */}
         <div className="mb-8">
           <Card className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)] overflow-hidden">
@@ -269,16 +278,16 @@ function AttemptResultComponent() {
                 {/* Big Score Circle */}
                 <div className="w-32 h-32 rounded-full border-4 border-[var(--matcha-500)] flex flex-col items-center justify-center bg-[var(--matcha-100)]">
                   <span className="text-3xl font-headline font-extrabold text-[var(--matcha-800)]">
-                    {percentage}%
+                    {attempt.status === "awaiting_review" ? ui("待批改") : `${percentage}%`}
                   </span>
                   <span className="text-xs text-[var(--matcha-700)] font-medium">
-                    {questionStats.correct}/{questionStats.total}
+                    {questionStats.subjective ? `${attempt.totalScore ?? 0}/${attempt.maxScore ?? 0} ${ui("得分")}` : `${questionStats.correct}/${questionStats.total}`}
                   </span>
                 </div>
 
                 <div className="flex-1 space-y-2 text-center md:text-left">
                   <p className="text-lg font-semibold text-[var(--clay-black)]">
-                    <LocalizedValue value={percentage >= 80
+                    <LocalizedValue value={attempt.status === "awaiting_review" ? "待批改" : percentage >= 80
                       ? "Sempurna!"
                       : percentage >= 60
                         ? "Bagus, terus berlatih!"
@@ -297,11 +306,11 @@ function AttemptResultComponent() {
                     </span>
                     <span className="flex items-center gap-1">
                       <MaterialIcon name="check_circle" className="text-sm text-[var(--matcha-600)]" />
-                      {questionStats.correct} <LocalizedText source={"benar"} />
+                      {questionStats.correct} <LocalizedText source={questionStats.subjective ? "客观题正确" : "benar"} />
                     </span>
                     <span className="flex items-center gap-1">
                       <MaterialIcon name="cancel" className="text-sm text-[var(--pomegranate-400)]" />
-                      {questionStats.wrong} <LocalizedText source={"salah"} />
+                      {questionStats.wrong} <LocalizedText source={questionStats.subjective ? "客观题错误" : "salah"} />
                     </span>
                   </div>
 
@@ -343,14 +352,16 @@ function AttemptResultComponent() {
               const secPct = sec.maxScore && sec.maxScore > 0
                 ? Math.round(((sec.score ?? 0) / sec.maxScore) * 100)
                 : 0;
+              const pending = sec.answers.some((response) => response.userAnswer?.trim() && response.partialScore == null && sec.questions.some((q) => q.id === response.questionId && isSubjectiveFormat(q.format ?? "")));
+              const subjective = sec.questions.some((q) => isSubjectiveFormat(q.format ?? ""));
               return (
                 <Card key={sec.id} className="clay-shadow bg-[var(--pure-white)] border-2 border-[var(--oat-border)] rounded-[var(--radius-xl)]">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-[var(--clay-black)]">{sec.title}</p>
+                        <p className="font-semibold text-[var(--clay-black)]">{sectionLabel(sec.title, ui)}</p>
                         <p className="text-sm text-[var(--warm-charcoal)]">
-                          {sec.score ?? 0}/{sec.maxScore ?? 0} <LocalizedText source={"benar"} />
+                          {pending ? ui("待批改") : `${sec.score ?? 0}/${sec.maxScore ?? 0}`} <LocalizedText source={subjective ? "得分" : "benar"} />
                         </p>
                         {sec.timeSpentSec != null && (
                           <p className="text-xs text-[var(--warm-silver)] mt-1 flex items-center gap-1">
@@ -360,7 +371,7 @@ function AttemptResultComponent() {
                         )}
                       </div>
                       <div className="w-16 h-16 rounded-full border-2 border-[var(--matcha-400)] flex items-center justify-center bg-[var(--matcha-50)]">
-                        <span className="text-lg font-bold text-[var(--matcha-700)]">{secPct}%</span>
+                        <span className="text-lg font-bold text-[var(--matcha-700)]">{pending ? ui("待批改") : `${secPct}%`}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -371,20 +382,20 @@ function AttemptResultComponent() {
         </div>
 
         {/* Skill Breakdown */}
-        <div className="mb-8">
+        {questionStats.objective > 0 && <div className="mb-8">
           <h2 className="text-xl font-headline font-bold text-[var(--clay-black)] mb-1">
             <LocalizedText source={"Kemampuan per Topik"} />
           </h2>
           <p className="text-sm text-[var(--warm-charcoal)] mb-4"><LocalizedText source={"Klik topik untuk filter soal"} /></p>
           <SkillBreakdown
-            questions={allQuestions.map(({ q, ans }) => ({
+            questions={allQuestions.filter(({ q }) => !isSubjectiveFormat(q.format ?? "")).map(({ q, ans }) => ({
               skillTags: q.skillTags ?? [],
               isCorrect: ans?.isCorrect ?? null,
             }))}
             onSkillClick={toggleSkill}
             activeSkills={filterSkills}
           />
-        </div>
+        </div>}
 
         {/* Question Review */}
         <div className="mb-8">
@@ -404,7 +415,7 @@ function AttemptResultComponent() {
             setFilterStatus={setFilterStatus}
             filterSkills={filterSkills}
             setFilterSkills={setFilterSkills}
-            questions={allQuestions.map(({ q, ans }) => ({
+            questions={allQuestions.filter(({ q }) => !isSubjectiveFormat(q.format ?? "")).map(({ q, ans }) => ({
               skillTags: q.skillTags ?? [],
               isCorrect: ans?.isCorrect,
             }))}
