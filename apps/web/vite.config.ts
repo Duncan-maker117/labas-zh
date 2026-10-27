@@ -11,16 +11,16 @@ const previewHost = previewUrl ? new URL(previewUrl).hostname : undefined;
 export default defineConfig({
   server: {
     port: previewHost ? 3002 : 3001,
-    host: "127.0.0.1",
+    host: "0.0.0.0",
     strictPort: true,
     allowedHosts: previewHost ? [previewHost] : undefined,
-    proxy: previewHost
-      ? {
-          "/api": "http://127.0.0.1:3003",
-          "/trpc": "http://127.0.0.1:3003",
-          "/health": "http://127.0.0.1:3003",
-        }
-      : undefined,
+    // Keep browser requests on the page's origin, including LAN phone previews.
+    proxy: Object.fromEntries(
+      ["/api", "/trpc", "/health"].map((path) => [
+        path,
+        { target: previewHost ? "http://127.0.0.1:3003" : "http://127.0.0.1:3000", changeOrigin: true },
+      ]),
+    ),
   },
   resolve: {
     tsconfigPaths: true,

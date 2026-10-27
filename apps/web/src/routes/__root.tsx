@@ -132,7 +132,7 @@ function RootComponent() {
       </AppModeProvider>
         </LocaleProvider>
       </ThemeProvider>
-      {import.meta.env.DEV && (
+      {import.meta.env.DEV && import.meta.env.VITE_DEVTOOLS_ENABLED === "true" && (
         <>
           <TanStackRouterDevtools position="bottom-left" />
           <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />

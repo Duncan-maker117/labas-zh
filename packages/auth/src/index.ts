@@ -3,6 +3,7 @@ import * as schema from "@labas/db/schema/auth";
 import { env } from "@labas/env/server";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { getTrustedOrigins } from "./trusted-origins";
 
 export function createAuth() {
   const db = createDb();
@@ -13,7 +14,7 @@ export function createAuth() {
 
       schema: schema,
     }),
-    trustedOrigins: [env.CORS_ORIGIN],
+    trustedOrigins: getTrustedOrigins(env.CORS_ORIGIN, env.NODE_ENV),
     emailAndPassword: {
       enabled: true,
       disableSignUp: false,

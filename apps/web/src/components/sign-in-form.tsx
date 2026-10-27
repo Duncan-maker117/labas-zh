@@ -21,10 +21,16 @@ import Loader from "./loader";
 export default function SignInForm({ redirectTo }: { redirectTo?: string } = {}) {
   const destination = getLoginDestination(redirectTo);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const navigate = useNavigate({
     from: "/login",
   });
   const { isPending } = authClient.useSession();
+
+  const reportError = (message: string) => {
+    setSubmitError(message);
+    toast.error(uiMessage(message));
+  };
 
   const form = useForm({
     defaultValues: {
@@ -33,30 +39,40 @@ export default function SignInForm({ redirectTo }: { redirectTo?: string } = {})
       password: "",
     },
     onSubmit: async ({ value }) => {
-      if (isSignUp) {
-        await authClient.signUp.email({ name: value.name, email: value.email, password: value.password }, {
-          onSuccess: () => { navigate({ to: destination }); toast.success(uiMessage("注册成功")); },
-          onError: (error) => { toast.error(uiMessage(error.error.message || "注册失败")); },
-        });
-        return;
+      setSubmitError(null);
+      try {
+        if (isSignUp) {
+          await authClient.signUp.email({ name: value.name, email: value.email, password: value.password }, {
+            onSuccess: () => { navigate({ to: destination }); toast.success(uiMessage("注册成功")); },
+            onError: ({ error }) => {
+              reportError(error.status >= 500 ? "登录服务暂时不可用，请稍后重试。" : error.message || "注册失败");
+            },
+          });
+          return;
+        }
+        await authClient.signIn.email(
+          {
+            email: value.email,
+            password: value.password,
+          },
+          {
+            onSuccess: () => {
+              trackUmamiEvent(AnalyticsEvent.SIGN_IN);
+              navigate({ to: destination });
+              toast.success(uiMessage("登录成功"));
+            },
+            onError: ({ error }) => {
+              reportError(error.status >= 500
+                ? "登录服务暂时不可用，请稍后重试。"
+                : error.status === 401
+                  ? "邮箱或密码不正确，请重新输入。"
+                  : error.message || error.statusText || "登录失败");
+            },
+          },
+        );
+      } catch {
+        reportError("无法连接登录服务，请检查网络后重试。");
       }
-      await authClient.signIn.email(
-        {
-          email: value.email,
-          password: value.password,
-        },
-        {
-          onSuccess: () => {
-            trackUmamiEvent(AnalyticsEvent.SIGN_IN);
-            navigate({ to: destination });
-            toast.success(uiMessage("登录成功"));
-          },
-          onError: (error) => {
-            const msg = error.error.message || error.error.statusText;
-            toast.error(uiMessage(msg || "登录失败"));
-          },
-        },
-      );
     },
     validators: {
       onSubmit: z.object({
@@ -135,6 +151,7 @@ export default function SignInForm({ redirectTo }: { redirectTo?: string } = {})
             e.stopPropagation();
             form.handleSubmit();
           }}
+          aria-describedby={submitError ? "auth-submit-error" : undefined}
           className="space-y-4"
         >
           {isSignUp && <form.Field name="name">{(field) => <div className="space-y-2"><Label htmlFor={field.name}><LocalizedText source={"姓名"} /></Label><Input id={field.name} name={field.name} value={field.state.value} onChange={(event) => field.handleChange(event.target.value)} /></div>}</form.Field>}
@@ -193,6 +210,12 @@ export default function SignInForm({ redirectTo }: { redirectTo?: string } = {})
             </form.Field>
           </div>
 
+          {submitError && (
+            <p id="auth-submit-error" role="alert" className="text-red-500 text-sm">
+              <LocalizedValue value={submitError} />
+            </p>
+          )}
+
           <form.Subscribe
             selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
           >
@@ -203,7 +226,7 @@ export default function SignInForm({ redirectTo }: { redirectTo?: string } = {})
             )}
           </form.Subscribe>
         </form>
-        <p className="text-center text-sm text-muted-foreground"><LocalizedValue value={isSignUp ? "已有账号？" : "还没有账号？"} /><button type="button" className="ml-1 font-semibold text-primary underline-offset-4 hover:underline" onClick={() => setIsSignUp((current) => !current)}><LocalizedValue value={isSignUp ? "登录" : "创建账号"} /></button></p>
+        <p className="text-center text-sm text-muted-foreground"><LocalizedValue value={isSignUp ? "已有账号？" : "还没有账号？"} /><button type="button" className="ml-1 font-semibold text-primary underline-offset-4 hover:underline" onClick={() => { setSubmitError(null); setIsSignUp((current) => !current); }}><LocalizedValue value={isSignUp ? "登录" : "创建账号"} /></button></p>
       </CardContent>
     </Card>
   );

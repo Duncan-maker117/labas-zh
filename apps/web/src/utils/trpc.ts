@@ -1,7 +1,7 @@
 import { uiMessage } from "@/lib/locale";
 import { getErrorMessage } from "@/lib/error-utils";
 import type { AppRouter } from "@labas/api/routers/index";
-import { env } from "@labas/env/web";
+import { serverUrl } from "@/lib/server-url";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
@@ -31,7 +31,7 @@ export const queryClient = new QueryClient({
 export const trpcClient = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: `${env.VITE_SERVER_URL}/trpc`,
+      url: `${serverUrl}/trpc`,
       fetch(url, options) {
         return fetch(url, {
           ...options,
