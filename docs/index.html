@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DUNCAN 外语学习网站 | 静态预览</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f7f5ef;color:#252445;font:16px/1.6 system-ui,-apple-system,"Microsoft YaHei",sans-serif}header{max-width:1200px;margin:auto;padding:24px 20px 12px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.brand{font-size:1.3rem;font-weight:800;letter-spacing:.08em;color:#241165}.repo{color:#34237c}h1{font-size:clamp(1.6rem,4vw,2.5rem);margin:24px 0 8px}p{margin:8px 0}.note{background:#ece8fa;padding:12px 16px;border-radius:12px;color:#3c3470}nav{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}button{border:1px solid #d2cde5;background:#fff;color:#3c3470;border-radius:999px;padding:9px 17px;cursor:pointer;font:inherit}button[aria-pressed=true]{background:#29196b;color:#fff;border-color:#29196b}main{max-width:1200px;margin:0 auto;padding:0 20px 40px}figure{margin:0;background:white;border:1px solid #e4e0ee;border-radius:14px;overflow:hidden;box-shadow:0 12px 35px #30285c15}figure img{width:100%;height:auto;display:block}figcaption{padding:12px 16px;color:#625f73}footer{max-width:1200px;margin:auto;padding:0 20px 30px;color:#625f73;font-size:.9rem}a{color:#34237c}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top"><span class="brand">DUNCAN</span><a class="repo" href="https://github.com/Duncan-maker117/labas-zh">查看 GitHub 项目 →</a></div>
+    <h1>外语学习网站 · 界面预览</h1>
+    <p>从首页到学习概览，看看 DUNCAN 的页面设计。</p>
+    <p class="note"><strong>这是静态截图预览。</strong>可切换页面，但不能登录、做题或使用 AI；截图拍摄于 2026 年 10 月 24 日，可能与最新代码不同。</p>
+    <nav aria-label="选择预览页面">
+      <button type="button" aria-pressed="true" data-image="home.png" data-label="首页">首页</button>
+      <button type="button" aria-pressed="false" data-image="login.png" data-label="登录页">登录页</button>
+      <button type="button" aria-pressed="false" data-image="dashboard.png" data-label="学习概览">学习概览</button>
+      <button type="button" aria-pressed="false" data-image="mobile.png" data-label="手机首页">手机首页</button>
+    </nav>
+  </header>
+  <main><figure><img id="preview" src="home.png" alt="DUNCAN 首页预览"><figcaption id="caption">首页 · 本地页面截图</figcaption></figure></main>
+  <footer>学习概览使用隔离测试会话和空数据。实际操作需要在本地启动项目；<a href="https://github.com/Duncan-maker117/labas-zh/blob/main/README.md">查看运行说明和功能介绍</a>。</footer>
+  <script>
+    const preview = document.querySelector('#preview');
+    const caption = document.querySelector('#caption');
+    const buttons = document.querySelectorAll('nav button');
+    buttons.forEach(button => button.addEventListener('click', () => {
+      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      preview.src = button.dataset.image;
+      preview.alt = `DUNCAN ${button.dataset.label}预览`;
+      caption.textContent = `${button.dataset.label} · 本地页面截图`;
+    }));
+  </script>
+</body>
+</html>
